@@ -25,7 +25,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 2800,
     mrp: 5600,
-    images: [],
+    images: ["/products/pendant-14-indonesia-1.jpg","/products/pendant-14-indonesia-2.jpg"],
     tagline: "The Hanuman bead — fearlessness and divine protection.",
     description: "The 14-faced Rudraksha is traditionally associated with Lord Hanuman and the planet Saturn (Shani). A hand-selected Indonesia bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -48,7 +48,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 500,
     mrp: 1000,
-    images: [],
+    images: ["/products/pendant-7-nepal-1.jpg","/products/pendant-7-nepal-2.jpg"],
     tagline: "The Lakshmi bead — abundance and steady fortune.",
     description: "The 7-faced Rudraksha is traditionally associated with Goddess Mahalakshmi and the planet Saturn (Shani). A hand-selected Nepal bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -71,7 +71,7 @@ export const products: Product[] = [
     planet: "Jupiter (Guru)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-5-nepal-1.jpg","/products/pendant-5-nepal-2.jpg"],
     tagline: "The everyday bead — calm, clarity, a quieter mind.",
     description: "The 5-faced Rudraksha is traditionally associated with Kalagni Rudra and the planet Jupiter (Guru). A hand-selected Nepal bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -94,7 +94,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 1950,
     mrp: 3900,
-    images: [],
+    images: ["/products/pendant-gs-nepal-1.jpg","/products/pendant-gs-nepal-2.jpg"],
     tagline: "Two beads, naturally joined — union and harmony.",
     description: "Wooden Gauri Shankar Rudraksha Pendant with Silver Coated Capping and Lab Certificate (Dark Brown). Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -117,7 +117,7 @@ export const products: Product[] = [
     planet: "Sun (Surya)",
     price: 1450,
     mrp: 2900,
-    images: [],
+    images: ["/products/pendant-12-indonesia-1.jpg","/products/pendant-12-indonesia-2.jpg"],
     tagline: "The Sun bead — brilliance, leadership, solar strength.",
     description: "The 12-faced Rudraksha is traditionally associated with Lord Sun (Surya) and the planet Sun (Surya). A hand-selected Indonesia bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -140,7 +140,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 1000,
     mrp: 2000,
-    images: [],
+    images: ["/products/mala-7-mukhi-1.jpg"],
     tagline: "The Lakshmi mala — abundance and steady fortune.",
     description: "A 108 + 1 bead mala of 7-faced Rudraksha, associated with Goddess Mahalakshmi and the planet Saturn (Shani). Hand-knotted on red thread with a tassel. Made for japa and daily wear. Bead size approx. varies. Lab Certified and worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -186,7 +186,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 500,
     mrp: 1000,
-    images: [],
+    images: ["/products/pendant-3-nepal-1.jpg","/products/pendant-3-nepal-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected Nepal bead (approx. 15–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -209,7 +209,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 2850,
     mrp: 5700,
-    images: [],
+    images: ["/products/pendant-11-nepal-1.jpg","/products/pendant-11-nepal-2.jpg"],
     tagline: "The Indra bead — higher wisdom and intuitive power.",
     description: "The 11-faced Rudraksha is traditionally associated with Indra and the planet All planets. A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -232,7 +232,7 @@ export const products: Product[] = [
     planet: "Ketu",
     price: 400,
     mrp: 800,
-    images: [],
+    images: ["/products/pendant-9-indonesia-1.jpg","/products/pendant-9-indonesia-2.jpg"],
     tagline: "The Durga bead — energy, courage, protection.",
     description: "The 9-faced Rudraksha is traditionally associated with Goddess Durga and the planet Ketu. A hand-selected Indonesia bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -255,7 +255,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 400,
     mrp: 800,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Indonesia bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -301,7 +301,7 @@ export const products: Product[] = [
     planet: "Pacifies all planets",
     price: 2900,
     mrp: 5800,
-    images: [],
+    images: ["/products/pendant-10-nepal-1.jpg","/products/pendant-10-nepal-2.jpg"],
     tagline: "The Vishnu bead — a shield against negativity.",
     description: "The 10-faced Rudraksha is traditionally associated with Lord Vishnu and the planet Pacifies all planets. A hand-selected Nepal bead (approx. 18–22 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -347,7 +347,7 @@ export const products: Product[] = [
     planet: "Ketu",
     price: 2550,
     mrp: 5100,
-    images: [],
+    images: ["/products/pendant-9-nepal-1.jpg","/products/pendant-9-nepal-2.jpg"],
     tagline: "The Durga bead — energy, courage, protection.",
     description: "The 9-faced Rudraksha is traditionally associated with Goddess Durga and the planet Ketu. A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -370,7 +370,7 @@ export const products: Product[] = [
     planet: "Ketu",
     price: 1000,
     mrp: 2000,
-    images: [],
+    images: ["/products/mala-9-mukhi-1.jpg","/products/mala-9-mukhi-2.jpg"],
     tagline: "The Durga mala — energy, courage, protection.",
     description: "A 108 + 1 bead mala of 9-faced Rudraksha, associated with Goddess Durga and the planet Ketu. Hand-knotted on red thread with a tassel. Made for japa and daily wear. Bead size approx. varies. Lab Certified and worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -393,7 +393,7 @@ export const products: Product[] = [
     planet: "Pacifies all planets",
     price: 600,
     mrp: 1200,
-    images: [],
+    images: ["/products/pendant-10-indonesia-1.jpg","/products/pendant-10-indonesia-2.jpg"],
     tagline: "The Vishnu bead — a shield against negativity.",
     description: "The 10-faced Rudraksha is traditionally associated with Lord Vishnu and the planet Pacifies all planets. A hand-selected Indonesia bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -439,7 +439,7 @@ export const products: Product[] = [
     planet: "Mercury (Budha)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-4-nepal-1.jpg","/products/pendant-4-nepal-2.jpg"],
     tagline: "The Brahma bead — knowledge, clarity and sharper thought.",
     description: "The 4-faced Rudraksha is traditionally associated with Brahma and the planet Mercury (Budha). A hand-selected Nepal bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -462,7 +462,7 @@ export const products: Product[] = [
     planet: "Venus (Shukra)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-6-nepal-1.jpg","/products/pendant-6-nepal-2.jpg"],
     tagline: "For expression, charisma and grounded confidence.",
     description: "The 6-faced Rudraksha is traditionally associated with Kartikeya and the planet Venus (Shukra). A hand-selected Nepal bead (approx. ~18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -485,7 +485,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 4050,
     mrp: 8100,
-    images: [],
+    images: ["/products/pendant-gs-nepal-1.jpg","/products/pendant-gs-nepal-2.jpg"],
     tagline: "Two beads, naturally joined — union and harmony.",
     description: "Lab Certified Gauri Shankar Rudraksha Pendant, Nepal Originated Rudrakash. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -531,7 +531,7 @@ export const products: Product[] = [
     planet: "Jupiter (Guru)",
     price: 1400,
     mrp: 2800,
-    images: [],
+    images: ["/products/mala-5-mukhi-1.jpg"],
     tagline: "The everyday mala — calm, clarity, a quieter mind.",
     description: "A 108 + 1 bead mala of 5-faced Rudraksha, associated with Kalagni Rudra and the planet Jupiter (Guru). Hand-knotted on red thread with a tassel. Made for japa and daily wear. Bead size approx. 18–20 mm. Lab Certified and worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -577,7 +577,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 1800,
     mrp: 3600,
-    images: [],
+    images: ["/products/loose-gauri-1.jpg","/products/loose-gauri-2.jpg"],
     tagline: "Two beads, naturally joined — union and harmony.",
     description: "Lab Certified Gauri Shankar Rudraksha, Indonesia/Java Originated Rudrakash (Brown). Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -623,7 +623,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 2000,
     mrp: 4000,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -646,7 +646,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 1200,
     mrp: 2400,
-    images: [],
+    images: ["/products/pendant-11-nepal-1.jpg","/products/pendant-11-nepal-2.jpg"],
     tagline: "The Indra bead — higher wisdom and intuitive power.",
     description: "The 11-faced Rudraksha is traditionally associated with Indra and the planet All planets. A hand-selected Indonesia bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -692,7 +692,7 @@ export const products: Product[] = [
     planet: "Sun (Surya)",
     price: 1350,
     mrp: 2700,
-    images: [],
+    images: ["/products/pendant-12-indonesia-1.jpg","/products/pendant-12-indonesia-2.jpg"],
     tagline: "The Sun bead — brilliance, leadership, solar strength.",
     description: "The 12-faced Rudraksha is traditionally associated with Lord Sun (Surya) and the planet Sun (Surya). A hand-selected Indonesia bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -761,7 +761,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 1350,
     mrp: 2700,
-    images: [],
+    images: ["/products/combo-kaalsarp-1.jpg","/products/combo-kaalsarp-2.jpg"],
     tagline: "Eight, nine and ten — the Kaal Sarp Dosh combination.",
     description: "Certified Kaal Sarp Dosh Nivarak Rudraksha Combination of 8 Mukhi, 9 Mukhi and 10 Mukhi Rudrakash. Every bead in this combination is individually Lab Certified. The pendant is traditionally worn on the recommendation of astrologers and pandits as a specific remedial combination.",
     benefits: [
@@ -830,7 +830,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 2950,
     mrp: 5900,
-    images: [],
+    images: ["/products/loose-gauri-1.jpg","/products/loose-gauri-2.jpg"],
     tagline: "Two beads, naturally joined — union and harmony.",
     description: "Lab Certified Gauri Shankar Rudraksha, Nepal Originated Rudrakash. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -876,7 +876,7 @@ export const products: Product[] = [
     planet: "Ketu",
     price: 3500,
     mrp: 7000,
-    images: [],
+    images: ["/products/pendant-9-nepal-1.jpg","/products/pendant-9-nepal-2.jpg"],
     tagline: "The Durga bead — energy, courage, protection.",
     description: "The 9-faced Rudraksha is traditionally associated with Goddess Durga and the planet Ketu. A hand-selected Nepal bead (approx. 20–25 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -899,7 +899,7 @@ export const products: Product[] = [
     planet: "Ketu",
     price: 550,
     mrp: 1100,
-    images: [],
+    images: ["/products/pendant-9-indonesia-1.jpg","/products/pendant-9-indonesia-2.jpg"],
     tagline: "The Durga bead — energy, courage, protection.",
     description: "The 9-faced Rudraksha is traditionally associated with Goddess Durga and the planet Ketu. A hand-selected Indonesia bead (approx. 15–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -922,7 +922,7 @@ export const products: Product[] = [
     planet: "Mercury (Budha)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-4-nepal-1.jpg","/products/pendant-4-nepal-2.jpg"],
     tagline: "The Brahma bead — knowledge, clarity and sharper thought.",
     description: "The 4-faced Rudraksha is traditionally associated with Brahma and the planet Mercury (Budha). A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1014,7 +1014,7 @@ export const products: Product[] = [
     planet: "Sun (Surya)",
     price: 4350,
     mrp: 8700,
-    images: [],
+    images: ["/products/pendant-12-nepal-1.jpg","/products/pendant-12-nepal-2.jpg"],
     tagline: "The Sun bead — brilliance, leadership, solar strength.",
     description: "The 12-faced Rudraksha is traditionally associated with Lord Sun (Surya) and the planet Sun (Surya). A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1152,7 +1152,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 450,
     mrp: 900,
-    images: [],
+    images: ["/products/pendant-3-nepal-1.jpg","/products/pendant-3-nepal-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected Nepal bead (approx. 10–14 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1221,7 +1221,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 16500,
     mrp: 33000,
-    images: [],
+    images: ["/products/pendant-14-indonesia-1.jpg","/products/pendant-14-indonesia-2.jpg"],
     tagline: "The Hanuman bead — fearlessness and divine protection.",
     description: "The 14-faced Rudraksha is traditionally associated with Lord Hanuman and the planet Saturn (Shani). A hand-selected Nepal bead (approx. 20–25 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1267,7 +1267,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 15000,
     mrp: 30000,
-    images: [],
+    images: ["/products/pendant-14-indonesia-1.jpg","/products/pendant-14-indonesia-2.jpg"],
     tagline: "The Hanuman bead — fearlessness and divine protection.",
     description: "The 14-faced Rudraksha is traditionally associated with Lord Hanuman and the planet Saturn (Shani). A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1405,7 +1405,7 @@ export const products: Product[] = [
     planet: "Venus (Shukra)",
     price: 400,
     mrp: 800,
-    images: [],
+    images: ["/products/pendant-6-nepal-1.jpg","/products/pendant-6-nepal-2.jpg"],
     tagline: "For expression, charisma and grounded confidence.",
     description: "The 6-faced Rudraksha is traditionally associated with Kartikeya and the planet Venus (Shukra). A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1451,7 +1451,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 950,
     mrp: 1900,
-    images: [],
+    images: ["/products/mala-7-mukhi-1.jpg"],
     tagline: "The Lakshmi mala — abundance and steady fortune.",
     description: "A 108 + 1 bead mala of 7-faced Rudraksha, associated with Goddess Mahalakshmi and the planet Saturn (Shani). Hand-knotted on red thread with a tassel. Made for japa and daily wear. Bead size approx. varies. Lab Certified and worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1497,7 +1497,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 300,
     mrp: 600,
-    images: [],
+    images: ["/products/pendant-3-india-1.jpg","/products/pendant-3-india-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected India bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1543,7 +1543,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 3150,
     mrp: 6300,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Nepal bead (approx. 12–15 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1566,7 +1566,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 550,
     mrp: 1100,
-    images: [],
+    images: ["/products/pendant-ganesh-nepal-1.jpg","/products/pendant-ganesh-nepal-2.jpg"],
     tagline: "The Ganesh bead — obstacles cleared, auspicious beginnings.",
     description: "Lab Certified Ganesh Rudraksha Pendant, Size: 15-20mm (Nepali). Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1681,7 +1681,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 300,
     mrp: 600,
-    images: [],
+    images: ["/products/pendant-3-nepal-1.jpg","/products/pendant-3-nepal-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected Nepal bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1704,7 +1704,7 @@ export const products: Product[] = [
     planet: "Sun (Surya)",
     price: 4000,
     mrp: 8000,
-    images: [],
+    images: ["/products/pendant-12-nepal-1.jpg","/products/pendant-12-nepal-2.jpg"],
     tagline: "The Sun bead — brilliance, leadership, solar strength.",
     description: "The 12-faced Rudraksha is traditionally associated with Lord Sun (Surya) and the planet Sun (Surya). A hand-selected Nepal bead (approx. 18–22 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1773,7 +1773,7 @@ export const products: Product[] = [
     planet: "Sun (Surya)",
     price: 3750,
     mrp: 7500,
-    images: [],
+    images: ["/products/pendant-12-nepal-1.jpg","/products/pendant-12-nepal-2.jpg"],
     tagline: "The Sun bead — brilliance, leadership, solar strength.",
     description: "The 12-faced Rudraksha is traditionally associated with Lord Sun (Surya) and the planet Sun (Surya). A hand-selected Nepal bead (approx. 18–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1842,7 +1842,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 3500,
     mrp: 7000,
-    images: [],
+    images: ["/products/pendant-14-indonesia-1.jpg","/products/pendant-14-indonesia-2.jpg"],
     tagline: "The Hanuman bead — fearlessness and divine protection.",
     description: "The 14-faced Rudraksha is traditionally associated with Lord Hanuman and the planet Saturn (Shani). A hand-selected Indonesia bead (approx. 14–17 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -1865,7 +1865,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 1650,
     mrp: 3300,
-    images: [],
+    images: ["/products/pendant-11-nepal-1.jpg","/products/pendant-11-nepal-2.jpg"],
     tagline: "The Indra bead — higher wisdom and intuitive power.",
     description: "The 11-faced Rudraksha is traditionally associated with Indra and the planet All planets. A hand-selected Indonesia bead (approx. 10–14 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2026,7 +2026,7 @@ export const products: Product[] = [
     planet: "Moon (Chandra)",
     price: 5500,
     mrp: 11000,
-    images: [],
+    images: ["/products/pendant-2-india-1.jpg","/products/pendant-2-india-2.jpg"],
     tagline: "Two faces in one bead — balance and sacred union.",
     description: "The 2-faced Rudraksha is traditionally associated with Ardhanarishvara and the planet Moon (Chandra). A hand-selected Nepal bead (approx. 10–15 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2095,7 +2095,7 @@ export const products: Product[] = [
     planet: "Jupiter (Guru)",
     price: 300,
     mrp: 600,
-    images: [],
+    images: ["/products/pendant-5-nepal-1.jpg","/products/pendant-5-nepal-2.jpg"],
     tagline: "The everyday bead — calm, clarity, a quieter mind.",
     description: "The 5-faced Rudraksha is traditionally associated with Kalagni Rudra and the planet Jupiter (Guru). A hand-selected Nepal bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2256,7 +2256,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 500,
     mrp: 1000,
-    images: [],
+    images: ["/products/pendant-3-nepal-1.jpg","/products/pendant-3-nepal-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected Nepal bead (approx. 17–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2279,7 +2279,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 4000,
     mrp: 8000,
-    images: [],
+    images: ["/products/pendant-14-indonesia-1.jpg","/products/pendant-14-indonesia-2.jpg"],
     tagline: "The Hanuman bead — fearlessness and divine protection.",
     description: "The 14-faced Rudraksha is traditionally associated with Lord Hanuman and the planet Saturn (Shani). A hand-selected Indonesia bead (approx. 14–17 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2325,7 +2325,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 500,
     mrp: 1000,
-    images: [],
+    images: ["/products/pendant-3-nepal-1.jpg","/products/pendant-3-nepal-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected Nepal bead (approx. ~18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2371,7 +2371,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 1900,
     mrp: 3800,
-    images: [],
+    images: ["/products/loose-gauri-1.jpg","/products/loose-gauri-2.jpg"],
     tagline: "Two beads, naturally joined — union and harmony.",
     description: "Lab Certified Gauri Shankar Rudraksha, Indonesia/Java Originated Rudrakash (Brown). Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2394,7 +2394,7 @@ export const products: Product[] = [
     planet: "Moon (Chandra)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-2-india-1.jpg","/products/pendant-2-india-2.jpg"],
     tagline: "Two faces in one bead — balance and sacred union.",
     description: "The 2-faced Rudraksha is traditionally associated with Ardhanarishvara and the planet Moon (Chandra). A hand-selected India bead (approx. 15–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2440,7 +2440,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-7-nepal-1.jpg","/products/pendant-7-nepal-2.jpg"],
     tagline: "The Lakshmi bead — abundance and steady fortune.",
     description: "The 7-faced Rudraksha is traditionally associated with Goddess Mahalakshmi and the planet Saturn (Shani). A hand-selected Indonesia bead (approx. 15–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2555,7 +2555,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-7-nepal-1.jpg","/products/pendant-7-nepal-2.jpg"],
     tagline: "The Lakshmi bead — abundance and steady fortune.",
     description: "The 7-faced Rudraksha is traditionally associated with Goddess Mahalakshmi and the planet Saturn (Shani). A hand-selected Indonesia bead (approx. ~15 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2578,7 +2578,7 @@ export const products: Product[] = [
     planet: "Jupiter (Guru)",
     price: 250,
     mrp: 500,
-    images: [],
+    images: ["/products/loose-5-mukhi-1.jpg","/products/loose-5-mukhi-2.jpg"],
     tagline: "The everyday bead — calm, clarity, a quieter mind.",
     description: "A Nepal 5-faced Rudraksha bead associated with Kalagni Rudra and the planet Jupiter (Guru). Supplied loose — suitable for stringing, setting, or keeping in puja. Bead size approx. ~18 mm. Each bead is Lab Certified and worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2624,7 +2624,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 450,
     mrp: 900,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Indonesia bead (approx. 10–14 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2647,7 +2647,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 450,
     mrp: 900,
-    images: [],
+    images: ["/products/pendant-7-nepal-1.jpg","/products/pendant-7-nepal-2.jpg"],
     tagline: "The Lakshmi bead — abundance and steady fortune.",
     description: "The 7-faced Rudraksha is traditionally associated with Goddess Mahalakshmi and the planet Saturn (Shani). A hand-selected Indonesia bead (approx. 17–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2739,7 +2739,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 2700,
     mrp: 5400,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Nepal bead (approx. 18–22 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2762,7 +2762,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 2600,
     mrp: 5200,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2785,7 +2785,7 @@ export const products: Product[] = [
     planet: "Venus (Shukra)",
     price: 200,
     mrp: 400,
-    images: [],
+    images: ["/products/pendant-6-nepal-1.jpg","/products/pendant-6-nepal-2.jpg"],
     tagline: "For expression, charisma and grounded confidence.",
     description: "The 6-faced Rudraksha is traditionally associated with Kartikeya and the planet Venus (Shukra). A hand-selected Nepal bead (approx. 12–15 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -2877,7 +2877,7 @@ export const products: Product[] = [
     planet: "Ketu",
     price: 2500,
     mrp: 5000,
-    images: [],
+    images: ["/products/pendant-9-nepal-1.jpg","/products/pendant-9-nepal-2.jpg"],
     tagline: "The Durga bead — energy, courage, protection.",
     description: "The 9-faced Rudraksha is traditionally associated with Goddess Durga and the planet Ketu. A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3038,7 +3038,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 2000,
     mrp: 4000,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Nepal bead (approx. 12–15 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3130,7 +3130,7 @@ export const products: Product[] = [
     planet: "Pacifies all planets",
     price: 900,
     mrp: 1800,
-    images: [],
+    images: ["/products/pendant-10-indonesia-1.jpg","/products/pendant-10-indonesia-2.jpg"],
     tagline: "The Vishnu bead — a shield against negativity.",
     description: "The 10-faced Rudraksha is traditionally associated with Lord Vishnu and the planet Pacifies all planets. A hand-selected Indonesia bead (approx. 17–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3153,7 +3153,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-7-nepal-1.jpg","/products/pendant-7-nepal-2.jpg"],
     tagline: "The Lakshmi bead — abundance and steady fortune.",
     description: "The 7-faced Rudraksha is traditionally associated with Goddess Mahalakshmi and the planet Saturn (Shani). A hand-selected Nepal bead (approx. 10–15 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3176,7 +3176,7 @@ export const products: Product[] = [
     planet: "Jupiter (Guru)",
     price: 200,
     mrp: 400,
-    images: [],
+    images: ["/products/pendant-5-nepal-1.jpg","/products/pendant-5-nepal-2.jpg"],
     tagline: "The everyday bead — calm, clarity, a quieter mind.",
     description: "The 5-faced Rudraksha is traditionally associated with Kalagni Rudra and the planet Jupiter (Guru). A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3199,7 +3199,7 @@ export const products: Product[] = [
     planet: "Pacifies all planets",
     price: 850,
     mrp: 1700,
-    images: [],
+    images: ["/products/pendant-10-nepal-1.jpg","/products/pendant-10-nepal-2.jpg"],
     tagline: "The Vishnu bead — a shield against negativity.",
     description: "The 10-faced Rudraksha is traditionally associated with Lord Vishnu and the planet Pacifies all planets. A hand-selected Nepal bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3222,7 +3222,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 1600,
     mrp: 3200,
-    images: [],
+    images: ["/products/pendant-11-nepal-1.jpg","/products/pendant-11-nepal-2.jpg"],
     tagline: "The Indra bead — higher wisdom and intuitive power.",
     description: "The 11-faced Rudraksha is traditionally associated with Indra and the planet All planets. A hand-selected Indonesia bead (approx. 17–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3268,7 +3268,7 @@ export const products: Product[] = [
     planet: "Venus (Shukra)",
     price: 400,
     mrp: 800,
-    images: [],
+    images: ["/products/pendant-6-nepal-1.jpg","/products/pendant-6-nepal-2.jpg"],
     tagline: "For expression, charisma and grounded confidence.",
     description: "The 6-faced Rudraksha is traditionally associated with Kartikeya and the planet Venus (Shukra). A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3291,7 +3291,7 @@ export const products: Product[] = [
     planet: "All planets",
     price: 1500,
     mrp: 3000,
-    images: [],
+    images: ["/products/pendant-11-nepal-1.jpg","/products/pendant-11-nepal-2.jpg"],
     tagline: "The Indra bead — higher wisdom and intuitive power.",
     description: "The 11-faced Rudraksha is traditionally associated with Indra and the planet All planets. A hand-selected Indonesia bead (approx. 17–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3314,7 +3314,7 @@ export const products: Product[] = [
     planet: "Sun (Surya)",
     price: 1500,
     mrp: 3000,
-    images: [],
+    images: ["/products/pendant-12-indonesia-1.jpg","/products/pendant-12-indonesia-2.jpg"],
     tagline: "The Sun bead — brilliance, leadership, solar strength.",
     description: "The 12-faced Rudraksha is traditionally associated with Lord Sun (Surya) and the planet Sun (Surya). A hand-selected Indonesia bead (approx. 17–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3337,7 +3337,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 450,
     mrp: 900,
-    images: [],
+    images: ["/products/pendant-7-nepal-1.jpg","/products/pendant-7-nepal-2.jpg"],
     tagline: "The Lakshmi bead — abundance and steady fortune.",
     description: "The 7-faced Rudraksha is traditionally associated with Goddess Mahalakshmi and the planet Saturn (Shani). A hand-selected Indonesia bead (approx. 14–17 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3360,7 +3360,7 @@ export const products: Product[] = [
     planet: "Saturn (Shani)",
     price: 700,
     mrp: 1400,
-    images: [],
+    images: ["/products/pendant-7-nepal-1.jpg","/products/pendant-7-nepal-2.jpg"],
     tagline: "The Lakshmi bead — abundance and steady fortune.",
     description: "The 7-faced Rudraksha is traditionally associated with Goddess Mahalakshmi and the planet Saturn (Shani). A hand-selected Nepal bead (approx. 12–15 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3406,7 +3406,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 700,
     mrp: 1400,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Indonesia bead (approx. 18–22 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3452,7 +3452,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 600,
     mrp: 1200,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Indonesia bead (approx. 17–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3613,7 +3613,7 @@ export const products: Product[] = [
     planet: "Pacifies all planets",
     price: 500,
     mrp: 1000,
-    images: [],
+    images: ["/products/pendant-10-indonesia-1.jpg","/products/pendant-10-indonesia-2.jpg"],
     tagline: "The Vishnu bead — a shield against negativity.",
     description: "The 10-faced Rudraksha is traditionally associated with Lord Vishnu and the planet Pacifies all planets. A hand-selected Indonesia bead (approx. 15–20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3636,7 +3636,7 @@ export const products: Product[] = [
     planet: "Jupiter (Guru)",
     price: 500,
     mrp: 1000,
-    images: [],
+    images: ["/products/pendant-5-nepal-1.jpg","/products/pendant-5-nepal-2.jpg"],
     tagline: "The everyday bead — calm, clarity, a quieter mind.",
     description: "The 5-faced Rudraksha is traditionally associated with Kalagni Rudra and the planet Jupiter (Guru). A hand-selected Nepal bead (approx. ~20 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3659,7 +3659,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 450,
     mrp: 900,
-    images: [],
+    images: ["/products/pendant-3-nepal-1.jpg","/products/pendant-3-nepal-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected Nepal bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3728,7 +3728,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 250,
     mrp: 500,
-    images: [],
+    images: ["/products/pendant-3-india-1.jpg","/products/pendant-3-india-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected India bead (approx. 18–22 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3751,7 +3751,7 @@ export const products: Product[] = [
     planet: "Jupiter (Guru)",
     price: 550,
     mrp: 1100,
-    images: [],
+    images: ["/products/loose-5-mukhi-1.jpg","/products/loose-5-mukhi-2.jpg"],
     tagline: "The everyday bead — calm, clarity, a quieter mind.",
     description: "A Nepal 5-faced Rudraksha bead associated with Kalagni Rudra and the planet Jupiter (Guru). Supplied loose — suitable for stringing, setting, or keeping in puja. Bead size approx. 15–18 mm. Each bead is Lab Certified and worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3797,7 +3797,7 @@ export const products: Product[] = [
     planet: "Rahu",
     price: 500,
     mrp: 1000,
-    images: [],
+    images: ["/products/pendant-8-nepal-1.jpg","/products/pendant-8-nepal-2.jpg"],
     tagline: "The Ganesha bead — obstacles removed, wisdom revealed.",
     description: "The 8-faced Rudraksha is traditionally associated with Lord Ganesha and the planet Rahu. A hand-selected Indonesia bead (approx. 14–17 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3820,7 +3820,7 @@ export const products: Product[] = [
     planet: "Moon (Chandra)",
     price: 450,
     mrp: 900,
-    images: [],
+    images: ["/products/pendant-2-india-1.jpg","/products/pendant-2-india-2.jpg"],
     tagline: "Two faces in one bead — balance and sacred union.",
     description: "The 2-faced Rudraksha is traditionally associated with Ardhanarishvara and the planet Moon (Chandra). A hand-selected India bead (approx. varies) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3866,7 +3866,7 @@ export const products: Product[] = [
     planet: "Mars (Mangal)",
     price: 400,
     mrp: 800,
-    images: [],
+    images: ["/products/pendant-3-nepal-1.jpg","/products/pendant-3-nepal-2.jpg"],
     tagline: "The Agni bead — a fresh start, a lighter past.",
     description: "The 3-faced Rudraksha is traditionally associated with Agni (Lord of Fire) and the planet Mars (Mangal). A hand-selected Nepal bead (approx. 10–14 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -3981,7 +3981,7 @@ export const products: Product[] = [
     planet: "Moon (Chandra)",
     price: 400,
     mrp: 800,
-    images: [],
+    images: ["/products/pendant-2-india-1.jpg","/products/pendant-2-india-2.jpg"],
     tagline: "Two faces in one bead — balance and sacred union.",
     description: "The 2-faced Rudraksha is traditionally associated with Ardhanarishvara and the planet Moon (Chandra). A hand-selected India bead (approx. 20–25 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
@@ -4004,7 +4004,7 @@ export const products: Product[] = [
     planet: "Venus (Shukra)",
     price: 350,
     mrp: 700,
-    images: [],
+    images: ["/products/pendant-6-nepal-1.jpg","/products/pendant-6-nepal-2.jpg"],
     tagline: "For expression, charisma and grounded confidence.",
     description: "The 6-faced Rudraksha is traditionally associated with Kartikeya and the planet Venus (Shukra). A hand-selected Nepal bead (approx. 15–18 mm) set in a hand-finished silver capping on red thread. Lab Certified and traditionally worn on the recommendation of astrologers and pandits.",
     benefits: [
