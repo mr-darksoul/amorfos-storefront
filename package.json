@@ -6,7 +6,8 @@
     "dev": "NODE_OPTIONS=--no-experimental-webstorage next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "tsx scripts/seed-products.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",
@@ -22,6 +23,7 @@
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "tailwindcss": "^4.1.8",
+    "tsx": "^4.22.4",
     "typescript": "^5.8.3"
   }
 }

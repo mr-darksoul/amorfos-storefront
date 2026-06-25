@@ -22,7 +22,9 @@ export async function getAdminProduct(id: string): Promise<Product | undefined> 
     .select("data")
     .eq("id", id)
     .single();
-  if (error || !data) return undefined;
+  // Mirror getAdminProducts: fall back to the hardcoded catalog when the
+  // Supabase row is missing, so the listing and detail page stay in sync.
+  if (error || !data) return hardcoded.find((p) => p.id === id);
   return data.data as Product;
 }
 

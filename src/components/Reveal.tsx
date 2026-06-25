@@ -19,6 +19,14 @@ export default function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Reveal immediately if the element is already in view on mount (e.g. the
+    // above-the-fold hero, or a page opened in a background tab where the
+    // IntersectionObserver is throttled until the tab becomes visible).
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      setVisible(true);
+      return;
+    }
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

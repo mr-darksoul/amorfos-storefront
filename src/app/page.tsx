@@ -29,7 +29,8 @@ export default async function Home() {
   const products = await getAdminProducts();
   const heroProduct =
     products.find((p) => p.id === "5-mukhi-rudraksha-mala-nepal") ?? products[0];
-  const bestsellers = products.filter((p) => p.bestseller).slice(0, 4);
+  const flagged = products.filter((p) => p.bestseller);
+  const bestsellers = (flagged.length ? flagged : products).slice(0, 4);
 
   return (
     <>
