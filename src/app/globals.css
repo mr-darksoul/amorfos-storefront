@@ -1,0 +1,152 @@
+@import "tailwindcss";
+
+/* ──────────────────────────────────────────────────────────────
+   Amorfos — design tokens
+   A warm, light, considered palette. Parchment-ivory grounds,
+   espresso type, a single deep antique-gold accent, and the
+   rudraksha browns of the product itself. (à la Forest Essentials.)
+
+   Naming note: the "ink" family is the page's GROUND (now light),
+   the "bone" family is the FOREGROUND text (now dark). The "dark"
+   and "cream" tokens are for the few chips/gradients that sit on
+   top of product photography and must stay dark with light text.
+   ────────────────────────────────────────────────────────────── */
+@theme {
+  --color-ink: #f6f1e7;          /* warm ivory — primary background */
+  --color-ink-raised: #efe7d5;   /* raised surfaces, bands, inputs */
+  --color-ink-soft: #e7dcc6;     /* hover / inset / track */
+  --color-bone: #221b12;         /* primary text (espresso) */
+  --color-bone-dim: #5d5340;     /* secondary text */
+  --color-bone-faint: #8a7d66;   /* tertiary / captions */
+  --color-gold: #97712f;         /* deep antique gold accent */
+  --color-gold-soft: #b08a3f;    /* brighter gold for emphasis */
+  --color-gold-deep: #6f521f;
+  --color-rudra: #7a4326;        /* rudraksha brown */
+  --color-dark: #221b12;         /* dark chips / gradients over imagery */
+  --color-cream: #f6f1e7;        /* light text on dark chips */
+  --color-line: rgba(34, 27, 18, 0.14);
+  --color-line-strong: rgba(34, 27, 18, 0.26);
+
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 18px 50px -24px rgba(74, 52, 24, 0.28);
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+* {
+  border-color: var(--color-line);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv01";
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-cream);
+}
+
+/* Thin, brand-tinted scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-ink-raised); }
+::-webkit-scrollbar-thumb {
+  background: #d3c5a9;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--color-gold); }
+
+/* ── Type helpers ─────────────────────────────────────────────── */
+.font-serif { font-family: var(--font-serif); }
+
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--color-gold);
+}
+
+.display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+}
+
+/* The calligraphic logo is black artwork on an opaque white field.
+   Invert it (white field -> black, script -> white), then `screen` blends
+   the now-black field away against the dark page, leaving a clean wordmark. */
+.logo-invert {
+  filter: invert(1) brightness(1.7);
+  mix-blend-mode: screen;
+}
+
+/* ── Reveal-on-scroll ─────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.95rem 1.9rem;
+  border-radius: 2px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--color-gold);
+  color: var(--color-cream);
+}
+.btn-primary:hover { background: var(--color-gold-deep); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-outline {
+  border: 1px solid var(--color-line-strong);
+  color: var(--color-bone);
+  background: transparent;
+}
+.btn-outline:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+/* Subtle film-grain layer for depth on flat dark fields */
+.grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
