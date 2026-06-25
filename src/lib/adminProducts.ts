@@ -1,35 +1,29 @@
 import { products as hardcoded } from "./products";
+import { supabase, isSupabaseConfigured } from "./supabase";
 import type { Product } from "./types";
 
-const BLOB_PATH = "amorfos-products.json";
-
-function hasBlob(): boolean {
-  return !!process.env.BLOB_READ_WRITE_TOKEN;
-}
-
-async function fetchFromBlob(): Promise<Product[] | null> {
-  if (!hasBlob()) return null;
-  try {
-    const { list } = await import("@vercel/blob");
-    const { blobs } = await list({ prefix: BLOB_PATH });
-    const blob = blobs.find((b) => b.pathname === BLOB_PATH);
-    if (!blob) return null;
-    const res = await fetch(blob.url, { cache: "no-store" });
-    if (!res.ok) return null;
-    return (await res.json()) as Product[];
-  } catch {
-    return null;
-  }
-}
+// ── Read ─────────────────────────────────────────────────────────
 
 export async function getAdminProducts(): Promise<Product[]> {
-  const blobProducts = await fetchFromBlob();
-  return blobProducts ?? hardcoded;
+  if (!isSupabaseConfigured()) return hardcoded;
+  const { data, error } = await supabase()
+    .from("products")
+    .select("data")
+    .eq("active", true)
+    .order("created_at", { ascending: true });
+  if (error || !data || data.length === 0) return hardcoded;
+  return data.map((row) => row.data as Product);
 }
 
 export async function getAdminProduct(id: string): Promise<Product | undefined> {
-  const list = await getAdminProducts();
-  return list.find((p) => p.id === id);
+  if (!isSupabaseConfigured()) return hardcoded.find((p) => p.id === id);
+  const { data, error } = await supabase()
+    .from("products")
+    .select("data")
+    .eq("id", id)
+    .single();
+  if (error || !data) return undefined;
+  return data.data as Product;
 }
 
 export async function getAdminRelated(product: Product, limit = 3): Promise<Product[]> {
@@ -39,38 +33,45 @@ export async function getAdminRelated(product: Product, limit = 3): Promise<Prod
   return [...sameCat, ...others].slice(0, limit);
 }
 
-export async function saveAdminProducts(products: Product[]): Promise<void> {
-  if (!hasBlob()) {
-    throw new Error("BLOB_READ_WRITE_TOKEN is not configured. Set it in your environment variables.");
-  }
-  const { put } = await import("@vercel/blob");
-  await put(BLOB_PATH, JSON.stringify(products, null, 2), {
-    access: "public",
-    contentType: "application/json",
-    addRandomSuffix: false,
-  });
-}
+// ── Write ────────────────────────────────────────────────────────
 
 export async function addAdminProduct(product: Product): Promise<void> {
-  const list = await getAdminProducts();
-  if (list.some((p) => p.id === product.id)) {
-    throw new Error(`Product with id "${product.id}" already exists.`);
+  if (!isSupabaseConfigured()) {
+    throw new Error("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not configured.");
   }
-  await saveAdminProducts([...list, product]);
+  const { error } = await supabase()
+    .from("products")
+    .insert({ id: product.id, data: product });
+  if (error) throw new Error(error.message);
 }
 
 export async function updateAdminProduct(id: string, updates: Product): Promise<void> {
-  const list = await getAdminProducts();
-  const idx = list.findIndex((p) => p.id === id);
-  if (idx === -1) throw new Error(`Product "${id}" not found.`);
-  const next = [...list];
-  next[idx] = updates;
-  await saveAdminProducts(next);
+  if (!isSupabaseConfigured()) {
+    throw new Error("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not configured.");
+  }
+  const { error } = await supabase()
+    .from("products")
+    .update({ data: updates, updated_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw new Error(error.message);
 }
 
 export async function deleteAdminProduct(id: string): Promise<void> {
-  const list = await getAdminProducts();
-  const next = list.filter((p) => p.id !== id);
-  if (next.length === list.length) throw new Error(`Product "${id}" not found.`);
-  await saveAdminProducts(next);
+  if (!isSupabaseConfigured()) {
+    throw new Error("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not configured.");
+  }
+  const { error } = await supabase().from("products").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+// kept for back-compat — used by some admin API routes
+export async function saveAdminProducts(products: Product[]): Promise<void> {
+  if (!isSupabaseConfigured()) {
+    throw new Error("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not configured.");
+  }
+  const rows = products.map((p) => ({ id: p.id, data: p }));
+  const { error } = await supabase()
+    .from("products")
+    .upsert(rows, { onConflict: "id" });
+  if (error) throw new Error(error.message);
 }

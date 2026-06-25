@@ -2,15 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { useCheckout } from "@/lib/useCheckout";
 import { inr } from "@/lib/format";
 import { site } from "@/lib/site";
 import { CloseIcon, MinusIcon, PlusIcon, ArrowIcon } from "./icons";
 
 export default function CartDrawer() {
   const { items, isOpen, close, subtotal, setQty, remove, count } = useCart();
-  const { checkout, loading, error } = useCheckout();
+  const router = useRouter();
 
   const remaining = site.freeShippingThreshold - subtotal;
   const freeShip = remaining <= 0;
@@ -154,17 +154,12 @@ export default function CartDrawer() {
               {freeShip ? "Shipping is free." : "Shipping calculated at checkout."} Taxes included.
             </p>
 
-            {error && (
-              <p className="mb-3 rounded bg-rudra/20 px-3 py-2 text-xs text-gold-soft">{error}</p>
-            )}
-
             <button
-              onClick={checkout}
-              disabled={loading}
+              onClick={() => { close(); router.push("/checkout"); }}
               className="btn btn-primary w-full"
             >
-              {loading ? "Starting checkout…" : "Checkout"}
-              {!loading && <ArrowIcon className="size-4" />}
+              Checkout
+              <ArrowIcon className="size-4" />
             </button>
             <p className="mt-3 text-center text-[0.65rem] tracking-wide text-bone-faint">
               Secure payments via Razorpay · UPI · Cards · Netbanking

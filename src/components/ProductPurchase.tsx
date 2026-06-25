@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { useCheckout } from "@/lib/useCheckout";
 import type { Product } from "@/lib/types";
 import { MinusIcon, PlusIcon, CheckIcon } from "./icons";
 
 export default function ProductPurchase({ product }: { product: Product }) {
-  const { add, open } = useCart();
-  const { checkout, loading } = useCheckout();
+  const { add } = useCart();
+  const router = useRouter();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -18,10 +18,9 @@ export default function ProductPurchase({ product }: { product: Product }) {
     setTimeout(() => setAdded(false), 1800);
   };
 
-  const handleBuyNow = async () => {
+  const handleBuyNow = () => {
     add(product.id, qty);
-    open();
-    await checkout();
+    router.push("/checkout");
   };
 
   return (
@@ -58,10 +57,9 @@ export default function ProductPurchase({ product }: { product: Product }) {
 
       <button
         onClick={handleBuyNow}
-        disabled={loading}
         className="btn btn-primary mt-3 w-full"
       >
-        {loading ? "Starting checkout…" : "Buy it now"}
+        Buy it now
       </button>
 
       <p className="mt-4 text-center text-[0.7rem] tracking-wide text-bone-faint">

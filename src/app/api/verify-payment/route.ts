@@ -1,14 +1,9 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
-/**
- * Verifies a Razorpay payment signature after the modal succeeds.
- * Razorpay signs `${order_id}|${payment_id}` with your key secret;
- * we recompute the HMAC and compare. This is what proves the payment
- * is genuine before we treat the order as paid.
- */
 export async function POST(req: Request) {
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
   if (!keySecret || keySecret.includes("REPLACE_ME")) {
@@ -41,15 +36,28 @@ export async function POST(req: Request) {
 
   const verified =
     expected.length === razorpay_signature.length &&
-    crypto.timingSafeEqual(
-      Buffer.from(expected),
-      Buffer.from(razorpay_signature),
-    );
+    crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(razorpay_signature));
 
   if (!verified) {
+    if (isSupabaseConfigured()) {
+      await supabase()
+        .from("orders")
+        .update({ status: "failed" })
+        .eq("razorpay_order_id", razorpay_order_id);
+    }
     return NextResponse.json({ verified: false }, { status: 400 });
   }
 
-  // In production you'd persist the order + mark it paid here.
+  if (isSupabaseConfigured()) {
+    await supabase()
+      .from("orders")
+      .update({
+        status: "paid",
+        razorpay_payment_id,
+        paid_at: new Date().toISOString(),
+      })
+      .eq("razorpay_order_id", razorpay_order_id);
+  }
+
   return NextResponse.json({ verified: true, paymentId: razorpay_payment_id });
 }
