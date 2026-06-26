@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 const MAX_SCALE = 4;
 const MIN_SCALE = 1;
@@ -161,12 +162,14 @@ export default function ImageLightbox({
     else setScale(DOUBLE_TAP_SCALE);
   };
 
-  return (
+  // Portal to <body> so the overlay escapes the gallery's stacking context
+  // and renders above the sticky site header (z-50).
+  return createPortal(
     <div
       role="dialog"
       aria-modal="true"
       aria-label={`${name} — image viewer`}
-      className="fixed inset-0 z-[60] flex flex-col bg-dark/95 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex flex-col bg-dark/95 backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -245,7 +248,8 @@ export default function ImageLightbox({
           ))}
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
 
