@@ -43,3 +43,38 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_status      text NOT NUL
 -- fulfillment_status: unfulfilled | synced | processing | shipped | out_for_delivery | delivered | failed
 
 CREATE INDEX IF NOT EXISTS orders_awb_idx ON orders (shiprocket_awb);
+
+-- ── Row Level Security + inventory (migration 002) ─────────────────────────
+-- See supabase/migrations/002_rls_and_stock.sql for the rationale. Included
+-- here so a fresh install is locked down and stock-aware out of the box.
+ALTER TABLE orders   ENABLE ROW LEVEL SECURITY;
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders   FORCE ROW LEVEL SECURITY;
+ALTER TABLE products FORCE ROW LEVEL SECURITY;
+
+CREATE OR REPLACE FUNCTION decrement_stock(p_items jsonb)
+RETURNS void
+LANGUAGE plpgsql
+SET search_path = ''
+AS $$
+DECLARE
+  item jsonb;
+BEGIN
+  FOR item IN SELECT * FROM jsonb_array_elements(p_items)
+  LOOP
+    UPDATE public.products
+    SET data = jsonb_set(
+      data,
+      '{stock}',
+      to_jsonb(
+        GREATEST(
+          COALESCE((data->>'stock')::int, 0) - COALESCE((item->>'qty')::int, 0),
+          0
+        )
+      )
+    )
+    WHERE id = (item->>'id')
+      AND (data->>'stock') IS NOT NULL;
+  END LOOP;
+END;
+$$;

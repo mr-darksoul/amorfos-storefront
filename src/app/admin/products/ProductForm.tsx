@@ -47,6 +47,7 @@ const EMPTY: Omit<Product, "id"> = {
   benefits: [""],
   bestseller: false,
   newArrival: false,
+  stock: null, // untracked by default (always available)
 };
 
 interface Props {
@@ -365,6 +366,22 @@ export default function ProductForm({ initial, mode }: Props) {
             />
           </Field>
         </div>
+
+        <Field
+          label="Stock"
+          hint="Leave blank for untracked (always available). Set a number to track inventory — 0 shows the product as Sold out and blocks checkout."
+        >
+          <input
+            type="number"
+            value={form.stock ?? ""}
+            onChange={(e) =>
+              set("stock", e.target.value === "" ? null : Number(e.target.value))
+            }
+            min={0}
+            placeholder="Untracked"
+            className={inputCls}
+          />
+        </Field>
       </section>
 
       {/* Images */}

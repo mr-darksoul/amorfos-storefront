@@ -45,20 +45,36 @@ export async function POST(req: Request) {
       await supabase()
         .from("orders")
         .update({ status: "failed" })
-        .eq("razorpay_order_id", razorpay_order_id);
+        // Only a still-pending order may be flipped to failed. Without this an
+        // unauthenticated request carrying a real order id + junk signature
+        // could mark an already-paid order failed.
+        .eq("razorpay_order_id", razorpay_order_id)
+        .eq("status", "pending");
     }
     return NextResponse.json({ verified: false }, { status: 400 });
   }
 
   if (isSupabaseConfigured()) {
-    await supabase()
+    const { data: paidRows } = await supabase()
       .from("orders")
       .update({
         status: "paid",
         razorpay_payment_id,
         paid_at: new Date().toISOString(),
       })
-      .eq("razorpay_order_id", razorpay_order_id);
+      .eq("razorpay_order_id", razorpay_order_id)
+      .select("id");
+
+    // A verified payment with no matching order row is a critical data gap:
+    // the customer was charged but we have nothing to fulfill. We can't
+    // reconstruct the order here (no items/customer), so log loudly for manual
+    // recovery — but still confirm to the customer, since the payment is real.
+    if (!paidRows || paidRows.length === 0) {
+      console.error(
+        `[verify-payment] CRITICAL: verified payment ${razorpay_payment_id} ` +
+          `for order ${razorpay_order_id} matched no DB row — manual recovery needed.`,
+      );
+    }
 
     // Run after the response is sent, but keep the serverless function alive
     // until it completes (plain fire-and-forget is killed on Vercel once the
@@ -72,6 +88,16 @@ export async function POST(req: Request) {
           .single();
 
         if (!order) return;
+
+        // Decrement inventory for stock-tracked products. The SQL function
+        // clamps at 0 and ignores products that don't track stock, so this is
+        // safe to call for every order. Errors are non-fatal.
+        const { error: stockErr } = await supabase().rpc("decrement_stock", {
+          p_items: order.items,
+        });
+        if (stockErr) {
+          console.error("[post-payment] stock decrement failed:", stockErr);
+        }
 
         // Send notifications (non-blocking on Shiprocket)
         await Promise.allSettled([

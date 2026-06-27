@@ -1,0 +1,46 @@
+/**
+ * Tiny in-memory, fixed-window rate limiter.
+ *
+ * NOTE: state lives in the module scope of a single serverless instance, so the
+ * limit is per-warm-instance, not strictly global across the fleet. That is good
+ * enough to blunt brute-force / enumeration from a single client; a distributed
+ * limiter (e.g. Upstash) would be the upgrade if abuse becomes a real problem.
+ */
+
+type Bucket = { count: number; resetAt: number };
+
+const buckets = new Map<string, Bucket>();
+
+export interface RateLimitResult {
+  ok: boolean;
+  /** Seconds until the window resets (only meaningful when !ok). */
+  retryAfter: number;
+}
+
+export function rateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+): RateLimitResult {
+  const now = Date.now();
+  const bucket = buckets.get(key);
+
+  if (!bucket || bucket.resetAt <= now) {
+    buckets.set(key, { count: 1, resetAt: now + windowMs });
+    return { ok: true, retryAfter: 0 };
+  }
+
+  if (bucket.count >= limit) {
+    return { ok: false, retryAfter: Math.ceil((bucket.resetAt - now) / 1000) };
+  }
+
+  bucket.count += 1;
+  return { ok: true, retryAfter: 0 };
+}
+
+/** Best-effort client IP from the proxy headers Vercel sets. */
+export function clientIp(req: Request): string {
+  const xff = req.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0]!.trim();
+  return req.headers.get("x-real-ip") || "unknown";
+}

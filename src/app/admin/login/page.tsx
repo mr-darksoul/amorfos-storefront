@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Metadata } from "next";
 
 export default function AdminLoginPage() {
   const router = useRouter();

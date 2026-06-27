@@ -159,7 +159,17 @@ All env vars are set in Vercel production:
   Add photos before promoting the store widely.
 - No order-placement email/SMS (Shiprocket notify covers *shipping* events only).
 - No COD (checkout is prepaid Razorpay only).
-- No product search, inventory/stock tracking, analytics pixel.
+- No product search, analytics pixel.
 - No admin UI to retry a failed Shiprocket sync (manual DB fix needed if `after()` errors).
+
+**Inventory (added):** opt-in per product via `Product.stock` (`undefined`/`null`
+= untracked/unlimited; a number = tracked, `0` = sold out). Set it in the admin
+product form. Checkout (`api/create-order`) rejects qty over stock; confirmed
+payments decrement atomically via the `decrement_stock` Postgres function
+(`supabase/migrations/002_rls_and_stock.sql`). Sold-out shows on cards + PDP and
+sets `OutOfStock` in JSON-LD. Note: stock is reserved on *payment*, not at cart
+add, so a tiny oversell window remains under simultaneous checkouts — fine for
+low-volume one-of-a-kind beads. **Run migration 002 in Supabase** (it also turns
+on RLS) before relying on this in production.
 
 See setup/deploy details in `README.md`.

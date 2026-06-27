@@ -20,7 +20,13 @@ export interface SupabaseOrder {
     state?: string;
     pincode?: string;
   };
-  items: { id: string; name: string; qty: number; price: number }[];
+  items: {
+    id: string;
+    name: string;
+    qty: number;
+    price: number;
+    category?: string;
+  }[];
   paid_at: string | null;
   shiprocket_shipment_id?: string | null;
   shiprocket_awb?: string | null;
@@ -47,6 +53,8 @@ const WEIGHT_KG: Record<string, number> = {
   loose: 0.1,
 };
 
+// Fallback only — used for legacy orders persisted before line items carried a
+// category. New orders store item.category directly (see api/create-order).
 function inferCategory(productId: string): string {
   if (productId.includes("mala")) return "mala";
   if (productId.includes("combination") || productId.includes("combo")) return "combination";
@@ -56,7 +64,7 @@ function inferCategory(productId: string): string {
 
 function totalWeightKg(items: SupabaseOrder["items"]): number {
   const weight = items.reduce((sum, item) => {
-    const cat = inferCategory(item.id);
+    const cat = item.category ?? inferCategory(item.id);
     return sum + (WEIGHT_KG[cat] ?? 0.1) * item.qty;
   }, 0);
   return Math.max(Math.round(weight * 1000) / 1000, 0.1); // min 100g, 3 decimal places

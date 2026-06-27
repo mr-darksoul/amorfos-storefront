@@ -11,6 +11,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const off = discountPct(product.price, product.mrp);
   const hasFirst = product.images.length > 0;
   const hasSecond = product.images.length > 1;
+  const soldOut = typeof product.stock === "number" && product.stock <= 0;
 
   return (
     <div className="group relative flex flex-col">
@@ -58,22 +59,30 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
         </div>
-        {off > 0 && (
-          <span className="absolute right-3 top-3 rounded-full bg-gold px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.14em] text-cream">
-            {off}% off
+        {soldOut ? (
+          <span className="absolute right-3 top-3 rounded-full bg-dark/85 px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.14em] text-cream backdrop-blur-sm">
+            Sold out
           </span>
+        ) : (
+          off > 0 && (
+            <span className="absolute right-3 top-3 rounded-full bg-gold px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.14em] text-cream">
+              {off}% off
+            </span>
+          )
         )}
 
         {/* Quick add */}
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            add(product.id);
-          }}
-          className="absolute inset-x-3 bottom-3 translate-y-3 rounded-sm bg-dark/95 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-cream opacity-0 transition-all duration-300 hover:bg-gold group-hover:translate-y-0 group-hover:opacity-100"
-        >
-          Quick add
-        </button>
+        {!soldOut && (
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              add(product.id);
+            }}
+            className="absolute inset-x-3 bottom-3 translate-y-3 rounded-sm bg-dark/95 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-cream opacity-0 transition-all duration-300 hover:bg-gold group-hover:translate-y-0 group-hover:opacity-100"
+          >
+            Quick add
+          </button>
+        )}
       </Link>
 
       <div className="mt-4 flex flex-col gap-1">

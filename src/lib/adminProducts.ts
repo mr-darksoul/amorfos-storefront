@@ -65,15 +65,3 @@ export async function deleteAdminProduct(id: string): Promise<void> {
   const { error } = await supabase().from("products").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }
-
-// kept for back-compat — used by some admin API routes
-export async function saveAdminProducts(products: Product[]): Promise<void> {
-  if (!isSupabaseConfigured()) {
-    throw new Error("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY are not configured.");
-  }
-  const rows = products.map((p) => ({ id: p.id, data: p }));
-  const { error } = await supabase()
-    .from("products")
-    .upsert(rows, { onConflict: "id" });
-  if (error) throw new Error(error.message);
-}

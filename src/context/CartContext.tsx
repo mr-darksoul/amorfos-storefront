@@ -12,8 +12,6 @@ import {
 import { products } from "@/lib/products";
 import type { CartLine, Product } from "@/lib/types";
 
-type LivePrice = { price: number; mrp: number };
-
 const STORAGE_KEY = "amorfos.cart.v1";
 
 /**
@@ -92,36 +90,49 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, dispatch] = useReducer(reducer, []);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
-  const [livePrices, setLivePrices] = useState<Record<string, LivePrice>>({});
+  const [liveProducts, setLiveProducts] = useState<Record<string, Product>>({});
 
-  // Fetch live prices from the server so cart totals match Supabase (admin CRUD).
+  // Fetch the live catalogue so cart totals match Supabase (admin CRUD) and so
+  // products created in admin — which aren't in the static products.ts baked
+  // into the bundle — can still be rendered and priced in the cart.
   useEffect(() => {
     fetch("/api/products")
       .then((r) => r.json())
-      .then((data: { id: string; price: number; mrp: number }[]) => {
-        const map: Record<string, LivePrice> = {};
-        for (const p of data) map[p.id] = { price: p.price, mrp: p.mrp };
-        setLivePrices(map);
+      .then((data: Product[]) => {
+        const map: Record<string, Product> = {};
+        for (const p of data) map[p.id] = p;
+        setLiveProducts(map);
       })
-      .catch(() => { /* fall back to hardcoded prices silently */ });
+      .catch(() => { /* fall back to hardcoded catalogue silently */ });
   }, []);
 
-  // Load from localStorage once on mount.
+  // Load from localStorage once on mount. We keep every stored line here — the
+  // `items` memo drops anything that can't be resolved, and a separate effect
+  // prunes truly-dead ids once the live catalogue has loaded (so we don't drop
+  // admin-only products just because they aren't in the static bundle).
   useEffect(() => {
     const store = getStore();
     try {
       const raw = store?.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as CartLine[];
-        // Drop any lines whose product no longer exists.
-        const valid = parsed.filter((l) => products.some((p) => p.id === l.id));
-        dispatch({ type: "hydrate", lines: valid });
+        dispatch({ type: "hydrate", lines: parsed });
       }
     } catch {
       /* ignore malformed storage */
     }
     setHydrated(true);
   }, []);
+
+  // Once the live catalogue is loaded, drop any line whose product no longer
+  // exists in either the live catalogue or the static fallback.
+  useEffect(() => {
+    if (Object.keys(liveProducts).length === 0) return;
+    for (const l of lines) {
+      const known = liveProducts[l.id] || products.some((p) => p.id === l.id);
+      if (!known) dispatch({ type: "remove", id: l.id });
+    }
+  }, [liveProducts, lines]);
 
   // Persist on change (after first hydrate so we don't clobber storage).
   useEffect(() => {
@@ -144,14 +155,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const items: CartItem[] = useMemo(() => {
     return lines
       .map((l) => {
-        const base = products.find((p) => p.id === l.id);
-        if (!base) return null;
-        const live = livePrices[l.id];
-        const product: Product = live ? { ...base, price: live.price, mrp: live.mrp } : base;
+        // Prefer the live catalogue (current price/stock, includes admin-only
+        // products); fall back to the static bundle before the fetch resolves.
+        const product = liveProducts[l.id] ?? products.find((p) => p.id === l.id);
+        if (!product) return null;
         return { ...l, product, lineTotal: product.price * l.qty };
       })
       .filter((x): x is CartItem => x !== null);
-  }, [lines, livePrices]);
+  }, [lines, liveProducts]);
 
   const count = items.reduce((n, i) => n + i.qty, 0);
   const subtotal = items.reduce((n, i) => n + i.lineTotal, 0);

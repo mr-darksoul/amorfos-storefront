@@ -48,6 +48,7 @@ export default async function ProductPage({
   if (!product) notFound();
 
   const off = discountPct(product.price, product.mrp);
+  const soldOut = typeof product.stock === "number" && product.stock <= 0;
   const related = await getAdminRelated(product);
 
   const specs: [string, string][] = [
@@ -72,7 +73,9 @@ export default async function ProductPage({
       url: `${site.url}/shop/${product.id}`,
       priceCurrency: "INR",
       price: product.price,
-      availability: "https://schema.org/InStock",
+      availability: soldOut
+        ? "https://schema.org/OutOfStock"
+        : "https://schema.org/InStock",
       seller: { "@type": "Organization", name: site.name },
     },
   };

@@ -21,6 +21,14 @@ export interface Product {
   benefits: string[];
   bestseller?: boolean;
   newArrival?: boolean;
+  /**
+   * Units in stock. Inventory is opt-in per product:
+   *   - undefined / null → untracked (treated as always available)
+   *   - a number         → tracked; 0 means sold out
+   * Decremented atomically on confirmed payment (see verify-payment + the
+   * decrement_stock SQL function).
+   */
+  stock?: number | null;
 }
 
 export interface CartLine {

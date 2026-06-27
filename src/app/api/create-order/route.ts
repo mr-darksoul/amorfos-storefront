@@ -58,7 +58,13 @@ export async function POST(req: Request) {
 
   const products = await getAdminProducts();
   let subtotal = 0;
-  const orderItems: { id: string; name: string; qty: number; price: number }[] = [];
+  const orderItems: {
+    id: string;
+    name: string;
+    qty: number;
+    price: number;
+    category: string;
+  }[] = [];
 
   for (const line of lines) {
     const product = products.find((p) => p.id === line.id);
@@ -66,8 +72,26 @@ export async function POST(req: Request) {
     if (!product) {
       return NextResponse.json({ error: `Unknown product: ${line.id}` }, { status: 400 });
     }
+    // Inventory check (only for products that opt into stock tracking).
+    if (typeof product.stock === "number" && qty > product.stock) {
+      return NextResponse.json(
+        {
+          error:
+            product.stock <= 0
+              ? `${product.name} is sold out.`
+              : `Only ${product.stock} left of ${product.name}.`,
+        },
+        { status: 409 },
+      );
+    }
     subtotal += product.price * qty;
-    orderItems.push({ id: product.id, name: product.name, qty, price: product.price });
+    orderItems.push({
+      id: product.id,
+      name: product.name,
+      qty,
+      price: product.price,
+      category: product.category,
+    });
   }
 
   const shipping = subtotal >= site.freeShippingThreshold ? 0 : SHIPPING_FLAT;
@@ -86,9 +110,12 @@ export async function POST(req: Request) {
       },
     });
 
-    // Persist as a pending order if Supabase is configured
+    // Persist as a pending order if Supabase is configured. If this fails we
+    // must NOT hand the client an orderId — otherwise the customer could pay
+    // into an order that has no DB row, so verify-payment would update 0 rows
+    // and no confirmation / fulfillment would ever happen.
     if (isSupabaseConfigured()) {
-      await supabase().from("orders").insert({
+      const { error: insertErr } = await supabase().from("orders").insert({
         razorpay_order_id: order.id,
         amount,
         subtotal,
@@ -97,6 +124,13 @@ export async function POST(req: Request) {
         customer,
         items: orderItems,
       });
+      if (insertErr) {
+        console.error("Failed to persist pending order:", insertErr);
+        return NextResponse.json(
+          { error: "Could not start checkout. Please try again." },
+          { status: 500 },
+        );
+      }
     }
 
     return NextResponse.json({
