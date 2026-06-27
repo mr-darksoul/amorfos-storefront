@@ -33,6 +33,12 @@ export interface Order {
   items: OrderItem[];
   created_at: string;
   paid_at: string | null;
+  // Shiprocket fields
+  shiprocket_order_id?: string | null;
+  shiprocket_shipment_id?: string | null;
+  shiprocket_awb?: string | null;
+  shiprocket_label_url?: string | null;
+  fulfillment_status?: string | null;
 }
 
 const STATUS_LABEL: Record<Order["status"], string> = {
@@ -47,8 +53,29 @@ const STATUS_CLASS: Record<Order["status"], string> = {
   failed: "bg-rudra/15 text-rudra",
 };
 
+const FULFILLMENT_LABEL: Record<string, string> = {
+  unfulfilled: "Unfulfilled",
+  synced: "Synced",
+  processing: "Processing",
+  shipped: "Shipped",
+  out_for_delivery: "Out for delivery",
+  delivered: "Delivered",
+  failed: "Sync failed",
+};
+
+const FULFILLMENT_CLASS: Record<string, string> = {
+  unfulfilled: "bg-paper-soft text-ink-faint",
+  synced: "bg-gold/15 text-gold",
+  processing: "bg-blue-700/15 text-blue-600",
+  shipped: "bg-blue-700/20 text-blue-500",
+  out_for_delivery: "bg-green-700/15 text-green-500",
+  delivered: "bg-green-700/20 text-green-600",
+  failed: "bg-rudra/15 text-rudra",
+};
+
 export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [shipping, setShipping] = useState<Record<string, { loading: boolean; awb?: string; labelUrl?: string; error?: string }>>({});
 
   if (orders.length === 0) {
     return (
@@ -57,6 +84,21 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
         <p className="mt-2 text-sm">Orders will appear here once customers complete checkout.</p>
       </div>
     );
+  }
+
+  async function handleShip(orderId: string) {
+    setShipping((prev) => ({ ...prev, [orderId]: { loading: true } }));
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/ship`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setShipping((prev) => ({ ...prev, [orderId]: { loading: false, error: data.error || "Failed" } }));
+      } else {
+        setShipping((prev) => ({ ...prev, [orderId]: { loading: false, awb: data.awb, labelUrl: data.labelUrl } }));
+      }
+    } catch {
+      setShipping((prev) => ({ ...prev, [orderId]: { loading: false, error: "Network error" } }));
+    }
   }
 
   return (
@@ -75,111 +117,175 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
           </tr>
         </thead>
         <tbody className="divide-y divide-line">
-          {orders.map((o) => (
-            <>
-              <tr
-                key={o.id}
-                className="hover:bg-paper/50 cursor-pointer"
-                onClick={() => setExpanded(expanded === o.id ? null : o.id)}
-              >
-                <td className="px-4 py-3 text-ink-dim whitespace-nowrap">
-                  {new Date(o.created_at).toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </td>
-                <td className="px-4 py-3">
-                  <p className="text-ink">{o.customer.name || "—"}</p>
-                  <p className="text-xs text-ink-faint">{o.customer.phone || ""}</p>
-                </td>
-                <td className="px-4 py-3 text-ink-dim">
-                  {o.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
-                </td>
-                <td className="px-4 py-3 tabular-nums text-ink whitespace-nowrap">
-                  {inr(o.amount)}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-[0.65rem] uppercase tracking-wide ${STATUS_CLASS[o.status]}`}
-                  >
-                    {STATUS_LABEL[o.status]}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-xs text-gold-soft">
-                  {expanded === o.id ? "▲" : "▼"}
-                </td>
-              </tr>
+          {orders.map((o) => {
+            const shipState = shipping[o.id];
+            const awb = shipState?.awb || o.shiprocket_awb;
+            const labelUrl = shipState?.labelUrl || o.shiprocket_label_url;
+            const fulfillment = o.fulfillment_status || "unfulfilled";
 
-              {expanded === o.id && (
-                <tr key={`${o.id}-detail`} className="bg-paper-raised">
-                  <td colSpan={6} className="px-6 py-5">
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                      <div>
-                        <p className="eyebrow mb-2">Customer</p>
-                        <p className="text-ink">{o.customer.name || "—"}</p>
-                        <p className="text-ink-dim">{o.customer.phone || "—"}</p>
-                        {o.customer.email && <p className="text-ink-dim">{o.customer.email}</p>}
-                      </div>
-                      {(o.customer.address || o.customer.city) && (
-                        <div>
-                          <p className="eyebrow mb-2">Shipping address</p>
-                          <p className="text-ink-dim">{o.customer.address}</p>
-                          <p className="text-ink-dim">
-                            {[o.customer.city, o.customer.state, o.customer.pincode]
-                              .filter(Boolean)
-                              .join(", ")}
-                          </p>
-                        </div>
+            return (
+              <>
+                <tr
+                  key={o.id}
+                  className="hover:bg-paper/50 cursor-pointer"
+                  onClick={() => setExpanded(expanded === o.id ? null : o.id)}
+                >
+                  <td className="px-4 py-3 text-ink-dim whitespace-nowrap">
+                    {new Date(o.created_at).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </td>
+                  <td className="px-4 py-3">
+                    <p className="text-ink">{o.customer.name || "—"}</p>
+                    <p className="text-xs text-ink-faint">{o.customer.phone || ""}</p>
+                  </td>
+                  <td className="px-4 py-3 text-ink-dim">
+                    {o.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
+                  </td>
+                  <td className="px-4 py-3 tabular-nums text-ink whitespace-nowrap">
+                    {inr(o.amount)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-col gap-1">
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-[0.65rem] uppercase tracking-wide w-fit ${STATUS_CLASS[o.status]}`}
+                      >
+                        {STATUS_LABEL[o.status]}
+                      </span>
+                      {o.status === "paid" && (
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-[0.65rem] uppercase tracking-wide w-fit ${FULFILLMENT_CLASS[fulfillment] || FULFILLMENT_CLASS.unfulfilled}`}
+                        >
+                          {FULFILLMENT_LABEL[fulfillment] || fulfillment}
+                        </span>
                       )}
-                      <div>
-                        <p className="eyebrow mb-2">Payment</p>
-                        <p className="font-mono text-xs text-ink-dim break-all">
-                          {o.razorpay_payment_id || o.razorpay_order_id}
-                        </p>
-                        {o.paid_at && (
-                          <p className="mt-1 text-xs text-ink-faint">
-                            Paid {new Date(o.paid_at).toLocaleString("en-IN")}
-                          </p>
-                        )}
-                        {o.status === "paid" && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              downloadInvoice(o);
-                            }}
-                            className="btn btn-outline mt-3 px-3 py-1.5 text-xs"
-                          >
-                            Download invoice
-                          </button>
-                        )}
-                      </div>
-                      <div>
-                        <p className="eyebrow mb-2">Order breakdown</p>
-                        <ul className="space-y-1">
-                          {o.items.map((item) => (
-                            <li key={item.id} className="flex justify-between text-xs text-ink-dim">
-                              <span>{item.qty}× {item.name}</span>
-                              <span className="tabular-nums">{inr(item.price * item.qty)}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <div className="mt-2 border-t border-line pt-2 flex justify-between text-xs text-ink-dim">
-                          <span>Shipping</span>
-                          <span>{o.shipping === 0 ? "Free" : inr(o.shipping)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm text-ink font-serif mt-1">
-                          <span>Total</span>
-                          <span className="tabular-nums">{inr(o.amount)}</span>
-                        </div>
-                      </div>
                     </div>
                   </td>
+                  <td className="px-4 py-3 text-xs text-gold-soft">
+                    {expanded === o.id ? "▲" : "▼"}
+                  </td>
                 </tr>
-              )}
-            </>
-          ))}
+
+                {expanded === o.id && (
+                  <tr key={`${o.id}-detail`} className="bg-paper-raised">
+                    <td colSpan={6} className="px-6 py-5">
+                      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div>
+                          <p className="eyebrow mb-2">Customer</p>
+                          <p className="text-ink">{o.customer.name || "—"}</p>
+                          <p className="text-ink-dim">{o.customer.phone || "—"}</p>
+                          {o.customer.email && <p className="text-ink-dim">{o.customer.email}</p>}
+                        </div>
+                        {(o.customer.address || o.customer.city) && (
+                          <div>
+                            <p className="eyebrow mb-2">Shipping address</p>
+                            <p className="text-ink-dim">{o.customer.address}</p>
+                            <p className="text-ink-dim">
+                              {[o.customer.city, o.customer.state, o.customer.pincode]
+                                .filter(Boolean)
+                                .join(", ")}
+                            </p>
+                          </div>
+                        )}
+                        <div>
+                          <p className="eyebrow mb-2">Payment</p>
+                          <p className="font-mono text-xs text-ink-dim break-all">
+                            {o.razorpay_payment_id || o.razorpay_order_id}
+                          </p>
+                          {o.paid_at && (
+                            <p className="mt-1 text-xs text-ink-faint">
+                              Paid {new Date(o.paid_at).toLocaleString("en-IN")}
+                            </p>
+                          )}
+                          {o.status === "paid" && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadInvoice(o);
+                              }}
+                              className="btn btn-outline mt-3 px-3 py-1.5 text-xs"
+                            >
+                              Download invoice
+                            </button>
+                          )}
+                        </div>
+                        <div>
+                          <p className="eyebrow mb-2">Order breakdown</p>
+                          <ul className="space-y-1">
+                            {o.items.map((item) => (
+                              <li key={item.id} className="flex justify-between text-xs text-ink-dim">
+                                <span>{item.qty}× {item.name}</span>
+                                <span className="tabular-nums">{inr(item.price * item.qty)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <div className="mt-2 border-t border-line pt-2 flex justify-between text-xs text-ink-dim">
+                            <span>Shipping</span>
+                            <span>{o.shipping === 0 ? "Free" : inr(o.shipping)}</span>
+                          </div>
+                          <div className="flex justify-between text-sm text-ink font-serif mt-1">
+                            <span>Total</span>
+                            <span className="tabular-nums">{inr(o.amount)}</span>
+                          </div>
+                        </div>
+                        {o.status === "paid" && (
+                          <div>
+                            <p className="eyebrow mb-2">Fulfillment</p>
+                            {!o.shiprocket_shipment_id && !o.shiprocket_order_id && (
+                              <p className="text-xs text-ink-faint">Not yet synced to Shiprocket.</p>
+                            )}
+                            {o.shiprocket_order_id && (
+                              <p className="font-mono text-xs text-ink-dim break-all">
+                                SR #{o.shiprocket_order_id}
+                              </p>
+                            )}
+                            {awb ? (
+                              <div className="mt-2 space-y-2">
+                                <p className="text-xs text-ink-dim">
+                                  AWB: <span className="font-mono">{awb}</span>
+                                </p>
+                                {labelUrl && (
+                                  <a
+                                    href={labelUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="btn btn-outline px-3 py-1.5 text-xs inline-block"
+                                  >
+                                    Print label
+                                  </a>
+                                )}
+                              </div>
+                            ) : o.shiprocket_shipment_id ? (
+                              <div className="mt-2">
+                                <button
+                                  type="button"
+                                  disabled={shipState?.loading}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleShip(o.id);
+                                  }}
+                                  className="btn btn-primary px-3 py-1.5 text-xs disabled:opacity-50"
+                                >
+                                  {shipState?.loading ? "Generating…" : "Ready to ship"}
+                                </button>
+                                {shipState?.error && (
+                                  <p className="mt-1 text-xs text-rudra">{shipState.error}</p>
+                                )}
+                              </div>
+                            ) : null}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </>
+            );
+          })}
         </tbody>
       </table>
     </div>

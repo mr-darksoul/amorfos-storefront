@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { createShiprocketOrder, isShiprocketConfigured } from "@/lib/shiprocket";
+import { sendOrderConfirmationEmail, sendOrderConfirmationWhatsApp } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -57,6 +59,40 @@ export async function POST(req: Request) {
         paid_at: new Date().toISOString(),
       })
       .eq("razorpay_order_id", razorpay_order_id);
+
+    // Fire-and-forget: sync to Shiprocket and send notifications
+    // Errors here must never block the payment confirmation response
+    void (async () => {
+      try {
+        const { data: order } = await supabase()
+          .from("orders")
+          .select("*")
+          .eq("razorpay_order_id", razorpay_order_id)
+          .single();
+
+        if (!order) return;
+
+        // Send notifications (non-blocking on Shiprocket)
+        await Promise.allSettled([
+          sendOrderConfirmationEmail(order),
+          sendOrderConfirmationWhatsApp(order),
+        ]);
+
+        if (!isShiprocketConfigured()) return;
+
+        const result = await createShiprocketOrder(order);
+        await supabase()
+          .from("orders")
+          .update({
+            shiprocket_order_id: result.shiprocket_order_id,
+            shiprocket_shipment_id: result.shipment_id,
+            fulfillment_status: "synced",
+          })
+          .eq("id", order.id);
+      } catch (err) {
+        console.error("[post-payment] background sync failed:", err);
+      }
+    })();
   }
 
   return NextResponse.json({ verified: true, paymentId: razorpay_payment_id });

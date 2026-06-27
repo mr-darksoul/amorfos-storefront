@@ -31,3 +31,15 @@ CREATE TABLE IF NOT EXISTS orders (
 -- Index for fast admin lookups
 CREATE INDEX IF NOT EXISTS orders_status_idx    ON orders (status);
 CREATE INDEX IF NOT EXISTS orders_created_idx   ON orders (created_at DESC);
+
+-- ── Shiprocket fulfilment (migration 001) ─────────────────────────────────
+-- Run supabase/migrations/001_shiprocket.sql to add these columns to an
+-- existing database; they are included here for new installs.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shiprocket_order_id    text;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shiprocket_shipment_id  text;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shiprocket_awb          text;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shiprocket_label_url    text;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS fulfillment_status      text NOT NULL DEFAULT 'unfulfilled';
+-- fulfillment_status: unfulfilled | synced | processing | shipped | out_for_delivery | delivered | failed
+
+CREATE INDEX IF NOT EXISTS orders_awb_idx ON orders (shiprocket_awb);
