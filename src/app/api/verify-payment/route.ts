@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import crypto from "crypto";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { createShiprocketOrder, isShiprocketConfigured } from "@/lib/shiprocket";
@@ -60,9 +60,10 @@ export async function POST(req: Request) {
       })
       .eq("razorpay_order_id", razorpay_order_id);
 
-    // Fire-and-forget: sync to Shiprocket and send notifications
-    // Errors here must never block the payment confirmation response
-    void (async () => {
+    // Run after the response is sent, but keep the serverless function alive
+    // until it completes (plain fire-and-forget is killed on Vercel once the
+    // response flushes). Errors here must never block payment confirmation.
+    after(async () => {
       try {
         const { data: order } = await supabase()
           .from("orders")
@@ -92,7 +93,7 @@ export async function POST(req: Request) {
       } catch (err) {
         console.error("[post-payment] background sync failed:", err);
       }
-    })();
+    });
   }
 
   return NextResponse.json({ verified: true, paymentId: razorpay_payment_id });
