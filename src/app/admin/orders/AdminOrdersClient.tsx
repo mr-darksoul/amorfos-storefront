@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { inr } from "@/lib/format";
+import { downloadInvoice } from "@/lib/invoice";
 
 interface OrderItem {
   id: string;
@@ -140,6 +141,18 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                           <p className="mt-1 text-xs text-ink-faint">
                             Paid {new Date(o.paid_at).toLocaleString("en-IN")}
                           </p>
+                        )}
+                        {o.status === "paid" && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadInvoice(o);
+                            }}
+                            className="btn btn-outline mt-3 px-3 py-1.5 text-xs"
+                          >
+                            Download invoice
+                          </button>
                         )}
                       </div>
                       <div>
