@@ -12,6 +12,8 @@ import {
 import { products } from "@/lib/products";
 import type { CartLine, Product } from "@/lib/types";
 
+type LivePrice = { price: number; mrp: number };
+
 const STORAGE_KEY = "amorfos.cart.v1";
 
 /**
@@ -90,6 +92,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, dispatch] = useReducer(reducer, []);
   const [isOpen, setIsOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [livePrices, setLivePrices] = useState<Record<string, LivePrice>>({});
+
+  // Fetch live prices from the server so cart totals match Supabase (admin CRUD).
+  useEffect(() => {
+    fetch("/api/products")
+      .then((r) => r.json())
+      .then((data: { id: string; price: number; mrp: number }[]) => {
+        const map: Record<string, LivePrice> = {};
+        for (const p of data) map[p.id] = { price: p.price, mrp: p.mrp };
+        setLivePrices(map);
+      })
+      .catch(() => { /* fall back to hardcoded prices silently */ });
+  }, []);
 
   // Load from localStorage once on mount.
   useEffect(() => {
@@ -129,12 +144,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const items: CartItem[] = useMemo(() => {
     return lines
       .map((l) => {
-        const product = products.find((p) => p.id === l.id);
-        if (!product) return null;
+        const base = products.find((p) => p.id === l.id);
+        if (!base) return null;
+        const live = livePrices[l.id];
+        const product: Product = live ? { ...base, price: live.price, mrp: live.mrp } : base;
         return { ...l, product, lineTotal: product.price * l.qty };
       })
       .filter((x): x is CartItem => x !== null);
-  }, [lines]);
+  }, [lines, livePrices]);
 
   const count = items.reduce((n, i) => n + i.qty, 0);
   const subtotal = items.reduce((n, i) => n + i.lineTotal, 0);
