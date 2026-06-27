@@ -14,12 +14,12 @@ export default function TermsPage() {
     <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 md:py-24">
       <p className="eyebrow mb-3">Legal</p>
       <h1 className="display text-4xl sm:text-5xl">Terms & Conditions</h1>
-      <p className="mt-4 text-sm text-bone-faint">Last updated: {lastUpdated}</p>
+      <p className="mt-4 text-sm text-ink-faint">Last updated: {lastUpdated}</p>
 
-      <div className="mt-12 space-y-12 text-bone-dim">
+      <div className="mt-12 space-y-12 text-ink-dim">
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">1. About us</h2>
+          <h2 className="font-serif text-2xl text-ink">1. About us</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               Amorfos is operated by {site.founder}, {site.address}, India
@@ -30,7 +30,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">2. Products</h2>
+          <h2 className="font-serif text-2xl text-ink">2. Products</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               All Amorfos Rudraksha products are authentic and Lab Certified. Rudraksha is
@@ -49,7 +49,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">3. Pricing and orders</h2>
+          <h2 className="font-serif text-2xl text-ink">3. Pricing and orders</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               All prices are in Indian Rupees (₹) and are inclusive of applicable taxes.
@@ -66,7 +66,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">4. Payment</h2>
+          <h2 className="font-serif text-2xl text-ink">4. Payment</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               Payments are processed by Razorpay, a PCI-DSS Level 1 certified payment gateway.
@@ -77,7 +77,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">5. Shipping</h2>
+          <h2 className="font-serif text-2xl text-ink">5. Shipping</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               Orders are dispatched within 1–2 business days from Delhi. Delivery typically
@@ -96,7 +96,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">6. Returns and refunds</h2>
+          <h2 className="font-serif text-2xl text-ink">6. Returns and refunds</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               We accept returns within 7 days of delivery on unused products in their
@@ -114,7 +114,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">7. Intellectual property</h2>
+          <h2 className="font-serif text-2xl text-ink">7. Intellectual property</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               All content on this website — including text, images, the Amorfos name and logo —
@@ -125,7 +125,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">8. Limitation of liability</h2>
+          <h2 className="font-serif text-2xl text-ink">8. Limitation of liability</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               To the fullest extent permitted by law, Amorfos&apos; liability is limited to the
@@ -137,7 +137,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">9. Governing law and disputes</h2>
+          <h2 className="font-serif text-2xl text-ink">9. Governing law and disputes</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               These Terms are governed by the laws of India. Any disputes arising from a
@@ -151,7 +151,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">10. Changes to these terms</h2>
+          <h2 className="font-serif text-2xl text-ink">10. Changes to these terms</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               We may update these Terms at any time. The &quot;Last updated&quot; date at the top of

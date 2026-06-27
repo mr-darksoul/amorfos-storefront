@@ -16,7 +16,7 @@ export default async function AdminProductsPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <p className="eyebrow mb-1">Admin</p>
-          <h1 className="font-serif text-3xl text-bone">Products</h1>
+          <h1 className="font-serif text-3xl text-ink">Products</h1>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/admin/orders" className="text-sm text-gold-soft hover:underline">
@@ -30,8 +30,8 @@ export default async function AdminProductsPage() {
       </div>
 
       {!supabaseConfigured && (
-        <div className="mb-6 rounded-sm border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-bone-dim">
-          <strong className="text-bone">Supabase not configured.</strong> Add{" "}
+        <div className="mb-6 rounded-sm border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-ink-dim">
+          <strong className="text-ink">Supabase not configured.</strong> Add{" "}
           <code className="font-mono text-gold-soft">SUPABASE_URL</code> and{" "}
           <code className="font-mono text-gold-soft">SUPABASE_SERVICE_ROLE_KEY</code> to your
           environment to enable saving product edits and order tracking.

@@ -195,22 +195,22 @@ export default function ProductForm({ initial, mode }: Props) {
     hint?: string;
   }) => (
     <div>
-      <label className="mb-1.5 block text-xs uppercase tracking-[0.16em] text-bone-faint">
+      <label className="mb-1.5 block text-xs uppercase tracking-[0.16em] text-ink-faint">
         {label}
       </label>
       {children}
-      {hint && <p className="mt-1 text-xs text-bone-faint">{hint}</p>}
+      {hint && <p className="mt-1 text-xs text-ink-faint">{hint}</p>}
     </div>
   );
 
   const inputCls =
-    "w-full rounded-sm border border-line bg-ink px-3 py-2.5 text-sm text-bone outline-none focus:border-gold-soft";
+    "w-full rounded-sm border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none focus:border-gold-soft";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Identification */}
-      <section className="space-y-4 rounded-sm border border-line bg-ink p-5">
-        <h2 className="text-xs uppercase tracking-[0.18em] text-bone-faint">Identification</h2>
+      <section className="space-y-4 rounded-sm border border-line bg-paper p-5">
+        <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">Identification</h2>
 
         <Field label="Product name *">
           <input
@@ -240,8 +240,8 @@ export default function ProductForm({ initial, mode }: Props) {
       </section>
 
       {/* Classification */}
-      <section className="space-y-4 rounded-sm border border-line bg-ink p-5">
-        <h2 className="text-xs uppercase tracking-[0.18em] text-bone-faint">Classification</h2>
+      <section className="space-y-4 rounded-sm border border-line bg-paper p-5">
+        <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">Classification</h2>
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Category *">
@@ -339,8 +339,8 @@ export default function ProductForm({ initial, mode }: Props) {
       </section>
 
       {/* Pricing */}
-      <section className="space-y-4 rounded-sm border border-line bg-ink p-5">
-        <h2 className="text-xs uppercase tracking-[0.18em] text-bone-faint">Pricing (₹)</h2>
+      <section className="space-y-4 rounded-sm border border-line bg-paper p-5">
+        <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">Pricing (₹)</h2>
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="Selling price *">
@@ -368,9 +368,9 @@ export default function ProductForm({ initial, mode }: Props) {
       </section>
 
       {/* Images */}
-      <section className="space-y-4 rounded-sm border border-line bg-ink p-5">
-        <h2 className="text-xs uppercase tracking-[0.18em] text-bone-faint">Images</h2>
-        <p className="text-xs text-bone-faint">
+      <section className="space-y-4 rounded-sm border border-line bg-paper p-5">
+        <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">Images</h2>
+        <p className="text-xs text-ink-faint">
           Use <code className="font-mono">/products/image.jpg</code> for files in public/, or upload directly to Vercel Blob below.
         </p>
 
@@ -419,8 +419,8 @@ export default function ProductForm({ initial, mode }: Props) {
       </section>
 
       {/* Copy */}
-      <section className="space-y-4 rounded-sm border border-line bg-ink p-5">
-        <h2 className="text-xs uppercase tracking-[0.18em] text-bone-faint">Copy</h2>
+      <section className="space-y-4 rounded-sm border border-line bg-paper p-5">
+        <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">Copy</h2>
 
         <Field label="Tagline" hint="Short one-liner shown on cards and hero.">
           <input
@@ -471,10 +471,10 @@ export default function ProductForm({ initial, mode }: Props) {
       </section>
 
       {/* Flags */}
-      <section className="space-y-3 rounded-sm border border-line bg-ink p-5">
-        <h2 className="text-xs uppercase tracking-[0.18em] text-bone-faint">Badges</h2>
+      <section className="space-y-3 rounded-sm border border-line bg-paper p-5">
+        <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">Badges</h2>
 
-        <label className="flex items-center gap-3 text-sm text-bone-dim">
+        <label className="flex items-center gap-3 text-sm text-ink-dim">
           <input
             type="checkbox"
             checked={!!form.bestseller}
@@ -484,7 +484,7 @@ export default function ProductForm({ initial, mode }: Props) {
           Bestseller
         </label>
 
-        <label className="flex items-center gap-3 text-sm text-bone-dim">
+        <label className="flex items-center gap-3 text-sm text-ink-dim">
           <input
             type="checkbox"
             checked={!!form.newArrival}

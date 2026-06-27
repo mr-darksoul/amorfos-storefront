@@ -17,11 +17,11 @@ export default async function EditProductPage({
   return (
     <div className="mx-auto max-w-2xl px-5 py-10 sm:px-8">
       <div className="mb-8">
-        <Link href="/admin/products" className="text-xs uppercase tracking-[0.18em] text-bone-faint hover:text-gold-soft">
+        <Link href="/admin/products" className="text-xs uppercase tracking-[0.18em] text-ink-faint hover:text-gold-soft">
           ← Products
         </Link>
-        <h1 className="mt-3 font-serif text-3xl text-bone">Edit product</h1>
-        <p className="mt-1 font-mono text-xs text-bone-faint">{product.id}</p>
+        <h1 className="mt-3 font-serif text-3xl text-ink">Edit product</h1>
+        <p className="mt-1 font-mono text-xs text-ink-faint">{product.id}</p>
       </div>
 
       <ProductForm mode="edit" initial={product} />

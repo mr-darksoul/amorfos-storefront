@@ -26,21 +26,30 @@ export async function middleware(req: NextRequest) {
   if (!isAdminRoute) return NextResponse.next();
   if (PUBLIC_PATHS.some((p) => pathname === p)) return NextResponse.next();
 
+  // Fail closed: a request is authorized only when ADMIN_PASSWORD is set AND the
+  // cookie carries the matching HMAC token. If the password is unconfigured, no
+  // cookie can ever match, so every protected admin route is denied — never open.
   const password = process.env.ADMIN_PASSWORD;
-  if (!password) {
-    // Admin not configured — let the page show an error
-    return NextResponse.next();
-  }
-
-  const expected = await computeToken(password);
   const cookie = req.cookies.get("amorfos_admin")?.value;
+  const authorized =
+    !!password && !!cookie && cookie === (await computeToken(password));
 
-  if (cookie !== expected) {
-    const loginUrl = new URL("/admin/login", req.url);
-    return NextResponse.redirect(loginUrl);
+  if (authorized) return NextResponse.next();
+
+  // Denied. API routes get a JSON error (redirecting a fetch to an HTML login
+  // page just yields a confusing parse failure); page routes go to the login UI.
+  if (pathname.startsWith("/api/")) {
+    return NextResponse.json(
+      {
+        error: password
+          ? "Unauthorized."
+          : "Admin is not configured. Set ADMIN_PASSWORD.",
+      },
+      { status: password ? 401 : 503 },
+    );
   }
 
-  return NextResponse.next();
+  return NextResponse.redirect(new URL("/admin/login", req.url));
 }
 
 export const config = {

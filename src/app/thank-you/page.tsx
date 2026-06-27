@@ -20,7 +20,7 @@ export default function ThankYouPage() {
       </div>
       <p className="eyebrow mt-8 mb-3">Order confirmed</p>
       <h1 className="display text-4xl sm:text-5xl">Thank you for your order.</h1>
-      <p className="mx-auto mt-5 max-w-md leading-relaxed text-bone-dim">
+      <p className="mx-auto mt-5 max-w-md leading-relaxed text-ink-dim">
         Your payment was received and your order is being prepared with care. A
         confirmation will reach you shortly, and your Lab Certificate travels with
         the bead.
@@ -44,7 +44,7 @@ export default function ThankYouPage() {
         </a>
       </div>
 
-      <p className="mt-10 text-xs text-bone-faint">
+      <p className="mt-10 text-xs text-ink-faint">
         {site.name} · {site.address}
       </p>
     </div>

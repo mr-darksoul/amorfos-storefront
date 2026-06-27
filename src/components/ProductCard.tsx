@@ -30,7 +30,7 @@ export default function ProductCard({ product }: { product: Product }) {
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-serif text-3xl text-bone-faint opacity-40">
+            <span className="font-serif text-3xl text-ink-faint opacity-40">
               {product.mukhi ?? "✦"}
             </span>
           </div>
@@ -77,7 +77,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </Link>
 
       <div className="mt-4 flex flex-col gap-1">
-        <p className="text-[0.68rem] uppercase tracking-[0.2em] text-bone-faint">
+        <p className="text-[0.68rem] uppercase tracking-[0.2em] text-ink-faint">
           {product.categoryLabel} · {product.origin}
         </p>
         <Link href={`/shop/${product.id}`}>
@@ -86,9 +86,9 @@ export default function ProductCard({ product }: { product: Product }) {
           </h3>
         </Link>
         <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-base tabular-nums text-bone">{inr(product.price)}</span>
+          <span className="text-base tabular-nums text-ink">{inr(product.price)}</span>
           {product.mrp > product.price && (
-            <span className="text-sm tabular-nums text-bone-faint line-through">
+            <span className="text-sm tabular-nums text-ink-faint line-through">
               {inr(product.mrp)}
             </span>
           )}

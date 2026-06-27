@@ -50,7 +50,7 @@ export default function PoliciesPage() {
             <h2 className="font-serif text-2xl text-gold-soft">{s.title}</h2>
             <div className="mt-4 space-y-4">
               {s.body.map((p, i) => (
-                <p key={i} className="leading-relaxed text-bone-dim">
+                <p key={i} className="leading-relaxed text-ink-dim">
                   {p}
                 </p>
               ))}

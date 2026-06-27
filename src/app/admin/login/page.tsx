@@ -41,12 +41,12 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <p className="eyebrow mb-2">Amorfos</p>
-          <h1 className="font-serif text-3xl text-bone">Admin</h1>
+          <h1 className="font-serif text-3xl text-ink">Admin</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="password" className="mb-1.5 block text-xs uppercase tracking-[0.18em] text-bone-faint">
+            <label htmlFor="password" className="mb-1.5 block text-xs uppercase tracking-[0.18em] text-ink-faint">
               Password
             </label>
             <input
@@ -56,7 +56,7 @@ export default function AdminLoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               autoFocus
               required
-              className="w-full rounded-sm border border-line bg-ink px-4 py-3 text-sm text-bone outline-none focus:border-gold-soft"
+              className="w-full rounded-sm border border-line bg-paper px-4 py-3 text-sm text-ink outline-none focus:border-gold-soft"
             />
           </div>
 
@@ -73,8 +73,8 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <p className="mt-6 text-center text-xs text-bone-faint">
-          Set <code className="rounded bg-ink px-1 py-0.5 font-mono text-bone-dim">ADMIN_PASSWORD</code> in your environment to configure access.
+        <p className="mt-6 text-center text-xs text-ink-faint">
+          Set <code className="rounded bg-paper px-1 py-0.5 font-mono text-ink-dim">ADMIN_PASSWORD</code> in your environment to configure access.
         </p>
       </div>
     </div>

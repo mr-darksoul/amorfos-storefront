@@ -9,8 +9,8 @@ import { useCart } from "@/context/CartContext";
 
 const nav = [
   { href: "/shop", label: "Shop" },
-  { href: "/shop?category=pendant", label: "Pendants" },
-  { href: "/shop?category=mala", label: "Malas" },
+  { href: "/collections/rudraksha-pendant", label: "Pendants" },
+  { href: "/collections/rudraksha-mala", label: "Malas" },
   { href: "/about", label: "About" },
 ];
 
@@ -32,14 +32,14 @@ export default function Header() {
   return (
     <>
       {/* Announcement bar */}
-      <div className="bg-ink-raised text-center text-[0.68rem] tracking-[0.25em] uppercase text-gold-soft/90 py-2 px-4 border-b border-line">
+      <div className="bg-paper-raised text-center text-[0.68rem] tracking-[0.25em] uppercase text-gold-soft/90 py-2 px-4 border-b border-line">
         Lab Certified · Free shipping above ₹999 · 7-day returns
       </div>
 
       <header
         className={`sticky top-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-ink/90 backdrop-blur-md border-b border-line py-3"
+            ? "bg-paper/90 backdrop-blur-md border-b border-line py-3"
             : "bg-transparent py-5"
         }`}
       >
@@ -47,7 +47,7 @@ export default function Header() {
           {/* Mobile menu toggle */}
           <button
             onClick={() => setMenuOpen((v) => !v)}
-            className="md:hidden text-bone p-1 -ml-1"
+            className="md:hidden text-ink p-1 -ml-1"
             aria-label="Toggle menu"
           >
             {menuOpen ? <CloseIcon className="size-6" /> : <MenuIcon className="size-6" />}
@@ -59,7 +59,7 @@ export default function Header() {
               <Link
                 key={n.label}
                 href={n.href}
-                className="text-[0.78rem] tracking-[0.18em] uppercase text-bone-dim hover:text-gold-soft transition-colors"
+                className="text-[0.78rem] tracking-[0.18em] uppercase text-ink-dim hover:text-gold-soft transition-colors"
               >
                 {n.label}
               </Link>
@@ -76,12 +76,12 @@ export default function Header() {
           <div className="flex flex-1 items-center justify-end">
             <button
               onClick={open}
-              className="relative text-bone hover:text-gold-soft transition-colors p-1"
+              className="relative text-ink hover:text-gold-soft transition-colors p-1"
               aria-label={`Open cart, ${count} items`}
             >
               <BagIcon className="size-6" />
               {count > 0 && (
-                <span className="absolute -right-1.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-gold px-1 text-[0.6rem] font-medium text-ink">
+                <span className="absolute -right-1.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-gold px-1 text-[0.6rem] font-medium text-paper">
                   {count}
                 </span>
               )}
@@ -101,7 +101,7 @@ export default function Header() {
           onClick={() => setMenuOpen(false)}
         />
         <nav
-          className={`absolute left-0 top-0 h-full w-72 bg-ink-raised border-r border-line p-8 pt-24 transition-transform duration-400 ${
+          className={`absolute left-0 top-0 h-full w-72 bg-paper-raised border-r border-line p-8 pt-24 transition-transform duration-400 ${
             menuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
@@ -110,7 +110,7 @@ export default function Header() {
               <li key={n.label}>
                 <Link
                   href={n.href}
-                  className="font-serif text-2xl text-bone hover:text-gold-soft transition-colors"
+                  className="font-serif text-2xl text-ink hover:text-gold-soft transition-colors"
                 >
                   {n.label}
                 </Link>

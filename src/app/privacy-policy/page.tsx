@@ -14,12 +14,12 @@ export default function PrivacyPolicyPage() {
     <div className="mx-auto max-w-3xl px-5 py-16 sm:px-8 md:py-24">
       <p className="eyebrow mb-3">Legal</p>
       <h1 className="display text-4xl sm:text-5xl">Privacy Policy</h1>
-      <p className="mt-4 text-sm text-bone-faint">Last updated: {lastUpdated}</p>
+      <p className="mt-4 text-sm text-ink-faint">Last updated: {lastUpdated}</p>
 
-      <div className="mt-12 space-y-12 text-bone-dim">
+      <div className="mt-12 space-y-12 text-ink-dim">
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">1. Who we are</h2>
+          <h2 className="font-serif text-2xl text-ink">1. Who we are</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               Amorfos is a Delhi-based seller of authentic, Lab Certified Rudraksha products
@@ -40,28 +40,28 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">2. Information we collect</h2>
+          <h2 className="font-serif text-2xl text-ink">2. Information we collect</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
-              <strong className="text-bone">When you place an order:</strong> your name, delivery
+              <strong className="text-ink">When you place an order:</strong> your name, delivery
               address, phone number, and email address. Payment card details are processed directly
               by Razorpay and are never stored on our servers.
             </p>
             <p>
-              <strong className="text-bone">When you browse:</strong> standard server logs
+              <strong className="text-ink">When you browse:</strong> standard server logs
               (IP address, browser type, pages visited). We use your browser&apos;s
               localStorage to persist your shopping cart across sessions; no cookies are set by
               our site itself.
             </p>
             <p>
-              <strong className="text-bone">When you contact us:</strong> messages sent via
+              <strong className="text-ink">When you contact us:</strong> messages sent via
               WhatsApp or email are retained to handle your enquiry.
             </p>
           </div>
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">3. How we use your information</h2>
+          <h2 className="font-serif text-2xl text-ink">3. How we use your information</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>We use your information only to:</p>
             <ul className="ml-5 list-disc space-y-2">
@@ -75,17 +75,17 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">4. Sharing your information</h2>
+          <h2 className="font-serif text-2xl text-ink">4. Sharing your information</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>We share your data only with:</p>
             <ul className="ml-5 list-disc space-y-2">
               <li>
-                <strong className="text-bone">Razorpay</strong> — to process your payment. Razorpay
+                <strong className="text-ink">Razorpay</strong> — to process your payment. Razorpay
                 is a PCI-DSS Level 1 certified payment gateway. Their privacy policy is available at
                 razorpay.com/privacy.
               </li>
               <li>
-                <strong className="text-bone">Courier partners</strong> (e.g., India Post,
+                <strong className="text-ink">Courier partners</strong> (e.g., India Post,
                 Delhivery, Shiprocket) — to deliver your order. Only your name, address, and
                 phone number are shared.
               </li>
@@ -95,7 +95,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">5. Data retention</h2>
+          <h2 className="font-serif text-2xl text-ink">5. Data retention</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               Order records (name, address, items, payment reference) are retained for seven years
@@ -106,7 +106,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">6. Your rights</h2>
+          <h2 className="font-serif text-2xl text-ink">6. Your rights</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>You may contact us at any time to:</p>
             <ul className="ml-5 list-disc space-y-2">
@@ -124,7 +124,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">7. Security</h2>
+          <h2 className="font-serif text-2xl text-ink">7. Security</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               Our website is served over HTTPS. Payments are handled entirely by Razorpay; we
@@ -135,7 +135,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">8. Changes to this policy</h2>
+          <h2 className="font-serif text-2xl text-ink">8. Changes to this policy</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               We may update this policy from time to time. The &quot;Last updated&quot; date at the
@@ -146,7 +146,7 @@ export default function PrivacyPolicyPage() {
         </section>
 
         <section>
-          <h2 className="font-serif text-2xl text-bone">9. Governing law</h2>
+          <h2 className="font-serif text-2xl text-ink">9. Governing law</h2>
           <div className="mt-4 space-y-3 leading-relaxed">
             <p>
               This policy is governed by the laws of India, including the Information Technology

@@ -1,7 +1,9 @@
 # Amorfos — D2C storefront
 
 A production-ready Next.js storefront for **Amorfos**, a Delhi house selling
-authentic, Lab Certified Rudraksha. Dark, considered, premium.
+authentic, Lab Certified Rudraksha. Light, warm and considered — a parchment-ivory
+palette with espresso type and a single deep antique-gold accent (Forest Essentials
+direction). Brand tokens live in `src/app/globals.css`.
 
 - **Framework:** Next.js 15 (App Router) + TypeScript
 - **Styling:** Tailwind CSS v4

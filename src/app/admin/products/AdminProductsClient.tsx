@@ -30,7 +30,7 @@ export default function AdminProductsClient({ products }: { products: Product[] 
 
   if (products.length === 0) {
     return (
-      <div className="py-16 text-center text-bone-faint">
+      <div className="py-16 text-center text-ink-faint">
         <p className="font-serif text-2xl">No products yet.</p>
         <Link href="/admin/products/new" className="btn btn-primary mt-6 inline-flex">
           Add your first product
@@ -43,25 +43,25 @@ export default function AdminProductsClient({ products }: { products: Product[] 
     <div className="overflow-x-auto rounded-sm border border-line">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-line bg-ink text-left">
-            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-bone-faint font-normal">Name</th>
-            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-bone-faint font-normal">Category</th>
-            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-bone-faint font-normal">Origin</th>
-            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-bone-faint font-normal text-right">Price</th>
-            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-bone-faint font-normal">Tags</th>
+          <tr className="border-b border-line bg-paper text-left">
+            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal">Name</th>
+            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal">Category</th>
+            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal">Origin</th>
+            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal text-right">Price</th>
+            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal">Tags</th>
             <th className="px-4 py-3" />
           </tr>
         </thead>
         <tbody className="divide-y divide-line">
           {products.map((p) => (
-            <tr key={p.id} className="hover:bg-ink/50">
+            <tr key={p.id} className="hover:bg-paper/50">
               <td className="px-4 py-3">
-                <p className="font-serif text-base text-bone">{p.name}</p>
-                <p className="mt-0.5 font-mono text-[0.65rem] text-bone-faint">{p.id}</p>
+                <p className="font-serif text-base text-ink">{p.name}</p>
+                <p className="mt-0.5 font-mono text-[0.65rem] text-ink-faint">{p.id}</p>
               </td>
-              <td className="px-4 py-3 text-bone-dim">{p.categoryLabel}</td>
-              <td className="px-4 py-3 text-bone-dim">{p.origin}</td>
-              <td className="px-4 py-3 text-right tabular-nums text-bone">{inr(p.price)}</td>
+              <td className="px-4 py-3 text-ink-dim">{p.categoryLabel}</td>
+              <td className="px-4 py-3 text-ink-dim">{p.origin}</td>
+              <td className="px-4 py-3 text-right tabular-nums text-ink">{inr(p.price)}</td>
               <td className="px-4 py-3">
                 <div className="flex flex-wrap gap-1">
                   {p.bestseller && (
@@ -70,7 +70,7 @@ export default function AdminProductsClient({ products }: { products: Product[] 
                     </span>
                   )}
                   {p.newArrival && (
-                    <span className="rounded-full bg-bone/10 px-2 py-0.5 text-[0.6rem] uppercase tracking-wide text-bone-dim">
+                    <span className="rounded-full bg-ink/10 px-2 py-0.5 text-[0.6rem] uppercase tracking-wide text-ink-dim">
                       New
                     </span>
                   )}

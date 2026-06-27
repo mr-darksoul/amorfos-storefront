@@ -112,7 +112,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
         <h1 className="display text-4xl sm:text-5xl">
           {category === "all" ? "All Rudraksha" : categoryMeta[category].plural}
         </h1>
-        <p className="mt-3 max-w-xl text-sm text-bone-dim">
+        <p className="mt-3 max-w-xl text-sm text-ink-dim">
           {category === "all"
             ? "Pendants, malas, combination pieces and loose beads — each one Lab Certified."
             : categoryMeta[category].blurb}
@@ -132,15 +132,15 @@ export default function ShopClient({ products }: { products: Product[] }) {
             >
               Filters{activeCount > 0 ? ` (${activeCount})` : ""}
             </button>
-            <p className="hidden text-sm text-bone-faint md:block">
+            <p className="hidden text-sm text-ink-faint md:block">
               {filtered.length} {filtered.length === 1 ? "piece" : "pieces"}
             </p>
             <label className="flex items-center gap-2 text-sm">
-              <span className="text-bone-faint">Sort</span>
+              <span className="text-ink-faint">Sort</span>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as Sort)}
-                className="border border-line bg-ink-raised px-3 py-2 text-sm text-bone outline-none focus:border-gold"
+                className="border border-line bg-paper-raised px-3 py-2 text-sm text-ink outline-none focus:border-gold"
               >
                 <option value="featured">Featured</option>
                 <option value="price-asc">Price · Low to high</option>
@@ -151,7 +151,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
           {filtered.length === 0 ? (
             <div className="py-24 text-center">
-              <p className="font-serif text-2xl text-bone-dim">Nothing matches just yet.</p>
+              <p className="font-serif text-2xl text-ink-dim">Nothing matches just yet.</p>
               <button onClick={clearAll} className="btn btn-outline mt-6">
                 Clear filters
               </button>
@@ -179,7 +179,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
           onClick={() => setMobileFiltersOpen(false)}
         />
         <div
-          className={`absolute bottom-0 left-0 right-0 max-h-[80vh] overflow-y-auto rounded-t-2xl bg-ink-raised p-6 transition-transform duration-300 ${
+          className={`absolute bottom-0 left-0 right-0 max-h-[80vh] overflow-y-auto rounded-t-2xl bg-paper-raised p-6 transition-transform duration-300 ${
             mobileFiltersOpen ? "translate-y-0" : "translate-y-full"
           }`}
         >
@@ -222,8 +222,8 @@ function Pill({
       onClick={onClick}
       className={`rounded-full border px-3.5 py-1.5 text-xs transition-colors ${
         active
-          ? "border-gold bg-gold text-ink"
-          : "border-line text-bone-dim hover:border-line-strong hover:text-bone"
+          ? "border-gold bg-gold text-paper"
+          : "border-line text-ink-dim hover:border-line-strong hover:text-ink"
       }`}
     >
       {children}

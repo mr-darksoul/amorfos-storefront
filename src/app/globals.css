@@ -6,18 +6,19 @@
    espresso type, a single deep antique-gold accent, and the
    rudraksha browns of the product itself. (à la Forest Essentials.)
 
-   Naming note: the "ink" family is the page's GROUND (now light),
-   the "bone" family is the FOREGROUND text (now dark). The "dark"
-   and "cream" tokens are for the few chips/gradients that sit on
-   top of product photography and must stay dark with light text.
+   Naming: the "paper" family is the page's light GROUND; the "ink"
+   family is the dark FOREGROUND text. The "dark" and "cream" tokens
+   are for the few chips/gradients that sit on top of product
+   photography and must stay dark with light text (cream = light text
+   on those dark chips).
    ────────────────────────────────────────────────────────────── */
 @theme {
-  --color-ink: #f6f1e7;          /* warm ivory — primary background */
-  --color-ink-raised: #efe7d5;   /* raised surfaces, bands, inputs */
-  --color-ink-soft: #e7dcc6;     /* hover / inset / track */
-  --color-bone: #221b12;         /* primary text (espresso) */
-  --color-bone-dim: #5d5340;     /* secondary text */
-  --color-bone-faint: #8a7d66;   /* tertiary / captions */
+  --color-paper: #f6f1e7;          /* warm ivory — primary background */
+  --color-paper-raised: #efe7d5;   /* raised surfaces, bands, inputs */
+  --color-paper-soft: #e7dcc6;     /* hover / inset / track */
+  --color-ink: #221b12;         /* primary text (espresso) */
+  --color-ink-dim: #5d5340;     /* secondary text */
+  --color-ink-faint: #8a7d66;   /* tertiary / captions */
   --color-gold: #97712f;         /* deep antique gold accent */
   --color-gold-soft: #b08a3f;    /* brighter gold for emphasis */
   --color-gold-deep: #6f521f;
@@ -45,8 +46,8 @@ html {
 }
 
 body {
-  background-color: var(--color-ink);
-  color: var(--color-bone);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   font-feature-settings: "ss01", "cv01";
 }
@@ -58,7 +59,7 @@ body {
 
 /* Thin, brand-tinted scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--color-ink-raised); }
+::-webkit-scrollbar-track { background: var(--color-paper-raised); }
 ::-webkit-scrollbar-thumb {
   background: #d3c5a9;
   border-radius: 999px;
@@ -82,14 +83,6 @@ body {
   font-weight: 500;
   line-height: 1.02;
   letter-spacing: -0.01em;
-}
-
-/* The calligraphic logo is black artwork on an opaque white field.
-   Invert it (white field -> black, script -> white), then `screen` blends
-   the now-black field away against the dark page, leaving a clean wordmark. */
-.logo-invert {
-  filter: invert(1) brightness(1.7);
-  mix-blend-mode: screen;
 }
 
 /* ── Reveal-on-scroll ─────────────────────────────────────────── */
@@ -133,7 +126,7 @@ body {
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-outline {
   border: 1px solid var(--color-line-strong);
-  color: var(--color-bone);
+  color: var(--color-ink);
   background: transparent;
 }
 .btn-outline:hover {
@@ -141,7 +134,7 @@ body {
   color: var(--color-gold);
 }
 
-/* Subtle film-grain layer for depth on flat dark fields */
+/* Subtle film-grain layer for depth on flat color fields */
 .grain::before {
   content: "";
   position: absolute;

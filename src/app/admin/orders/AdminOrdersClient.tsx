@@ -51,7 +51,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
 
   if (orders.length === 0) {
     return (
-      <div className="py-16 text-center text-bone-faint">
+      <div className="py-16 text-center text-ink-faint">
         <p className="font-serif text-2xl">No orders yet.</p>
         <p className="mt-2 text-sm">Orders will appear here once customers complete checkout.</p>
       </div>
@@ -62,11 +62,11 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
     <div className="overflow-x-auto rounded-sm border border-line">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-line bg-ink text-left">
+          <tr className="border-b border-line bg-paper text-left">
             {["Date", "Customer", "Items", "Amount", "Status", ""].map((h) => (
               <th
                 key={h}
-                className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-bone-faint font-normal whitespace-nowrap"
+                className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal whitespace-nowrap"
               >
                 {h}
               </th>
@@ -78,10 +78,10 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
             <>
               <tr
                 key={o.id}
-                className="hover:bg-ink/50 cursor-pointer"
+                className="hover:bg-paper/50 cursor-pointer"
                 onClick={() => setExpanded(expanded === o.id ? null : o.id)}
               >
-                <td className="px-4 py-3 text-bone-dim whitespace-nowrap">
+                <td className="px-4 py-3 text-ink-dim whitespace-nowrap">
                   {new Date(o.created_at).toLocaleDateString("en-IN", {
                     day: "numeric",
                     month: "short",
@@ -89,13 +89,13 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                   })}
                 </td>
                 <td className="px-4 py-3">
-                  <p className="text-bone">{o.customer.name || "—"}</p>
-                  <p className="text-xs text-bone-faint">{o.customer.phone || ""}</p>
+                  <p className="text-ink">{o.customer.name || "—"}</p>
+                  <p className="text-xs text-ink-faint">{o.customer.phone || ""}</p>
                 </td>
-                <td className="px-4 py-3 text-bone-dim">
+                <td className="px-4 py-3 text-ink-dim">
                   {o.items.map((i) => `${i.qty}× ${i.name}`).join(", ")}
                 </td>
-                <td className="px-4 py-3 tabular-nums text-bone whitespace-nowrap">
+                <td className="px-4 py-3 tabular-nums text-ink whitespace-nowrap">
                   {inr(o.amount)}
                 </td>
                 <td className="px-4 py-3">
@@ -111,20 +111,20 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
               </tr>
 
               {expanded === o.id && (
-                <tr key={`${o.id}-detail`} className="bg-ink-raised">
+                <tr key={`${o.id}-detail`} className="bg-paper-raised">
                   <td colSpan={6} className="px-6 py-5">
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       <div>
                         <p className="eyebrow mb-2">Customer</p>
-                        <p className="text-bone">{o.customer.name || "—"}</p>
-                        <p className="text-bone-dim">{o.customer.phone || "—"}</p>
-                        {o.customer.email && <p className="text-bone-dim">{o.customer.email}</p>}
+                        <p className="text-ink">{o.customer.name || "—"}</p>
+                        <p className="text-ink-dim">{o.customer.phone || "—"}</p>
+                        {o.customer.email && <p className="text-ink-dim">{o.customer.email}</p>}
                       </div>
                       {(o.customer.address || o.customer.city) && (
                         <div>
                           <p className="eyebrow mb-2">Shipping address</p>
-                          <p className="text-bone-dim">{o.customer.address}</p>
-                          <p className="text-bone-dim">
+                          <p className="text-ink-dim">{o.customer.address}</p>
+                          <p className="text-ink-dim">
                             {[o.customer.city, o.customer.state, o.customer.pincode]
                               .filter(Boolean)
                               .join(", ")}
@@ -133,11 +133,11 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                       )}
                       <div>
                         <p className="eyebrow mb-2">Payment</p>
-                        <p className="font-mono text-xs text-bone-dim break-all">
+                        <p className="font-mono text-xs text-ink-dim break-all">
                           {o.razorpay_payment_id || o.razorpay_order_id}
                         </p>
                         {o.paid_at && (
-                          <p className="mt-1 text-xs text-bone-faint">
+                          <p className="mt-1 text-xs text-ink-faint">
                             Paid {new Date(o.paid_at).toLocaleString("en-IN")}
                           </p>
                         )}
@@ -146,17 +146,17 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                         <p className="eyebrow mb-2">Order breakdown</p>
                         <ul className="space-y-1">
                           {o.items.map((item) => (
-                            <li key={item.id} className="flex justify-between text-xs text-bone-dim">
+                            <li key={item.id} className="flex justify-between text-xs text-ink-dim">
                               <span>{item.qty}× {item.name}</span>
                               <span className="tabular-nums">{inr(item.price * item.qty)}</span>
                             </li>
                           ))}
                         </ul>
-                        <div className="mt-2 border-t border-line pt-2 flex justify-between text-xs text-bone-dim">
+                        <div className="mt-2 border-t border-line pt-2 flex justify-between text-xs text-ink-dim">
                           <span>Shipping</span>
                           <span>{o.shipping === 0 ? "Free" : inr(o.shipping)}</span>
                         </div>
-                        <div className="flex justify-between text-sm text-bone font-serif mt-1">
+                        <div className="flex justify-between text-sm text-ink font-serif mt-1">
                           <span>Total</span>
                           <span className="tabular-nums">{inr(o.amount)}</span>
                         </div>

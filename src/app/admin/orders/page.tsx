@@ -29,7 +29,7 @@ export default async function AdminOrdersPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <p className="eyebrow mb-1">Admin</p>
-          <h1 className="font-serif text-3xl text-bone">Orders</h1>
+          <h1 className="font-serif text-3xl text-ink">Orders</h1>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/admin/products" className="text-sm text-gold-soft hover:underline">
@@ -40,8 +40,8 @@ export default async function AdminOrdersPage() {
       </div>
 
       {!configured && (
-        <div className="mb-6 rounded-sm border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-bone-dim">
-          <strong className="text-bone">Supabase not configured.</strong> Add{" "}
+        <div className="mb-6 rounded-sm border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-ink-dim">
+          <strong className="text-ink">Supabase not configured.</strong> Add{" "}
           <code className="font-mono text-gold-soft">SUPABASE_URL</code> and{" "}
           <code className="font-mono text-gold-soft">SUPABASE_SERVICE_ROLE_KEY</code> to your
           environment variables to enable order tracking.
@@ -66,9 +66,9 @@ export default async function AdminOrdersPage() {
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-sm border border-line bg-ink-raised px-4 py-4">
-      <p className="text-xs uppercase tracking-[0.16em] text-bone-faint">{label}</p>
-      <p className="mt-1 font-serif text-2xl text-bone">{value}</p>
+    <div className="rounded-sm border border-line bg-paper-raised px-4 py-4">
+      <p className="text-xs uppercase tracking-[0.16em] text-ink-faint">{label}</p>
+      <p className="mt-1 font-serif text-2xl text-ink">{value}</p>
     </div>
   );
 }

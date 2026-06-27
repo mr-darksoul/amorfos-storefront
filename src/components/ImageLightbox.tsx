@@ -179,7 +179,7 @@ export default function ImageLightbox({
         ref={closeRef}
         onClick={onClose}
         aria-label="Close image viewer"
-        className="absolute right-4 top-4 z-10 flex size-10 items-center justify-center rounded-full bg-cream/10 text-cream ring-1 ring-cream/20 transition hover:bg-gold hover:text-ink"
+        className="absolute right-4 top-4 z-10 flex size-10 items-center justify-center rounded-full bg-cream/10 text-cream ring-1 ring-cream/20 transition hover:bg-gold hover:text-paper"
       >
         <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.6">
           <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
@@ -266,7 +266,7 @@ function ArrowButton({
       aria-label={side === "left" ? "Previous image" : "Next image"}
       className={`absolute top-1/2 -translate-y-1/2 ${
         side === "left" ? "left-4" : "right-4"
-      } flex size-11 items-center justify-center rounded-full bg-cream/10 text-cream ring-1 ring-cream/20 transition hover:bg-gold hover:text-ink`}
+      } flex size-11 items-center justify-center rounded-full bg-cream/10 text-cream ring-1 ring-cream/20 transition hover:bg-gold hover:text-paper`}
     >
       <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.6">
         <path

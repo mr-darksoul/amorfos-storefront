@@ -41,7 +41,7 @@ export default function AboutPage() {
             <h1 className="display text-4xl sm:text-6xl">
               A quieter way to wear<br />something ancient.
             </h1>
-            <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-bone-dim">
+            <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-ink-dim">
               Amorfos began with a simple belief — that a sacred bead deserves to
               be sourced honestly, certified properly, and presented with the care
               of a fine object. Not a bazaar. A house.
@@ -69,7 +69,7 @@ export default function AboutPage() {
           <h2 className="display text-3xl sm:text-4xl">
             Built by {site.founder}, in Delhi.
           </h2>
-          <div className="mt-6 space-y-4 leading-relaxed text-bone-dim">
+          <div className="mt-6 space-y-4 leading-relaxed text-ink-dim">
             <p>
               For years, we sold Rudraksha to thousands of customers across India
               on Amazon and Flipkart — learning, with every order, what people
@@ -94,13 +94,13 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="border-y border-line bg-ink-raised">
+      <section className="border-y border-line bg-paper-raised">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-16 sm:px-8 md:grid-cols-3 md:py-20">
           {values.map(({ Icon, title, text }, i) => (
             <Reveal key={title} delay={i * 90}>
               <Icon className="mb-5 size-9 text-gold" />
               <h3 className="font-serif text-2xl">{title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-bone-dim">{text}</p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-dim">{text}</p>
             </Reveal>
           ))}
         </div>
@@ -111,7 +111,7 @@ export default function AboutPage() {
         <Reveal>
           <p className="eyebrow mb-4">Reach us</p>
           <h2 className="display text-3xl sm:text-4xl">We&apos;re a message away.</h2>
-          <p className="mx-auto mt-5 max-w-md leading-relaxed text-bone-dim">
+          <p className="mx-auto mt-5 max-w-md leading-relaxed text-ink-dim">
             Questions about a bead, your order, or which mukhi to choose? Message
             us on WhatsApp — we usually reply the same day.
           </p>
@@ -130,7 +130,7 @@ export default function AboutPage() {
             </a>
           </div>
 
-          <p className="mt-10 text-sm text-bone-faint">
+          <p className="mt-10 text-sm text-ink-faint">
             {site.name} · {site.address}
           </p>
         </Reveal>

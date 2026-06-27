@@ -14,7 +14,7 @@ export default function AdminLogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className="text-xs uppercase tracking-[0.18em] text-bone-faint hover:text-bone"
+      className="text-xs uppercase tracking-[0.18em] text-ink-faint hover:text-ink"
     >
       Sign out
     </button>

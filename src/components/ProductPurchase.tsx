@@ -29,7 +29,7 @@ export default function ProductPurchase({ product }: { product: Product }) {
         <div className="flex items-center gap-4 rounded-full border border-line px-3 py-2.5">
           <button
             onClick={() => setQty((q) => Math.max(1, q - 1))}
-            className="text-bone-dim hover:text-bone"
+            className="text-ink-dim hover:text-ink"
             aria-label="Decrease quantity"
           >
             <MinusIcon className="size-4" />
@@ -37,7 +37,7 @@ export default function ProductPurchase({ product }: { product: Product }) {
           <span className="w-6 text-center text-sm tabular-nums">{qty}</span>
           <button
             onClick={() => setQty((q) => Math.min(10, q + 1))}
-            className="text-bone-dim hover:text-bone"
+            className="text-ink-dim hover:text-ink"
             aria-label="Increase quantity"
           >
             <PlusIcon className="size-4" />
@@ -62,8 +62,8 @@ export default function ProductPurchase({ product }: { product: Product }) {
         Buy it now
       </button>
 
-      <p className="mt-4 text-center text-[0.7rem] tracking-wide text-bone-faint">
-        Secure checkout · UPI · Cards · Netbanking · COD options at checkout
+      <p className="mt-4 text-center text-[0.7rem] tracking-wide text-ink-faint">
+        Secure checkout · UPI · Cards · Netbanking
       </p>
     </div>
   );
