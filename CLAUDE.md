@@ -60,8 +60,8 @@ Keep changes light/airy. Do not reintroduce a dark theme.
 - **Checkout:** dedicated `/checkout` page collects customer info (name + 10-digit
   phone required; email/address optional), then opens the Razorpay modal via
   `lib/useCheckout.ts`. "Buy it now" on a product routes straight here.
-- **Payments:** Razorpay — order created server-side (`api/create-order`, amount
-  recomputed from catalogue + shipping so a tampered client price can't change the
+- **Payments:** Razorpay (live keys) — order created server-side (`api/create-order`,
+  amount recomputed from catalogue + shipping so a tampered client price can't change the
   charge), HMAC SHA-256 signature verified (`api/verify-payment`). If keys are
   missing/placeholder, both routes return `503` and checkout is disabled.
 - **Cart:** React Context + `localStorage` (`context/CartContext.tsx`). No Redux.
@@ -69,12 +69,23 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   Two tables (`supabase/schema.sql`): `orders` (written pending → paid/failed across
   the create/verify routes, holds customer PII + line items) and `products`. When
   Supabase is unconfigured, everything **falls back to the hardcoded `products.ts`**.
-- **Admin:** `/admin` (cookie/HMAC gate via `ADMIN_PASSWORD` + `middleware.ts`) →
-  product CRUD (`/admin/products`) and an orders view (`/admin/orders`). Product data
-  layer `lib/adminProducts.ts` reads Supabase when configured, else `products.ts`.
-  Image uploads go to **Vercel Blob** (`BLOB_READ_WRITE_TOKEN`); without the token
-  uploads return `503`.
-- **Deploy target:** Vercel — set **Root Directory = `web`**.
+- **Fulfillment:** Shiprocket (`lib/shiprocket.ts`) — JWT token cached module-level;
+  `api/verify-payment` auto-syncs paid orders using Next 15 `after()` (keeps the
+  serverless function alive post-response so the sync completes; plain fire-and-forget
+  is killed by Vercel before the first `await`). Sync creates a Shiprocket order +
+  assigns AWB + requests pickup + generates label, then writes `shiprocket_*` cols +
+  sets `fulfillment_status = 'synced'`. Admin "Ready to Ship" (`api/admin/orders/[id]/ship`)
+  requires `shiprocket_shipment_id` to exist first.
+- **Notifications:** `lib/notify.ts` — order-confirmation email (GoDaddy SMTP/nodemailer)
+  + WhatsApp Cloud API. Shipping-status updates via webhook at `/api/webhooks/delivery-status`
+  (not `/shiprocket` — Shiprocket blocks URLs containing "shiprocket"/"sr"/"kr").
+- **Admin:** `/admin` (cookie/HMAC gate via `ADMIN_PASSWORD` + `middleware.ts`, fails
+  closed) → product CRUD (`/admin/products`), orders view with Ship action + PDF invoice
+  download (`/admin/orders`). Product data layer `lib/adminProducts.ts` reads Supabase
+  when configured, else `products.ts`. Image uploads go to **Vercel Blob**
+  (`BLOB_READ_WRITE_TOKEN`); without the token uploads return `503`.
+- **Deploy target:** Vercel (project `web`, org `manavmba24-1516`) — **Root Directory = `web`**.
+  GitHub→Vercel auto-deploy is **not** wired; deploy manually: `vercel --prod --yes` from `/web`.
 
 > Middleware **fails closed** (`src/middleware.ts`): a request is authorized only
 > when `ADMIN_PASSWORD` is set **and** the cookie carries the matching HMAC token.
@@ -92,19 +103,24 @@ web/src/
 │  ├─ collections/ · collections/[slug]/   Category landing pages (SEO)
 │  ├─ checkout/             Customer-info form → Razorpay modal
 │  ├─ thank-you/            Post-payment confirmation
+│  ├─ track/                Public order tracking page
 │  ├─ about/ · policies/ · privacy-policy/ · terms/   Brand + legal
 │  ├─ admin/                Gated: products CRUD + orders view
 │  ├─ api/create-order/ · api/verify-payment/          Razorpay (server)
+│  ├─ api/track/                                       Shiprocket tracking (server)
 │  ├─ api/admin/{login,logout,products,upload}/        Admin API
+│  ├─ api/admin/orders/[id]/ship/                      Assign AWB + pickup + label
+│  ├─ api/webhooks/delivery-status/                    Shiprocket status webhook
 │  ├─ sitemap.ts · robots.ts                           SEO
 │  └─ globals.css           ← brand design tokens (source of truth)
 ├─ components/              Header, Footer, CartDrawer, ProductCard,
 │                          ProductGallery, ProductPurchase, ShopClient, …
 ├─ context/CartContext.tsx  Cart state + localStorage persistence
-├─ middleware.ts            Admin cookie/HMAC gate
+├─ middleware.ts            Admin cookie/HMAC gate (fails closed)
 ├─ instrumentation.ts       Node localStorage shim (see gotcha)
 └─ lib/                     products, collections, site, format, types,
-                           useCheckout, supabase, adminProducts
+                           useCheckout, supabase, adminProducts,
+                           shiprocket, notify, invoice
 ```
 
 ## Editing the catalogue
@@ -122,24 +138,28 @@ libraries that feature-detect it. Handled two ways, no action needed:
 `src/instrumentation.ts` strips the broken global on boot, and the `dev` script
 passes `--no-experimental-webstorage`.
 
-## Status (as of 2026-06-27)
+## Status (as of 2026-06-27) — LIVE
 
-Configured locally in `.env.local`:
-- **Supabase** project `amorfos` (ap-south-1 / Mumbai) — URL + service-role key set.
-  Run `supabase/schema.sql` in any new project before use.
-- `ADMIN_PASSWORD` set locally.
-- Razorpay **test** `KEY_ID` set, but `KEY_SECRET` is still a **placeholder** →
-  `api/create-order` returns `503` and **no order can complete yet**, even in test.
+**https://amorfos.in** is live and processing real orders.
 
-Still gated on the user before launch:
-- **Real Razorpay test keys → run one full test order → live keys.** (#1 blocker.)
-- **Product images:** ~101 of 181 products have empty `images: []` and render a
-  placeholder glyph. Add photos (or hide imageless SKUs) before going live.
-- Not yet deployed to Vercel (needs his account; **Root Directory = `web`**).
-- Vercel Blob store + `BLOB_READ_WRITE_TOKEN` not set (admin image upload disabled).
+All env vars are set in Vercel production:
+- **Supabase** project `amorfos` (ap-south-1 / Mumbai) — confirmed active.
+- **Razorpay live keys** — smoke-tested + multiple real payments processed.
+- **Shiprocket** (`care@amorfos.in`, company 599101) — credentials smoke-tested;
+  end-to-end fulfillment confirmed: order → paid → Shiprocket order created → AWB
+  assigned (Shadowfax Surface) → pickup requested → label generated, all via `after()`.
+- **SMTP** (GoDaddy) + **WhatsApp Cloud API** — configured for notifications.
+- `ADMIN_PASSWORD` set. `BLOB_READ_WRITE_TOKEN` status: check Vercel dashboard.
 
-Known gaps surfaced in audit (not yet built): order-confirmation email/SMS,
-COD (checkout is prepaid Razorpay only), product search, inventory/stock tracking,
-analytics/pixel.
+**Shiprocket webhook** configured at `https://amorfos.in/api/webhooks/delivery-status`
+(Auth: `x-api-key` header = `SHIPROCKET_WEBHOOK_TOKEN`). Do not rename this path.
+
+**Remaining gaps (not yet built):**
+- **~101 of 181 products have no images** (`images: []`) — render placeholder glyphs.
+  Add photos before promoting the store widely.
+- No order-placement email/SMS (Shiprocket notify covers *shipping* events only).
+- No COD (checkout is prepaid Razorpay only).
+- No product search, inventory/stock tracking, analytics pixel.
+- No admin UI to retry a failed Shiprocket sync (manual DB fix needed if `after()` errors).
 
 See setup/deploy details in `README.md`.
