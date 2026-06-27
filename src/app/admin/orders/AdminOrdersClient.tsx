@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { inr } from "@/lib/format";
+import { downloadInvoice } from "@/lib/invoice";
 
 interface OrderItem {
   id: string;
@@ -75,9 +76,8 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
         </thead>
         <tbody className="divide-y divide-line">
           {orders.map((o) => (
-            <>
+            <Fragment key={o.id}>
               <tr
-                key={o.id}
                 className="hover:bg-paper/50 cursor-pointer"
                 onClick={() => setExpanded(expanded === o.id ? null : o.id)}
               >
@@ -111,7 +111,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
               </tr>
 
               {expanded === o.id && (
-                <tr key={`${o.id}-detail`} className="bg-paper-raised">
+                <tr className="bg-paper-raised">
                   <td colSpan={6} className="px-6 py-5">
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                       <div>
@@ -141,6 +141,18 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                             Paid {new Date(o.paid_at).toLocaleString("en-IN")}
                           </p>
                         )}
+                        {o.status === "paid" && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadInvoice(o);
+                            }}
+                            className="btn btn-outline mt-3 px-3 py-1.5 text-xs"
+                          >
+                            Download invoice
+                          </button>
+                        )}
                       </div>
                       <div>
                         <p className="eyebrow mb-2">Order breakdown</p>
@@ -165,7 +177,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                   </td>
                 </tr>
               )}
-            </>
+            </Fragment>
           ))}
         </tbody>
       </table>
