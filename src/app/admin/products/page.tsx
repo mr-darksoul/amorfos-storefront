@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { getAdminProducts } from "@/lib/adminProducts";
+import { getAdminProductListings } from "@/lib/adminProducts";
 import AdminProductsClient from "./AdminProductsClient";
 import AdminLogoutButton from "./AdminLogoutButton";
 
 export const metadata = { title: "Products" };
 
 export default async function AdminProductsPage() {
-  const products = await getAdminProducts();
+  const products = await getAdminProductListings();
   const supabaseConfigured = !!(
     process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
   );

@@ -55,6 +55,29 @@ interface Props {
   mode: "new" | "edit";
 }
 
+const inputCls =
+  "w-full rounded-sm border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none focus:border-gold-soft";
+
+function Field({
+  label,
+  children,
+  hint,
+}: {
+  label: string;
+  children: React.ReactNode;
+  hint?: string;
+}) {
+  return (
+    <div>
+      <label className="mb-1.5 block text-xs uppercase tracking-[0.16em] text-ink-faint">
+        {label}
+      </label>
+      {children}
+      {hint && <p className="mt-1 text-xs text-ink-faint">{hint}</p>}
+    </div>
+  );
+}
+
 export default function ProductForm({ initial, mode }: Props) {
   const router = useRouter();
   const [form, setForm] = useState<Omit<Product, "id">>(
@@ -185,27 +208,6 @@ export default function ProductForm({ initial, mode }: Props) {
       setSaving(false);
     }
   }
-
-  const Field = ({
-    label,
-    children,
-    hint,
-  }: {
-    label: string;
-    children: React.ReactNode;
-    hint?: string;
-  }) => (
-    <div>
-      <label className="mb-1.5 block text-xs uppercase tracking-[0.16em] text-ink-faint">
-        {label}
-      </label>
-      {children}
-      {hint && <p className="mt-1 text-xs text-ink-faint">{hint}</p>}
-    </div>
-  );
-
-  const inputCls =
-    "w-full rounded-sm border border-line bg-paper px-3 py-2.5 text-sm text-ink outline-none focus:border-gold-soft";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">

@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export interface Review {
   id: string;
@@ -21,6 +21,7 @@ export interface ReviewSummary {
 export type RatingMap = Record<number, { average: number; total: number }>;
 
 export async function getAllRatingSummaries(): Promise<RatingMap> {
+  if (!isSupabaseConfigured()) return {};
   const { data, error } = await supabase()
     .from("reviews")
     .select("mukhi, rating");
@@ -45,6 +46,7 @@ export async function getAllRatingSummaries(): Promise<RatingMap> {
 }
 
 export async function getReviewsByMukhi(mukhi: number): Promise<Review[]> {
+  if (!isSupabaseConfigured()) return [];
   const { data, error } = await supabase()
     .from("reviews")
     .select("*")

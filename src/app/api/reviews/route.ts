@@ -21,7 +21,11 @@ export async function POST(req: Request) {
     typeof mukhi !== "number" || mukhi < 1 || mukhi > 21 ||
     typeof reviewer !== "string" || reviewer.trim().length < 2 ||
     typeof rating !== "number" || rating < 1 || rating > 5 ||
-    typeof reviewBody !== "string" || reviewBody.trim().length < 10
+    typeof reviewBody !== "string" || reviewBody.trim().length < 10 ||
+    // title is optional, but if present it must be a string — otherwise the
+    // `title.trim()` below throws a TypeError on e.g. `title: 123`, which would
+    // surface as an unhandled 500 on this public endpoint.
+    (title !== undefined && title !== null && typeof title !== "string")
   ) {
     return NextResponse.json({ error: "Invalid review data" }, { status: 422 });
   }

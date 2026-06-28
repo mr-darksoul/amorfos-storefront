@@ -3,12 +3,34 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import type { Product } from "@/lib/types";
+import type { AdminProductListing } from "@/lib/adminProducts";
 import { inr } from "@/lib/format";
 
-export default function AdminProductsClient({ products }: { products: Product[] }) {
+export default function AdminProductsClient({ products }: { products: AdminProductListing[] }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [toggling, setToggling] = useState<string | null>(null);
+
+  async function handleToggle(id: string, active: boolean) {
+    setToggling(id);
+    try {
+      const res = await fetch(`/api/admin/products/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ active: !active }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error ?? "Update failed.");
+      } else {
+        router.refresh();
+      }
+    } catch {
+      alert("Network error.");
+    } finally {
+      setToggling(null);
+    }
+  }
 
   async function handleDelete(id: string, name: string) {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
@@ -49,12 +71,13 @@ export default function AdminProductsClient({ products }: { products: Product[] 
             <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal">Origin</th>
             <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal text-right">Price</th>
             <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal">Tags</th>
+            <th className="px-4 py-3 text-xs uppercase tracking-[0.16em] text-ink-faint font-normal">Status</th>
             <th className="px-4 py-3" />
           </tr>
         </thead>
         <tbody className="divide-y divide-line">
           {products.map((p) => (
-            <tr key={p.id} className="hover:bg-paper/50">
+            <tr key={p.id} className={`hover:bg-paper/50 ${p.active ? "" : "opacity-55"}`}>
               <td className="px-4 py-3">
                 <p className="font-serif text-base text-ink">{p.name}</p>
                 <p className="mt-0.5 font-mono text-[0.65rem] text-ink-faint">{p.id}</p>
@@ -75,6 +98,28 @@ export default function AdminProductsClient({ products }: { products: Product[] 
                     </span>
                   )}
                 </div>
+              </td>
+              <td className="px-4 py-3">
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={p.active}
+                  onClick={() => handleToggle(p.id, p.active)}
+                  disabled={toggling === p.id}
+                  title={p.active ? "Live — click to hide from store" : "Hidden — click to show on store"}
+                  className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 ${
+                    p.active ? "bg-gold" : "bg-ink/20"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-5 w-5 transform rounded-full bg-cream shadow transition-transform ${
+                      p.active ? "translate-x-[22px]" : "translate-x-0.5"
+                    }`}
+                  />
+                </button>
+                <span className="ml-2 align-middle text-[0.65rem] uppercase tracking-wide text-ink-faint">
+                  {p.active ? "Live" : "Hidden"}
+                </span>
               </td>
               <td className="px-4 py-3">
                 <div className="flex items-center justify-end gap-4">

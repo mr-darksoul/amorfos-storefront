@@ -11,7 +11,7 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await getAdminProduct(id);
+  const product = await getAdminProduct(id, true);
   if (!product) notFound();
 
   return (
