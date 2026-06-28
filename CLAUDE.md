@@ -8,7 +8,7 @@ Guidance for Claude (and collaborators) working in this repo. Read this first.
 Rudraksha — pendants, malas, combination pieces and loose beads, in
 hand-finished silver. Founded by **Manav Bansal** (Rohini, Sector-1, Delhi).
 Previously sold on Amazon/Flipkart; now going direct-to-consumer. Real business,
-launching ~mid-2026. Brand WhatsApp: +91 83684 69332 · care@amorfos.in.
+LIVE as of mid-2026. Brand WhatsApp: +91 83684 69332 · care@amorfos.in.
 
 This `web/` directory is the production storefront.
 
@@ -67,9 +67,9 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   missing/placeholder, both routes return `503` and checkout is disabled.
 - **Cart:** React Context + `localStorage` (`context/CartContext.tsx`). No Redux.
 - **Database:** **Supabase** (`lib/supabase.ts`, server-only `SUPABASE_SERVICE_ROLE_KEY`).
-  Three tables (`supabase/schema.sql`): `orders`, `products`, and `articles`. All
+  Five tables: `orders`, `products`, `articles`, `reviews`, `review_tokens`. All
   have RLS enabled (service-role only). When Supabase is unconfigured, products fall
-  back to the hardcoded `products.ts`; the journal renders empty.
+  back to the hardcoded `products.ts`; the journal and reviews render empty.
 - **Fulfillment:** Shiprocket (`lib/shiprocket.ts`) — JWT token cached module-level;
   `api/verify-payment` auto-syncs paid orders using Next 15 `after()` (keeps the
   serverless function alive post-response so the sync completes; plain fire-and-forget
@@ -78,13 +78,35 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   sets `fulfillment_status = 'synced'`. Admin "Ready to Ship" (`api/admin/orders/[id]/ship`)
   requires `shiprocket_shipment_id` to exist first.
 - **Notifications:** `lib/notify.ts` — order-confirmation email (GoDaddy SMTP/nodemailer)
-  + WhatsApp Cloud API. Shipping-status updates via webhook at `/api/webhooks/delivery-status`
-  (not `/shiprocket` — Shiprocket blocks URLs containing "shiprocket"/"sr"/"kr").
+  + WhatsApp Cloud API. Confirmation email includes a "Leave a Review" button when a
+  review token was generated. Shipping-status updates via webhook at
+  `/api/webhooks/delivery-status` (not `/shiprocket` — Shiprocket blocks URLs containing
+  "shiprocket"/"sr"/"kr").
+- **Reviews:** `lib/reviews.ts` — keyed by `mukhi` integer so all variants (mala/bead/pendant)
+  of the same mukhi share reviews. `getAllRatingSummaries()` runs one query and aggregates
+  in JS — single DB call for shop/collections pages. Reviews have `status = pending | approved`.
+  - **Star ratings** shown on product cards (shop, collections, homepage bestsellers) and inline
+    below the `<h1>` on product detail pages (clickable → `#reviews` anchor). `aggregateRating`
+    JSON-LD emitted for Google rich snippets.
+  - **ReviewSection** (`components/ReviewSection.tsx`) — paginated approved reviews, distribution
+    bars, Verified Purchase badge. Returns null when no reviews.
+  - **Option A — open form** (`components/ReviewForm.tsx`): any visitor submits name/rating/title/body
+    on the product page → `POST /api/reviews` (rate-limited 3/hr/IP) → `status=pending, verified=false`.
+  - **Option B — post-purchase verified** (`app/reviews/[token]/page.tsx`): after payment,
+    `verify-payment` generates a `review_tokens` row (60-day expiry, one token per order, tracks
+    which mukhi have been reviewed). Token URL inserted into confirmation email. Customer clicks →
+    `/reviews/[token]` page → `POST /api/reviews/[token]` → `status=pending, verified=true`.
+  - **Admin moderation** (`/admin/reviews`): lists all pending reviews with Approve / Reject.
+    Approve sets `status=approved` (goes live). Reject deletes the row.
+  - **Seeded data:** 38 Amazon reviews imported (scrapped 2026-06-28) for mukhi 4, 6, 7, 9, 11, 12, 13
+    — all `status=approved, source=amazon`.
+  - **Admin auth note:** `/admin/*` is protected entirely by `middleware.ts`. Admin sub-pages must NOT
+    re-implement their own auth check — the middleware already handles it.
 - **Admin:** `/admin` (cookie/HMAC gate via `ADMIN_PASSWORD` + `middleware.ts`, fails
   closed) → product CRUD (`/admin/products`), orders view with Ship action + PDF invoice
   download (`/admin/orders`), Journal CRUD (`/admin/journal` — list/edit/publish/unpublish/
-  delete drafts). Product data layer `lib/adminProducts.ts`; journal data layer
-  `lib/articles.ts`. Image uploads go to **Vercel Blob** (`BLOB_READ_WRITE_TOKEN`);
+  delete drafts), Reviews moderation (`/admin/reviews`). Product data layer `lib/adminProducts.ts`;
+  journal data layer `lib/articles.ts`. Image uploads go to **Vercel Blob** (`BLOB_READ_WRITE_TOKEN`);
   without the token uploads return `503`.
 - **Journal (SEO content engine):** `/journal` hub + `/journal/[slug]` article pages.
   Data stored in Supabase `articles` table (`status = draft | published`). Article body
@@ -120,25 +142,32 @@ web/src/
 │  ├─ about/ · policies/ · privacy-policy/ · terms/   Brand + legal
 │  ├─ journal/page.tsx       Journal hub (published articles, grouped by cluster)
 │  ├─ journal/[slug]/       Article page (JSON-LD, revalidate 60)
-│  ├─ admin/                Gated: products CRUD + orders view + journal CRUD
+│  ├─ admin/                Gated: products CRUD + orders view + journal CRUD + reviews
+│  ├─ admin/reviews/        Pending reviews moderation (approve / reject)
+│  ├─ reviews/[token]/      Post-purchase verified review page (public, token-gated)
 │  ├─ api/create-order/ · api/verify-payment/          Razorpay (server)
 │  ├─ api/track/                                       Shiprocket tracking (server)
 │  ├─ api/admin/{login,logout,products,upload}/        Admin API
 │  ├─ api/admin/journal/[slug]/publish/                Publish/unpublish gate
 │  ├─ api/admin/orders/[id]/ship/                      Assign AWB + pickup + label
+│  ├─ api/admin/reviews/                               GET pending reviews
+│  ├─ api/admin/reviews/[id]/                          PATCH approve | reject
+│  ├─ api/reviews/                                     POST open review submission
+│  ├─ api/reviews/[token]/                             GET token info · POST verified review
 │  ├─ api/cron/content-draft/                          Vercel Cron endpoint (CRON_SECRET)
 │  ├─ api/webhooks/delivery-status/                    Shiprocket status webhook
 │  ├─ sitemap.ts · robots.ts                           SEO (includes /journal + articles)
 │  └─ globals.css           ← brand design tokens (source of truth)
 ├─ components/              Header, Footer, CartDrawer, ProductCard,
-│                          ProductGallery, ProductPurchase, ShopClient, ArticleCard, …
+│                          ProductGallery, ProductPurchase, ShopClient, ArticleCard,
+│                          ReviewSection, ReviewForm, …
 ├─ context/CartContext.tsx  Cart state + localStorage persistence
 ├─ middleware.ts            Admin cookie/HMAC gate (fails closed)
 ├─ instrumentation.ts       Node localStorage shim (see gotcha)
 └─ lib/                     products, collections, site, format, types,
                            useCheckout, supabase, adminProducts, articles,
                            articleGenerator, validateCustomer,
-                           shiprocket, notify, invoice
+                           shiprocket, notify, invoice, reviews, ratelimit
 ```
 
 ## Editing the catalogue
@@ -162,7 +191,7 @@ passes `--no-experimental-webstorage`.
 
 All env vars are set in Vercel production:
 - **Supabase** project `amorfos` (ap-south-1 / Mumbai) — confirmed active. Migrations
-  001 (schema), 002 (RLS + stock), 003 (articles) all applied.
+  001 (schema), 002 (RLS + stock), 003 (articles), 004 (reviews + review_tokens) all applied.
 - **Razorpay live keys** — smoke-tested + multiple real payments processed.
 - **Shiprocket** (`care@amorfos.in`, company 599101) — end-to-end fulfillment confirmed.
 - **SMTP** (GoDaddy) + **WhatsApp Cloud API** — configured for notifications.
@@ -170,6 +199,13 @@ All env vars are set in Vercel production:
 
 **Shiprocket webhook** at `https://amorfos.in/api/webhooks/delivery-status`
 (Auth: `x-api-key` = `SHIPROCKET_WEBHOOK_TOKEN`). Do not rename this path.
+
+**Reviews system** (live as of 2026-06-28):
+- 38 seed reviews from Amazon for 7 mukhi types (4, 6, 7, 9, 11, 12, 13) — `status=approved`
+- Star ratings visible on product cards, collection pages, homepage bestsellers, and product detail
+- Open form (Option A) on every product page → pending, admin approves at `/admin/reviews`
+- Post-purchase token (Option B) generated in `verify-payment` → emailed in confirmation → 60-day link
+- Review tokens are per-order, track which mukhi the customer has already reviewed, expire after 60 days
 
 **Journal content pipeline:**
 - Vercel Cron fires daily at 04:00 UTC (9:30 AM IST) → `api/cron/content-draft`
@@ -181,7 +217,6 @@ All env vars are set in Vercel production:
 **Remaining gaps:**
 - **~101 of 181 products have no images** — render placeholder glyphs. Add photos
   before promoting widely.
-- No order-placement email/SMS (Shiprocket covers shipping events only).
 - No COD (prepaid Razorpay only).
 - No product search, no analytics pixel.
 - No admin UI to retry a failed Shiprocket sync (manual DB fix needed).
