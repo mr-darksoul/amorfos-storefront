@@ -216,7 +216,10 @@ These were intentionally out of scope for the first build (Manav chose SEO blog
 only). Logical next channels, reusing the same draft→approve queue:
 
 1. **Email** — repurpose published articles into a monthly newsletter to the
-   Supabase customer list (GoDaddy SMTP already wired in `lib/notify.ts`).
+   Supabase `subscribers` list (GoDaddy SMTP already wired in `lib/notify.ts`).
+   The lead-magnet form is **double opt-in**, so only mail rows with
+   `confirmed = true` — `confirmed = false` rows are unverified signups (and the
+   prune-able fake-signup spam the opt-in exists to filter out).
 2. **WhatsApp broadcast** — short article teasers to opted-in customers.
 3. **Social** — auto-generated captions + image briefs for Instagram/FB.
 4. **Fully hands-off drafting** — Vercel Cron → API route calling the Claude API

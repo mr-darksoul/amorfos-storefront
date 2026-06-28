@@ -67,9 +67,10 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   missing/placeholder, both routes return `503` and checkout is disabled.
 - **Cart:** React Context + `localStorage` (`context/CartContext.tsx`). No Redux.
 - **Database:** **Supabase** (`lib/supabase.ts`, server-only `SUPABASE_SERVICE_ROLE_KEY`).
-  Five tables: `orders`, `products`, `articles`, `reviews`, `review_tokens`. All
-  have RLS enabled (service-role only). When Supabase is unconfigured, products fall
-  back to the hardcoded `products.ts`; the journal and reviews render empty.
+  Seven tables: `orders`, `products`, `articles`, `reviews`, `review_tokens`,
+  `subscribers`, `abandoned_cart`. All have RLS enabled (service-role only). When
+  Supabase is unconfigured, products fall back to the hardcoded `products.ts`; the
+  journal and reviews render empty.
 - **Fulfillment:** Shiprocket (`lib/shiprocket.ts`) — JWT token cached module-level;
   `api/verify-payment` auto-syncs paid orders using Next 15 `after()` (keeps the
   serverless function alive post-response so the sync completes; plain fire-and-forget
@@ -82,6 +83,21 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   review token was generated. Shipping-status updates via webhook at
   `/api/webhooks/delivery-status` (not `/shiprocket` — Shiprocket blocks URLs containing
   "shiprocket"/"sr"/"kr").
+- **Newsletter lead-magnet (double opt-in):** `NewsletterForm` (footer + lead modal) →
+  `POST /api/subscribe` (rate-limited 5/hr/IP). A new signup is stored **unconfirmed**
+  with a single-use `confirm_token` and emailed only a lightweight confirmation link
+  (`sendConfirmationEmail`, no attachment) — sent via `after()`, new-insert only so a
+  re-signup never re-mails an existing subscriber. Clicking the link hits
+  `GET /api/subscribe/confirm?token=…`, which validates the token (7-day expiry), flips
+  `confirmed = true` and burns the token (race-guarded against double-click), then sends
+  the 5 MB guide PDF (`sendLeadMagnetEmail`) via `after()` and redirects to
+  `/newsletter/confirmed?state=…` (confirmed | already | expired | invalid). **Why this
+  shape:** the PDF is never sent until a human clicks a link in that inbox, so a
+  competitor flooding the form with fake/random addresses can't trigger a PDF send and
+  can't pollute the confirmed list (unconfirmed junk rows are pruned with
+  `DELETE FROM subscribers WHERE confirmed = false AND created_at < now() - interval '30 days'`).
+  The PDF lives outside `/public` (so it isn't hotlinkable) and is bundled into the
+  subscribe/confirm functions via `outputFileTracingIncludes` in `next.config.mjs`.
 - **Reviews:** `lib/reviews.ts` — keyed by `mukhi` integer so all variants (mala/bead/pendant)
   of the same mukhi share reviews. `getAllRatingSummaries()` runs one query and aggregates
   in JS — single DB call for shop/collections pages. Reviews have `status = pending | approved`.
@@ -145,6 +161,7 @@ web/src/
 │  ├─ admin/                Gated: products CRUD + orders view + journal CRUD + reviews
 │  ├─ admin/reviews/        Pending reviews moderation (approve / reject)
 │  ├─ reviews/[token]/      Post-purchase verified review page (public, token-gated)
+│  ├─ newsletter/confirmed/ Double opt-in landing (confirmed|already|expired|invalid)
 │  ├─ api/create-order/ · api/verify-payment/          Razorpay (server)
 │  ├─ api/track/                                       Shiprocket tracking (server)
 │  ├─ api/admin/{login,logout,products,upload}/        Admin API
@@ -154,6 +171,7 @@ web/src/
 │  ├─ api/admin/reviews/[id]/                          PATCH approve | reject
 │  ├─ api/reviews/                                     POST open review submission
 │  ├─ api/reviews/[token]/                             GET token info · POST verified review
+│  ├─ api/subscribe/ · api/subscribe/confirm/          Newsletter double opt-in (lead-magnet)
 │  ├─ api/cron/content-draft/                          Vercel Cron endpoint (CRON_SECRET)
 │  ├─ api/webhooks/delivery-status/                    Shiprocket status webhook
 │  ├─ sitemap.ts · robots.ts                           SEO (includes /journal + articles)
@@ -190,8 +208,11 @@ passes `--no-experimental-webstorage`.
 **https://amorfos.in** is live and processing real orders.
 
 All env vars are set in Vercel production:
-- **Supabase** project `amorfos` (ap-south-1 / Mumbai) — confirmed active. Migrations
-  001 (schema), 002 (RLS + stock), 003 (articles), 004 (reviews + review_tokens) all applied.
+- **Supabase** project `amorfos` (ap-south-1 / Mumbai, ref `qxdgqebjbwzwionwfnmg`) —
+  confirmed active. `supabase/migrations/`: 001 (shiprocket cols), 002 (RLS + stock),
+  003 (articles), 004 (subscribers), 005 (abandoned_cart), 006 (subscriber double opt-in
+  — `confirmed`/`confirm_token`/`confirmed_at`) all applied. The `reviews` + `review_tokens`
+  tables were applied directly via the Supabase MCP (no numbered file).
 - **Razorpay live keys** — smoke-tested + multiple real payments processed.
 - **Shiprocket** (`care@amorfos.in`, company 599101) — end-to-end fulfillment confirmed.
 - **SMTP** (GoDaddy) + **WhatsApp Cloud API** — configured for notifications.
