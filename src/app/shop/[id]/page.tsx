@@ -10,6 +10,8 @@ import ProductPurchase from "@/components/ProductPurchase";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
 import { ShieldIcon, TruckIcon, ReturnIcon, CheckIcon } from "@/components/icons";
+import ReviewSection from "@/components/ReviewSection";
+import { getReviewsByMukhi, summariseReviews } from "@/lib/reviews";
 
 export const revalidate = 60;
 
@@ -49,7 +51,11 @@ export default async function ProductPage({
 
   const off = discountPct(product.price, product.mrp);
   const soldOut = typeof product.stock === "number" && product.stock <= 0;
-  const related = await getAdminRelated(product);
+  const [related, reviews] = await Promise.all([
+    getAdminRelated(product),
+    product.mukhi ? getReviewsByMukhi(product.mukhi) : Promise.resolve([]),
+  ]);
+  const reviewSummary = summariseReviews(reviews);
 
   const specs: [string, string][] = [
     ["Mukhi", product.mukhiLabel],
@@ -78,6 +84,15 @@ export default async function ProductPage({
         : "https://schema.org/InStock",
       seller: { "@type": "Organization", name: site.name },
     },
+    ...(reviewSummary.total > 0 && {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: reviewSummary.average,
+        reviewCount: reviewSummary.total,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }),
   };
 
   return (
@@ -178,6 +193,9 @@ export default async function ProductPage({
             </a>
           </div>
         </div>
+
+        {/* Reviews */}
+        <ReviewSection reviews={reviews} summary={reviewSummary} />
 
         {/* Related */}
         {related.length > 0 && (
