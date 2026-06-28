@@ -5,6 +5,11 @@ import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
+// The session cookie is a deterministic HMAC of the password — the same value
+// for the life of that password. There is no per-session secret or server-side
+// revocation list: the only way to invalidate every issued cookie is to rotate
+// ADMIN_PASSWORD (which changes this token and so logs everyone out). Acceptable
+// for a single-admin store; revisit if multiple admins or true sessions are added.
 async function computeToken(password: string): Promise<string> {
   return createHmac("sha256", password).update("amorfos-admin-v1").digest("hex");
 }

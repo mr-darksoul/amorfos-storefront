@@ -76,6 +76,9 @@ export async function GET(req: Request) {
       reviewAt: "https://amorfos.in/admin/journal",
     });
   } catch (err) {
-    return NextResponse.json({ error: (err as Error).message }, { status: 500 });
+    // Log the real error (Vercel logs); return a generic message so internal
+    // SDK/provider details aren't echoed in the response body.
+    console.error("[content-draft] generation failed:", err);
+    return NextResponse.json({ error: "Content generation failed." }, { status: 500 });
   }
 }

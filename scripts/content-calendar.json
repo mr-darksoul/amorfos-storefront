@@ -1,5 +1,5 @@
 {
-  "_comment": "Amorfos Journal content calendar. The generator (scripts/generate-articles.ts) drafts the next entries not yet present in the Supabase `articles` table, in order, up to BATCH (default 2). Edit freely — slugs are the unique key. See docs/content-marketing-strategy.md.",
+  "_comment": "Amorfos Journal content calendar. The generator (scripts/generate-articles.ts) and the daily Vercel Cron (api/cron/content-draft) draft the next entry not yet present in the Supabase `articles` table, in order. Edit freely — `slug` is the unique key, so reordering/editing copy is safe but renaming a slug re-drafts it. Expanded 2026-06-28 from the SEO audit: full 1→14 Mukhi pillar set + Gauri Shankar/Ganesh, the buying/care/mala/remedies pillars, and a Rashi-based selection guide. See docs/content-marketing-strategy.md.",
   "entries": [
     {
       "slug": "what-lab-certified-rudraksha-means",
@@ -80,6 +80,226 @@
       "outline": "Traditional guidance on wearing a Rudraksha — thread, metal, when it is worn, and the note that it is worn on the recommendation of astrologers and pandits. Practical, respectful, no claims.",
       "relatedProductIds": [],
       "relatedCollectionSlugs": ["rudraksha-pendant", "rudraksha-mala"]
+    },
+    {
+      "slug": "1-mukhi-rudraksha-rarest-bead",
+      "title": "1 Mukhi Rudraksha: The Rarest Bead",
+      "targetKeyword": "1 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "1 Mukhi: ruling deity (Shiva), ruling planet (Sun), why round single-faced beads are rare and how the Indonesian form differs, who traditionally keeps it on the recommendation of astrologers and pandits, and origin/format notes. No medical or miraculous claims.",
+      "relatedProductIds": ["1-mukhi-nepal", "1-mukhi-india"],
+      "relatedCollectionSlugs": ["loose-rudraksha-beads", "rudraksha-pendant"]
+    },
+    {
+      "slug": "9-mukhi-rudraksha-meaning-tradition",
+      "title": "9 Mukhi Rudraksha: Meaning & Tradition",
+      "targetKeyword": "9 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "9 Mukhi: ruling deity (Maa Durga / the nine forms), ruling planet (Ketu), traditional associations, who wears it on the recommendation of astrologers and pandits, Nepal vs Indonesia origin notes. No claims.",
+      "relatedProductIds": ["9-mukhi-nepal", "9-mukhi-indonesia"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "how-to-clean-care-rudraksha",
+      "title": "How to Clean & Care for Rudraksha Beads",
+      "targetKeyword": "rudraksha care cleaning",
+      "cluster": "care",
+      "eyebrow": "Care & use",
+      "outline": "Practical care for Rudraksha pendants and malas: keeping beads dry, gentle wiping, avoiding harsh chemicals and perfume, occasional oiling in tradition, and safe storage. Respectful, practical, no claims.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-mala", "rudraksha-pendant"]
+    },
+    {
+      "slug": "gauri-shankar-rudraksha-explained",
+      "title": "Gauri Shankar Rudraksha Explained",
+      "targetKeyword": "gauri shankar rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "The naturally joined Gauri Shankar bead: what it is, the tradition of Shiva and Parvati together, who keeps it on the recommendation of astrologers and pandits, and how Amorfos certifies and sets it. No claims.",
+      "relatedProductIds": ["lab-certified-gauri-shankar-rudraksha-pendant-nepal", "lab-certified-gauri-shankar-rudraksha-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "loose-rudraksha-beads"]
+    },
+    {
+      "slug": "how-to-do-japa-rudraksha-mala",
+      "title": "How to Do Japa with a Rudraksha Mala",
+      "targetKeyword": "rudraksha japa mala",
+      "cluster": "mala",
+      "eyebrow": "Mala & japa",
+      "outline": "A respectful, practical guide to japa: holding the mala, using the guru bead, completing a round of 108, common traditions around mantra and posture. Tradition only, no claims.",
+      "relatedProductIds": ["lab-certified-rudraksha-mala-nepal", "rudraksha-mala-for-chanting-or-pooja-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-mala"]
+    },
+    {
+      "slug": "10-mukhi-rudraksha-meaning-tradition",
+      "title": "10 Mukhi Rudraksha: Meaning & Tradition",
+      "targetKeyword": "10 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "10 Mukhi: ruling deity (Vishnu), said in tradition to need no specific ruling planet, traditional associations, who wears it on the recommendation of astrologers and pandits, origin notes. No claims.",
+      "relatedProductIds": ["10-mukhi-nepal", "10-mukhi-indonesia"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "rudraksha-mukhi-complete-guide",
+      "title": "Rudraksha Mukhi: The Complete Guide",
+      "targetKeyword": "rudraksha mukhi guide",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "Pillar guide to the faces (mukhi) of the Rudraksha from 1 to 14 plus Gauri Shankar and Ganesh: what mukhi means, the ruling deity and planet traditionally linked to each, and how a bead is usually chosen on the recommendation of astrologers and pandits. Links out to each individual Mukhi guide. No claims.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "loose-rudraksha-beads"]
+    },
+    {
+      "slug": "11-mukhi-rudraksha-meaning-tradition",
+      "title": "11 Mukhi Rudraksha: Meaning & Tradition",
+      "targetKeyword": "11 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "11 Mukhi: ruling deity (Hanuman / the eleven Rudras), traditional associations, who wears it on the recommendation of astrologers and pandits, Nepal vs Indonesia origin notes. No claims.",
+      "relatedProductIds": ["11-mukhi-nepal", "11-mukhi-indonesia"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "how-to-buy-authentic-rudraksha",
+      "title": "How to Buy an Authentic Rudraksha",
+      "targetKeyword": "buy authentic rudraksha",
+      "cluster": "authenticity",
+      "eyebrow": "Buying & authenticity",
+      "outline": "Pillar buying guide: what authenticity means, why Lab Certification matters, choosing origin (Nepal vs Indonesia) and mukhi, what to ask a seller, and the Amorfos certification and 7-day return promise. Links to the identify-original and Lab-Certified spokes. Never name a specific lab.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "rudraksha-mala", "rudraksha-combination", "loose-rudraksha-beads"]
+    },
+    {
+      "slug": "12-mukhi-rudraksha-surya-bead",
+      "title": "12 Mukhi Rudraksha: The Surya Bead",
+      "targetKeyword": "12 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "12 Mukhi: ruling deity (Surya), ruling planet (Sun), traditional associations, who wears it on the recommendation of astrologers and pandits, origin notes. No claims.",
+      "relatedProductIds": ["12-mukhi-nepal", "12-mukhi-indonesia"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "when-rudraksha-is-energised",
+      "title": "When & How a Rudraksha Is Energised",
+      "targetKeyword": "rudraksha energising",
+      "cluster": "care",
+      "eyebrow": "Care & use",
+      "outline": "The tradition of preparing or energising a Rudraksha before wear — what it means, when it is done, and the note that it is done on the recommendation of astrologers and pandits. Respectful, tradition only, no claims.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "rudraksha-mala"]
+    },
+    {
+      "slug": "14-mukhi-rudraksha-meaning-tradition",
+      "title": "14 Mukhi Rudraksha: Meaning & Tradition",
+      "targetKeyword": "14 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "14 Mukhi: ruling deity (Hanuman / Deva Mani in tradition), ruling planet (Saturn), traditional associations, who wears it on the recommendation of astrologers and pandits, Nepal vs Indonesia origin notes. No claims.",
+      "relatedProductIds": ["14-mukhi-nepal", "14-mukhi-indonesia"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "study-success-rudraksha-set",
+      "title": "The Study Success Rudraksha Set",
+      "targetKeyword": "study success rudraksha",
+      "cluster": "remedies",
+      "eyebrow": "Remedies & combinations",
+      "outline": "The traditional combination worn for focus and learning (e.g. 4 Mukhi with supporting beads), what the tradition says, and how it is worn on the recommendation of astrologers and pandits. Explicitly no medical or miraculous claims.",
+      "relatedProductIds": ["study-success-pendant-of-4-nepal", "certified-confidence-booster-pendant-of-3-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-combination"]
+    },
+    {
+      "slug": "3-mukhi-rudraksha-meaning-tradition",
+      "title": "3 Mukhi Rudraksha: Meaning & Tradition",
+      "targetKeyword": "3 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "3 Mukhi: ruling deity (Agni), ruling planet (Mars), traditional associations, who wears it on the recommendation of astrologers and pandits, origin notes. No claims.",
+      "relatedProductIds": ["3-mukhi-nepal", "certified-confidence-booster-pendant-of-3-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "rudraksha-combinations-explained",
+      "title": "Rudraksha Combinations Explained",
+      "targetKeyword": "rudraksha combinations",
+      "cluster": "remedies",
+      "eyebrow": "Remedies & combinations",
+      "outline": "Pillar guide to combination pieces: what a combination is, why more than one mukhi is linked together, familiar traditional sets (Kaal Sarp Dosh, Study Success, and others), and how they are chosen on the recommendation of astrologers and pandits. Links to combination spokes. No medical or miraculous claims.",
+      "relatedProductIds": ["certified-kaal-sarp-dosh-nivarak-rudraksha-combination-of-8-mukhi-nepal", "study-success-pendant-of-4-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-combination"]
+    },
+    {
+      "slug": "8-mukhi-rudraksha-ganesha-bead",
+      "title": "8 Mukhi Rudraksha: The Ganesha Bead",
+      "targetKeyword": "8 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "8 Mukhi: ruling deity (Ganesha), ruling planet (Rahu), traditional associations, who wears it on the recommendation of astrologers and pandits, Nepal vs Indonesia origin notes. No claims.",
+      "relatedProductIds": ["8-mukhi-nepal", "8-mukhi-indonesia"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "which-rudraksha-to-wear-by-rashi",
+      "title": "Which Rudraksha to Wear by Rashi",
+      "targetKeyword": "which rudraksha to wear by rashi",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "A traditional reference to how mukhi are associated with planets and, in turn, with zodiac signs (rashi) — sign by sign, the mukhi commonly linked to each in tradition. Stress that selection is individual and should follow the recommendation of an astrologer or pandit; make no guarantees and no medical or miraculous claims. Links to the relevant Mukhi guides and the pendant collection.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "loose-rudraksha-beads"]
+    },
+    {
+      "slug": "6-mukhi-rudraksha-meaning-tradition",
+      "title": "6 Mukhi Rudraksha: Meaning & Tradition",
+      "targetKeyword": "6 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "6 Mukhi: ruling deity (Kartikeya), ruling planet (Venus / Mars in tradition), traditional associations, who wears it on the recommendation of astrologers and pandits, origin notes. No claims.",
+      "relatedProductIds": ["6-mukhi-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "4-mukhi-rudraksha-meaning-tradition",
+      "title": "4 Mukhi Rudraksha: Meaning & Tradition",
+      "targetKeyword": "4 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "4 Mukhi: ruling deity (Brahma), ruling planet (Mercury), traditional associations with learning and expression, who wears it on the recommendation of astrologers and pandits, origin notes. No claims.",
+      "relatedProductIds": ["4-mukhi-nepal", "study-success-pendant-of-4-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "2-mukhi-rudraksha-ardhanarishwara-bead",
+      "title": "2 Mukhi Rudraksha: The Ardhanarishwara Bead",
+      "targetKeyword": "2 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "2 Mukhi: ruling deity (Ardhanarishwara — Shiva and Parvati), ruling planet (Moon), traditional associations with harmony and relationships, who wears it on the recommendation of astrologers and pandits, origin notes. No claims.",
+      "relatedProductIds": ["2-mukhi-nepal", "2-mukhi-india"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "13-mukhi-rudraksha-indra-bead",
+      "title": "13 Mukhi Rudraksha: The Indra Bead",
+      "targetKeyword": "13 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "13 Mukhi: ruling deity (Indra / Kamadeva in tradition), ruling planet (Venus), traditional associations with charm and influence, who wears it on the recommendation of astrologers and pandits, Nepal vs Indonesia origin notes. No claims.",
+      "relatedProductIds": ["13-mukhi-nepal", "13-mukhi-indonesia"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
+    },
+    {
+      "slug": "ganesh-rudraksha-explained",
+      "title": "Ganesh Rudraksha Explained",
+      "targetKeyword": "ganesh rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "The Ganesh Rudraksha — a bead with a natural trunk-like protrusion: what it is, the tradition of Ganesha as the remover of obstacles (framed as tradition only), who keeps it on the recommendation of astrologers and pandits, and how Amorfos certifies it. No medical or miraculous claims.",
+      "relatedProductIds": ["lab-certified-ganesh-rudraksha-pendant-nepal", "lab-certified-double-ganesh-rudraksha-nepali-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-pendant"]
     }
   ]
 }

@@ -16,20 +16,21 @@ function mapStatus(srStatus: string): string {
 }
 
 export async function POST(req: Request) {
-  // Verify webhook token if configured
+  // Auth is mandatory. If the token is unset, every caller is rejected — this
+  // endpoint mutates order state, so it must never be left publicly writable by
+  // a missing env var. (SHIPROCKET_WEBHOOK_TOKEN is set in production.)
   const webhookToken = process.env.SHIPROCKET_WEBHOOK_TOKEN;
-  if (webhookToken) {
-    // Shiprocket sends the configured token in the x-api-key header.
-    // Accept a few header variants for robustness.
-    const provided =
-      req.headers.get("x-api-key") ||
-      req.headers.get("x-shiprocket-signature") ||
-      req.headers.get("authorization");
-    const ok =
-      provided === webhookToken || provided === `Bearer ${webhookToken}`;
-    if (!ok) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  // Shiprocket sends the configured token in the x-api-key header.
+  // Accept a few header variants for robustness.
+  const provided =
+    req.headers.get("x-api-key") ||
+    req.headers.get("x-shiprocket-signature") ||
+    req.headers.get("authorization");
+  const ok =
+    !!webhookToken &&
+    (provided === webhookToken || provided === `Bearer ${webhookToken}`);
+  if (!ok) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   let payload: Record<string, unknown>;
@@ -61,6 +62,17 @@ export async function POST(req: Request) {
   }
 
   const fulfillmentStatus = mapStatus(currentStatus);
+
+  // No-regression / idempotency guard. Shiprocket can deliver events out of
+  // order or repeat them, so:
+  //  - never move a delivered order backwards, and
+  //  - skip when the status is unchanged (avoids duplicate notifications).
+  if (
+    order.fulfillment_status === "delivered" ||
+    order.fulfillment_status === fulfillmentStatus
+  ) {
+    return NextResponse.json({ ok: true });
+  }
 
   await supabase()
     .from("orders")

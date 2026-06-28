@@ -123,8 +123,16 @@ ${schema}`;
   }
   const data = (await res.json()) as { content: { type: string; text: string }[] };
   const text = data.content.find((c) => c.type === "text")?.text ?? "";
-  const json = text.slice(text.indexOf("{"), text.lastIndexOf("}") + 1);
-  return JSON.parse(json) as Article;
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end < start) {
+    throw new Error("Claude returned non-JSON output.");
+  }
+  try {
+    return JSON.parse(text.slice(start, end + 1)) as Article;
+  } catch {
+    throw new Error("Claude returned malformed JSON.");
+  }
 }
 
 export function scaffold(entry: CalendarEntry): Article {

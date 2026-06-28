@@ -3,7 +3,17 @@
 _The Journal: an owned, SEO-first editorial engine that turns Rudraksha research
 demand into organic traffic and product discovery._
 
-Last updated: 2026-06-27 · Owner: Manav Bansal · Channel scope: **SEO blog/journal only**
+Last updated: 2026-06-28 · Owner: Manav Bansal · Channel scope: **SEO blog/journal only**
+
+> **2026-06-28 — SEO audit refresh.** The seed calendar was expanded from 8 to
+> **30 entries** (`scripts/content-calendar.json`): the full **1→14 Mukhi** pillar
+> set plus Gauri Shankar & Ganesh, the four cluster pillars, and a new
+> **"Which Rudraksha by Rashi"** selection guide — the keywords surfaced in the
+> audit as winnable long-tail for a new, low-authority domain. The on-page and
+> technical recommendations from the same audit (product `<title>`/H1 length,
+> missing product images, site-wide `Organization`/`WebSite` schema, default
+> social image) are **out of scope for this doc** — they are tracked as a
+> separate storefront workstream.
 
 ---
 
@@ -30,7 +40,7 @@ stops.
 
 | Metric | Source | Baseline (Jun 2026) | 6-month target |
 |---|---|---|---|
-| Indexed Journal articles | Google Search Console (GSC) | 0 | 24+ |
+| Indexed Journal articles | Google Search Console (GSC) | 0 | 30+ |
 | Organic impressions (Journal) | GSC | ~0 | growing MoM |
 | Organic clicks (Journal) | GSC | ~0 | 1,000+/mo |
 | Article → product/collection CTR | (needs analytics — see §8) | n/a | ≥ 8% |
@@ -44,10 +54,17 @@ lagging indicators.
 
 | Intent | Example queries | Article angle | Funnel target |
 |---|---|---|---|
-| Informational | "5 mukhi rudraksha benefits", "rudraksha meaning" | Mukhi guides, explainers | Soft → collection |
+| Informational | "5 mukhi rudraksha benefits", "[N] mukhi rudraksha", "rudraksha meaning" | Mukhi guides (1→14 + Gauri Shankar/Ganesh), explainers | Soft → collection |
+| Informational / selection | "which rudraksha to wear by rashi", "which mukhi for me" | Rashi selection guide + Mukhi pillar | Soft → collection |
 | Commercial-investigation | "original vs fake rudraksha", "best rudraksha for studies", "nepali vs indonesian rudraksha" | Buying guides, comparisons | Strong → product/collection |
 | Transactional | "buy 5 mukhi rudraksha" | (already served by product/collection pages) | Direct |
 | Navigational / brand | "amorfos rudraksha", "lab certified rudraksha" | About, certification explainer | Brand trust |
+
+> **Why long-tail first (audit, 2026-06-28):** head terms ("rudraksha mala", "buy
+> rudraksha online") are dominated by Rudra Centre (rudraksha-ratna.com, ~500K
+> visits/mo) and Rudralife — out of reach for a new domain in year one. Per-Mukhi,
+> question, and Rashi queries are the **winnable** entry points, and each maps
+> cleanly to existing inventory.
 
 The Journal owns **informational + commercial-investigation**; product and
 collection pages own **transactional**. Articles must never cannibalise a
@@ -61,9 +78,14 @@ all interlinked, every spoke linking to its matching collection/product.
 ### Cluster 1 — Mukhi guides _(pillar: "Rudraksha Mukhi: a complete guide")_
 One spoke per face. Each covers the traditional ruling deity & planet, who
 traditionally wears it (per astrologer/pandit recommendation), bead origin notes,
-and links to that mukhi's products.
+and links to that mukhi's products. **The full 1→14 spoke set is now seeded** in
+the calendar (plus Gauri Shankar and Ganesh), so the pillar can interlink a
+complete corpus rather than a partial one.
 - 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 Mukhi
 - Gauri Shankar, Ganesh Rudraksha
+- **"Which Rudraksha to wear by Rashi"** — a selection guide that maps mukhi →
+  planet → zodiac in tradition, funnelling "which mukhi for me?" demand into the
+  spokes. Framed strictly as tradition; selection follows astrologer/pandit advice.
 - → links to `/collections/rudraksha-pendant`, `/collections/loose-rudraksha-beads`
   and specific beads (e.g. `/shop/5-mukhi-nepal`, `/shop/7-mukhi-nepal`).
 
@@ -91,11 +113,13 @@ Framed strictly as **tradition**, with no medical/miraculous claims.
 - "How to do japa with a Rudraksha mala"
 - → links to `/collections/rudraksha-mala`.
 
-## 5. Cadence & 12-week launch calendar
+## 5. Cadence & 15-week launch calendar
 
 **Cadence: 2 articles / week** (drafted automatically, published after approval).
-The seeded calendar lives in `scripts/content-calendar.json`; this table is the
-human-readable mirror.
+The seeded calendar lives in `scripts/content-calendar.json` (**30 entries** as of
+2026-06-28); this table is the human-readable mirror and should be kept in parity
+with the JSON. At the daily Vercel Cron rate (1 draft/day) this is ~30 days of
+runway — top it up before it runs dry.
 
 | Wk | Article | Target keyword | Cluster | Key internal links |
 |----|---------|----------------|---------|--------------------|
@@ -123,6 +147,15 @@ human-readable mirror.
 | 11 | 3 Mukhi Rudraksha: meaning & tradition | 3 mukhi rudraksha | Mukhi | /shop/3-mukhi-nepal |
 | 12 | Rudraksha combinations explained (pillar) | rudraksha combinations | Remedies | /collections/rudraksha-combination |
 | 12 | 8 Mukhi Rudraksha: the Ganesha bead | 8 mukhi rudraksha | Mukhi | /shop/8-mukhi-nepal |
+| 13 | Which Rudraksha to wear by Rashi | which rudraksha to wear by rashi | Mukhi | /collections/rudraksha-pendant |
+| 13 | 6 Mukhi Rudraksha: meaning & tradition | 6 mukhi rudraksha | Mukhi | /shop/6-mukhi-nepal |
+| 14 | 4 Mukhi Rudraksha: meaning & tradition | 4 mukhi rudraksha | Mukhi | /shop/4-mukhi-nepal |
+| 14 | 2 Mukhi Rudraksha: the Ardhanarishwara bead | 2 mukhi rudraksha | Mukhi | /shop/2-mukhi-nepal |
+| 15 | 13 Mukhi Rudraksha: the Indra bead | 13 mukhi rudraksha | Mukhi | /shop/13-mukhi-nepal |
+| 15 | Ganesh Rudraksha explained | ganesh rudraksha | Mukhi | /shop/lab-certified-ganesh-rudraksha-pendant-nepal |
+
+_Weeks 13–15 (the rows above) were added in the 2026-06-28 audit refresh to
+complete the 1→14 Mukhi set and add the Rashi selection guide._
 
 > Validate the exact keyword/title with `WebSearch` before each batch if you want
 > to refine — the calendar is a living file.

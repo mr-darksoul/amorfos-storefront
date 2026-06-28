@@ -55,6 +55,11 @@ export async function POST(req: Request) {
   }
 
   if (isSupabaseConfigured()) {
+    // Only a still-pending order transitions to paid. This makes the whole
+    // post-payment side-effect block idempotent: a duplicate/replayed verify
+    // call (Razorpay retry, double network request) updates 0 rows and skips
+    // fulfillment, so we never send duplicate emails or create a second
+    // Shiprocket order.
     const { data: paidRows } = await supabase()
       .from("orders")
       .update({
@@ -63,17 +68,30 @@ export async function POST(req: Request) {
         paid_at: new Date().toISOString(),
       })
       .eq("razorpay_order_id", razorpay_order_id)
+      .eq("status", "pending")
       .select("id");
 
-    // A verified payment with no matching order row is a critical data gap:
-    // the customer was charged but we have nothing to fulfill. We can't
-    // reconstruct the order here (no items/customer), so log loudly for manual
-    // recovery — but still confirm to the customer, since the payment is real.
     if (!paidRows || paidRows.length === 0) {
-      console.error(
-        `[verify-payment] CRITICAL: verified payment ${razorpay_payment_id} ` +
-          `for order ${razorpay_order_id} matched no DB row — manual recovery needed.`,
-      );
+      // Nothing transitioned. Either the order was already paid (a harmless
+      // replay — just confirm again) or there is genuinely no row, which is a
+      // critical data gap (customer charged, nothing to fulfill). Distinguish
+      // the two so we only alert on the real problem, and never re-run
+      // fulfillment for an already-paid order.
+      const { data: existing } = await supabase()
+        .from("orders")
+        .select("status")
+        .eq("razorpay_order_id", razorpay_order_id)
+        .maybeSingle();
+
+      if (!existing) {
+        console.error(
+          `[verify-payment] CRITICAL: verified payment ${razorpay_payment_id} ` +
+            `for order ${razorpay_order_id} matched no DB row — manual recovery needed.`,
+        );
+      }
+
+      // Payment is real, so still confirm to the customer either way.
+      return NextResponse.json({ verified: true, paymentId: razorpay_payment_id });
     }
 
     // Run after the response is sent, but keep the serverless function alive

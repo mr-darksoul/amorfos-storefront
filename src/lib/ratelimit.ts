@@ -11,6 +11,17 @@ type Bucket = { count: number; resetAt: number };
 
 const buckets = new Map<string, Bucket>();
 
+// Drop expired buckets so the Map can't grow unbounded as new IPs appear.
+// Time-gated to at most once a minute to keep this O(1) on the hot path.
+let lastSweep = Date.now();
+function sweepExpired(now: number): void {
+  if (now - lastSweep < 60_000) return;
+  lastSweep = now;
+  for (const [key, b] of buckets) {
+    if (b.resetAt <= now) buckets.delete(key);
+  }
+}
+
 export interface RateLimitResult {
   ok: boolean;
   /** Seconds until the window resets (only meaningful when !ok). */
@@ -23,6 +34,7 @@ export function rateLimit(
   windowMs: number,
 ): RateLimitResult {
   const now = Date.now();
+  sweepExpired(now);
   const bucket = buckets.get(key);
 
   if (!bucket || bucket.resetAt <= now) {
