@@ -1,6 +1,4 @@
 import { ImageResponse } from "next/og";
-import { readFileSync } from "fs";
-import { join } from "path";
 import { getAdminProduct } from "@/lib/adminProducts";
 import { getAllRatingSummaries } from "@/lib/reviews";
 import { inr } from "@/lib/format";
@@ -12,9 +10,18 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Bundled fonts (include the ₹ glyph, which Satori's default font lacks).
-const fontDir = join(process.cwd(), "public/og-fonts");
-const fontRegular = readFileSync(join(fontDir, "NotoSans-Regular.ttf"));
-const fontBold = readFileSync(join(fontDir, "NotoSans-Bold.ttf"));
+// `new URL(..., import.meta.url)` lets the bundler trace + include the assets.
+async function loadFonts() {
+  const [regular, bold] = await Promise.all([
+    fetch(new URL("./NotoSans-Regular.ttf", import.meta.url)).then((r) =>
+      r.arrayBuffer(),
+    ),
+    fetch(new URL("./NotoSans-Bold.ttf", import.meta.url)).then((r) =>
+      r.arrayBuffer(),
+    ),
+  ]);
+  return { regular, bold };
+}
 
 // Gold filled star / muted empty star as inline SVG data URIs — guarantees
 // the gold colour regardless of the font that Satori falls back to.
@@ -35,9 +42,10 @@ export default async function Image({
 }: {
   params: { id: string };
 }) {
-  const [product, ratings] = await Promise.all([
+  const [product, ratings, fonts] = await Promise.all([
     getAdminProduct(params.id),
     getAllRatingSummaries(),
+    loadFonts(),
   ]);
 
   if (!product) {
@@ -58,7 +66,10 @@ export default async function Image({
           Amorfos
         </div>
       ),
-      { ...size, fonts: [{ name: "Noto Sans", data: fontRegular, weight: 400 }] },
+      {
+        ...size,
+        fonts: [{ name: "Noto Sans", data: fonts.regular, weight: 400 }],
+      },
     );
   }
 
@@ -237,8 +248,8 @@ export default async function Image({
     {
       ...size,
       fonts: [
-        { name: "Noto Sans", data: fontRegular, weight: 400 },
-        { name: "Noto Sans", data: fontBold, weight: 700 },
+        { name: "Noto Sans", data: fonts.regular, weight: 400 },
+        { name: "Noto Sans", data: fonts.bold, weight: 700 },
       ],
     },
   );
