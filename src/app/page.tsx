@@ -7,6 +7,7 @@ import { categoryMeta } from "@/lib/products";
 import { collectionHref } from "@/lib/collections";
 import { getPublishedArticles } from "@/lib/articles";
 import { getAdminProducts } from "@/lib/adminProducts";
+import { getAllRatingSummaries } from "@/lib/reviews";
 import { site } from "@/lib/site";
 import { ShieldIcon, TruckIcon, ReturnIcon, LeafIcon, ArrowIcon } from "@/components/icons";
 import type { Category } from "@/lib/types";
@@ -29,7 +30,7 @@ const catImage: Record<Category, string> = {
 };
 
 export default async function Home() {
-  const products = await getAdminProducts();
+  const [products, ratings] = await Promise.all([getAdminProducts(), getAllRatingSummaries()]);
   const heroProduct =
     products.find((p) => p.id === "5-mukhi-nepal-2") ?? products[0];
   // Caption is derived from the hero product so it can never drift from the image.
@@ -136,7 +137,7 @@ export default async function Home() {
         <div className="grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-4">
           {bestsellers.map((p, i) => (
             <Reveal key={p.id} delay={i * 80}>
-              <ProductCard product={p} />
+              <ProductCard product={p} ratings={ratings} />
             </Reveal>
           ))}
         </div>

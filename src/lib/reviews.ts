@@ -18,6 +18,32 @@ export interface ReviewSummary {
   distribution: Record<1 | 2 | 3 | 4 | 5, number>;
 }
 
+export type RatingMap = Record<number, { average: number; total: number }>;
+
+export async function getAllRatingSummaries(): Promise<RatingMap> {
+  const { data, error } = await supabase()
+    .from("reviews")
+    .select("mukhi, rating");
+
+  if (error || !data) return {};
+
+  const acc: Record<number, { sum: number; count: number }> = {};
+  for (const row of data) {
+    if (!acc[row.mukhi]) acc[row.mukhi] = { sum: 0, count: 0 };
+    acc[row.mukhi].sum += row.rating;
+    acc[row.mukhi].count++;
+  }
+
+  const result: RatingMap = {};
+  for (const [k, v] of Object.entries(acc)) {
+    result[Number(k)] = {
+      average: Math.round((v.sum / v.count) * 10) / 10,
+      total: v.count,
+    };
+  }
+  return result;
+}
+
 export async function getReviewsByMukhi(mukhi: number): Promise<Review[]> {
   const { data, error } = await supabase()
     .from("reviews")

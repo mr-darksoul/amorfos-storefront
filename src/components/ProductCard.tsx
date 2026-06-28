@@ -3,12 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/lib/types";
+import type { RatingMap } from "@/lib/reviews";
 import { inr, discountPct } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  product,
+  ratings,
+}: {
+  product: Product;
+  ratings?: RatingMap;
+}) {
   const { add } = useCart();
   const off = discountPct(product.price, product.mrp);
+  const rating = product.mukhi && ratings ? ratings[product.mukhi] : null;
   const hasFirst = product.images.length > 0;
   const hasSecond = product.images.length > 1;
   const soldOut = typeof product.stock === "number" && product.stock <= 0;
@@ -102,6 +110,25 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
         </div>
+        {rating && (
+          <div className="mt-1 flex items-center gap-1">
+            <span className="flex items-center gap-px">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <svg key={n} viewBox="0 0 20 20" className="size-3 shrink-0" aria-hidden>
+                  <path
+                    d="M10 1l2.6 5.3 5.8.8-4.2 4.1 1 5.8L10 14.3l-5.2 2.7 1-5.8L1.6 7.1l5.8-.8z"
+                    fill={rating.average >= n ? "var(--color-gold)" : "var(--color-paper-soft)"}
+                    stroke="var(--color-gold)"
+                    strokeWidth="0.8"
+                  />
+                </svg>
+              ))}
+            </span>
+            <span className="text-[0.65rem] tabular-nums text-ink-faint">
+              {rating.average.toFixed(1)} ({rating.total})
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

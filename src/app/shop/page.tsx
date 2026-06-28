@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import ShopClient from "@/components/ShopClient";
 import { getAdminProducts } from "@/lib/adminProducts";
+import { getAllRatingSummaries } from "@/lib/reviews";
 
 export const metadata: Metadata = {
   title: "Shop Lab Certified Rudraksha",
@@ -13,11 +14,14 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function ShopPage() {
-  const products = await getAdminProducts();
+  const [products, ratings] = await Promise.all([
+    getAdminProducts(),
+    getAllRatingSummaries(),
+  ]);
 
   return (
     <Suspense fallback={<div className="min-h-[60vh]" />}>
-      <ShopClient products={products} />
+      <ShopClient products={products} ratings={ratings} />
     </Suspense>
   );
 }

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getAdminProducts } from "@/lib/adminProducts";
 import { collections, getCollection } from "@/lib/collections";
 import ProductCard from "@/components/ProductCard";
+import { getAllRatingSummaries } from "@/lib/reviews";
 import Reveal from "@/components/Reveal";
 import { site } from "@/lib/site";
 
@@ -43,7 +44,7 @@ export default async function CollectionPage({
   const collection = getCollection(slug);
   if (!collection) notFound();
 
-  const all = await getAdminProducts();
+  const [all, ratings] = await Promise.all([getAdminProducts(), getAllRatingSummaries()]);
   const items = all
     .filter((p) => p.category === collection.category)
     .sort((a, b) => Number(!!b.bestseller) - Number(!!a.bestseller));
@@ -133,7 +134,7 @@ export default async function CollectionPage({
         ) : (
           <div className="grid grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-3">
             {items.map((p) => (
-              <ProductCard key={p.id} product={p} />
+              <ProductCard key={p.id} product={p} ratings={ratings} />
             ))}
           </div>
         )}

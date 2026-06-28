@@ -5,13 +5,14 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import ProductCard from "./ProductCard";
 import { categoryMeta } from "@/lib/products";
 import type { Category, Origin, Product } from "@/lib/types";
+import type { RatingMap } from "@/lib/reviews";
 
 type Sort = "featured" | "price-asc" | "price-desc";
 
 const allCategories = Object.keys(categoryMeta) as Category[];
 const allOrigins: Origin[] = ["Nepal", "Indonesia", "India"];
 
-export default function ShopClient({ products }: { products: Product[] }) {
+export default function ShopClient({ products, ratings }: { products: Product[]; ratings?: RatingMap }) {
   const allMukhi = useMemo(
     () =>
       [...new Set(products.map((p) => p.mukhi).filter((m): m is number => m !== null))].sort(
@@ -159,7 +160,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
           ) : (
             <div className="grid grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-3">
               {filtered.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductCard key={p.id} product={p} ratings={ratings} />
               ))}
             </div>
           )}

@@ -11,7 +11,7 @@ import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
 import { ShieldIcon, TruckIcon, ReturnIcon, CheckIcon } from "@/components/icons";
 import ReviewSection from "@/components/ReviewSection";
-import { getReviewsByMukhi, summariseReviews } from "@/lib/reviews";
+import { getReviewsByMukhi, summariseReviews, getAllRatingSummaries } from "@/lib/reviews";
 
 export const revalidate = 60;
 
@@ -51,9 +51,10 @@ export default async function ProductPage({
 
   const off = discountPct(product.price, product.mrp);
   const soldOut = typeof product.stock === "number" && product.stock <= 0;
-  const [related, reviews] = await Promise.all([
+  const [related, reviews, ratings] = await Promise.all([
     getAdminRelated(product),
     product.mukhi ? getReviewsByMukhi(product.mukhi) : Promise.resolve([]),
+    getAllRatingSummaries(),
   ]);
   const reviewSummary = summariseReviews(reviews);
 
@@ -206,7 +207,7 @@ export default async function ProductPage({
             </Reveal>
             <div className="grid grid-cols-2 gap-x-5 gap-y-10 lg:grid-cols-3">
               {related.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductCard key={p.id} product={p} ratings={ratings} />
               ))}
             </div>
           </section>
