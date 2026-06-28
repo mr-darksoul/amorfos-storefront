@@ -4,13 +4,14 @@ import { getAllRatingSummaries } from "@/lib/reviews";
 import { inr } from "@/lib/format";
 import { site } from "@/lib/site";
 
+// Dynamic OG image as a route handler (not the opengraph-image.tsx file
+// convention) so we control caching: the file convention forces an immutable
+// 1-year cache that freezes the image between deploys. Here we set a
+// revalidating CDN cache and the product page stamps a ?v= version onto the
+// URL, so price / rating / title changes propagate without a redeploy.
 export const runtime = "nodejs";
-// Regenerate the image periodically so price / rating / title changes flow
-// through without a redeploy (matches the product page's revalidate cadence).
-export const revalidate = 3600;
-export const alt = "Amorfos — Authentic, Lab Certified Rudraksha";
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+
+const size = { width: 1200, height: 630 };
 
 // Bundled fonts (include the ₹ glyph, which Satori's default font lacks).
 // Served as static assets from /public and fetched over HTTPS — reliable in
@@ -41,13 +42,18 @@ function absImage(src: string): string {
   return `${site.url}${src.startsWith("/") ? "" : "/"}${src}`;
 }
 
-export default async function Image({
-  params,
-}: {
-  params: { id: string };
-}) {
+// CDN caches for an hour, serves stale while revalidating for a day. A new ?v=
+// (emitted by the page when data changes) busts this immediately.
+const CACHE_CONTROL =
+  "public, max-age=0, s-maxage=3600, stale-while-revalidate=86400";
+
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const { id } = await params;
   const [product, ratings, fonts] = await Promise.all([
-    getAdminProduct(params.id),
+    getAdminProduct(id),
     getAllRatingSummaries(),
     loadFonts(),
   ]);
@@ -73,6 +79,7 @@ export default async function Image({
       {
         ...size,
         fonts: [{ name: "Noto Sans", data: fonts.regular, weight: 400 }],
+        headers: { "Cache-Control": CACHE_CONTROL },
       },
     );
   }
@@ -255,6 +262,7 @@ export default async function Image({
         { name: "Noto Sans", data: fonts.regular, weight: 400 },
         { name: "Noto Sans", data: fonts.bold, weight: 700 },
       ],
+      headers: { "Cache-Control": CACHE_CONTROL },
     },
   );
 }
