@@ -3,6 +3,7 @@ import { getArticlesForAdmin } from "@/lib/articles";
 import AdminJournalClient from "./AdminJournalClient";
 import AdminLogoutButton from "../products/AdminLogoutButton";
 
+export const dynamic = "force-dynamic";
 export const metadata = { title: "Journal" };
 
 export default async function AdminJournalPage() {

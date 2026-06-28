@@ -96,13 +96,15 @@ export default function AdminJournalClient({ rows }: { rows: ArticleRow[] }) {
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-4">
-                    <Link
-                      href={`/journal/${article.slug}`}
-                      target="_blank"
-                      className="text-xs text-ink-dim hover:text-ink"
-                    >
-                      Preview
-                    </Link>
+                    {status === "published" && (
+                      <Link
+                        href={`/journal/${article.slug}`}
+                        target="_blank"
+                        className="text-xs text-ink-dim hover:text-ink"
+                      >
+                        Preview
+                      </Link>
+                    )}
                     <Link
                       href={`/admin/journal/${article.slug}`}
                       className="text-xs text-gold-soft hover:underline"
