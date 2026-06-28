@@ -123,6 +123,31 @@ export default async function ProductPage({
           <div className="md:py-4">
             <p className="eyebrow mb-3">{product.categoryLabel} · {product.origin}</p>
             <h1 className="display text-4xl sm:text-5xl">{product.name}</h1>
+
+            {/* Inline rating */}
+            {reviewSummary.total > 0 && (
+              <a href="#reviews" className="mt-3 inline-flex items-center gap-2 group">
+                <span className="flex items-center gap-px">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <svg key={n} viewBox="0 0 20 20" className="size-4 shrink-0" aria-hidden>
+                      <path
+                        d="M10 1l2.6 5.3 5.8.8-4.2 4.1 1 5.8L10 14.3l-5.2 2.7 1-5.8L1.6 7.1l5.8-.8z"
+                        fill={reviewSummary.average >= n ? "var(--color-gold)" : "var(--color-paper-soft)"}
+                        stroke="var(--color-gold)"
+                        strokeWidth="0.6"
+                      />
+                    </svg>
+                  ))}
+                </span>
+                <span className="text-sm text-ink-dim tabular-nums">
+                  {reviewSummary.average.toFixed(1)}
+                </span>
+                <span className="text-sm text-ink-faint group-hover:text-gold-soft group-hover:underline underline-offset-2 transition-colors">
+                  ({reviewSummary.total} review{reviewSummary.total !== 1 ? "s" : ""})
+              </span>
+              </a>
+            )}
+
             <p className="mt-4 text-lg leading-relaxed text-ink-dim">{product.tagline}</p>
 
             {/* Price */}

@@ -71,7 +71,7 @@ export default function ReviewSection({
   const visible = reviews.slice(0, shown);
 
   return (
-    <section className="mt-16 border-t border-line pt-12">
+    <section id="reviews" className="mt-16 border-t border-line pt-12">
       <p className="eyebrow mb-4">What customers say</p>
 
       {/* Summary row */}
