@@ -223,7 +223,11 @@ All env vars are set in Vercel production:
 - **Razorpay live keys** — smoke-tested + multiple real payments processed.
 - **Shiprocket** (`care@amorfos.in`, company 599101) — end-to-end fulfillment confirmed.
 - **SMTP** (GoDaddy) + **WhatsApp Cloud API** — configured for notifications.
-- `ADMIN_PASSWORD`, `ANTHROPIC_API_KEY`, `CRON_SECRET`, `BLOB_READ_WRITE_TOKEN` all set.
+- `ADMIN_PASSWORD`, `ANTHROPIC_API_KEY`, `CRON_SECRET` all set.
+- **Vercel Blob** (product image uploads) — store `amorfos-images` (public, BOM1)
+  connected to the project 2026-06-28; `BLOB_READ_WRITE_TOKEN` injected for
+  **Production** only. Pull locally with
+  `vercel env pull .env.local --environment=production`.
 
 **Shiprocket webhook** at `https://amorfos.in/api/webhooks/delivery-status`
 (Auth: `x-api-key` = `SHIPROCKET_WEBHOOK_TOKEN`). Do not rename this path.
