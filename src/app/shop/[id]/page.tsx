@@ -27,15 +27,26 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const product = await getAdminProduct(id);
+  const [product, ratingsMap] = await Promise.all([
+    getAdminProduct(id),
+    getAllRatingSummaries(),
+  ]);
   if (!product) return { title: "Not found" };
+
+  const rating = product.mukhi ? ratingsMap[product.mukhi] : null;
+  const ratingPrefix = rating && rating.total > 0
+    ? `★ ${rating.average.toFixed(1)} (${rating.total} reviews) · `
+    : "";
+
+  const ogDescription = `${ratingPrefix}${product.tagline} ${product.origin} origin. Lab Certified. ${inr(product.price)}.`;
+
   return {
     title: `${product.name} · ${product.mukhiLabel}`,
     description: `${product.tagline} ${product.origin} origin, ${product.beadSize}. Lab Certified. ${inr(product.price)}.`,
     alternates: { canonical: `/shop/${product.id}` },
     openGraph: {
       title: `${product.name} — ${site.name}`,
-      description: product.tagline,
+      description: ogDescription,
       ...(product.images[0] ? { images: [{ url: product.images[0] }] } : {}),
     },
   };
