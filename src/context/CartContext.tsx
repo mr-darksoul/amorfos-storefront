@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { products } from "@/lib/products";
+import { trackAddToCart } from "@/lib/analytics";
 import type { CartLine, Product } from "@/lib/types";
 
 const STORAGE_KEY = "amorfos.cart.v1";
@@ -177,6 +178,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     add: (id, qty) => {
       dispatch({ type: "add", id, qty });
       setIsOpen(true);
+      // Fire AddToCart centrally so every entry point (PDP, cards, buy-now)
+      // is tracked. Resolve the product for price/name; skip if unknown.
+      const p = liveProducts[id] ?? products.find((x) => x.id === id);
+      if (p) {
+        trackAddToCart({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          qty: qty ?? 1,
+          category: p.category,
+        });
+      }
     },
     remove: (id) => dispatch({ type: "remove", id }),
     setQty: (id, qty) => dispatch({ type: "setQty", id, qty }),

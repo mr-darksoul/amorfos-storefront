@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { trackViewContent } from "@/lib/analytics";
 import type { Product } from "@/lib/types";
 import { MinusIcon, PlusIcon, CheckIcon } from "./icons";
 
@@ -11,6 +12,18 @@ export default function ProductPurchase({ product }: { product: Product }) {
   const router = useRouter();
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
+
+  // Fire ViewContent once per product view (PDP is a server component, so this
+  // client island is where we have the product in the browser).
+  useEffect(() => {
+    trackViewContent({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      qty: 1,
+      category: product.category,
+    });
+  }, [product.id, product.name, product.price, product.category]);
 
   // Inventory is opt-in per product: a numeric stock means it's tracked.
   const tracked = typeof product.stock === "number";

@@ -3,10 +3,18 @@ import crypto from "crypto";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { createShiprocketOrder, isShiprocketConfigured } from "@/lib/shiprocket";
 import { sendOrderConfirmationEmail, sendOrderConfirmationWhatsApp } from "@/lib/notify";
+import { sendMetaPurchaseEvent } from "@/lib/metaCapi";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
+  // Captured up front for the server-side Meta CAPI Purchase event (better
+  // match quality); the request object isn't available inside after().
+  const clientIp =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    undefined;
+  const userAgent = req.headers.get("user-agent") || undefined;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
   if (!keySecret || keySecret.includes("REPLACE_ME")) {
     return NextResponse.json(
@@ -106,6 +114,19 @@ export async function POST(req: Request) {
           .single();
 
         if (!order) return;
+
+        // Server-side Purchase (Meta Conversions API). De-duplicated against the
+        // browser pixel on /thank-you via event_id = razorpay_payment_id.
+        await sendMetaPurchaseEvent({
+          eventId: razorpay_payment_id,
+          value: order.amount,
+          currency: "INR",
+          email: order.customer?.email,
+          phone: order.customer?.phone,
+          contentIds: (order.items as { id: string }[]).map((i) => i.id),
+          clientIp,
+          userAgent,
+        });
 
         // Decrement inventory for stock-tracked products. The SQL function
         // clamps at 0 and ignores products that don't track stock, so this is

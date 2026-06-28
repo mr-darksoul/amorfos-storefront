@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Logo from "./Logo";
+import NewsletterForm from "./NewsletterForm";
 import { site, waLink } from "@/lib/site";
 
 export default function Footer() {
@@ -15,6 +16,14 @@ export default function Footer() {
           <p className="mt-4 text-xs tracking-wide text-ink-faint">
             Founded by {site.founder} · {site.address}
           </p>
+
+          <div className="mt-7 max-w-xs">
+            <h4 className="eyebrow mb-3">Choosing your mukhi?</h4>
+            <p className="mb-3 text-xs leading-relaxed text-ink-faint">
+              Get our short guide to the Rudraksha mukhi — honest, no miracles.
+            </p>
+            <NewsletterForm source="footer" />
+          </div>
         </div>
 
         <FooterCol title="Shop">

@@ -6,6 +6,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import Analytics from "@/components/Analytics";
+import LeadCapture from "@/components/LeadCapture";
 import { site } from "@/lib/site";
 
 const cormorant = Cormorant_Garamond({
@@ -66,12 +68,14 @@ export default function RootLayout({
       {/* suppressHydrationWarning: browser extensions (ColorZilla, Grammarly, etc.)
           inject attributes onto <body> before React hydrates. */}
       <body suppressHydrationWarning>
+        <Analytics />
         <CartProvider>
           <Header />
           <main>{children}</main>
           <Footer />
           <CartDrawer />
           <WhatsAppButton />
+          <LeadCapture />
         </CartProvider>
       </body>
     </html>

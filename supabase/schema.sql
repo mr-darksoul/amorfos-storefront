@@ -97,3 +97,27 @@ CREATE INDEX IF NOT EXISTS articles_status_published_idx
 
 ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE articles FORCE  ROW LEVEL SECURITY;
+
+-- ── Lead capture / subscribers (migration 004) ─────────────────────────────
+-- Opt-in emails from the lead-capture modal + footer form.
+CREATE TABLE IF NOT EXISTS subscribers (
+  id          uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+  email       text        UNIQUE NOT NULL,
+  phone       text,
+  source      text,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS subscribers_created_idx ON subscribers (created_at DESC);
+
+ALTER TABLE subscribers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subscribers FORCE  ROW LEVEL SECURITY;
+
+-- ── Abandoned-cart recovery (migration 005) ────────────────────────────────
+-- A pending order that never became paid is an abandoned cart; the recovery
+-- cron nudges it once and stamps recovery_sent_at so it's never messaged twice.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS recovery_sent_at timestamptz;
+
+CREATE INDEX IF NOT EXISTS orders_recovery_idx
+  ON orders (created_at)
+  WHERE status = 'pending' AND recovery_sent_at IS NULL;

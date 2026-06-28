@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { site } from "@/lib/site";
+import { trackInitiateCheckout } from "@/lib/analytics";
 import type { CustomerInfo } from "@/app/api/create-order/route";
 
 declare global {
@@ -34,6 +35,17 @@ export function useCheckout() {
       setError(null);
       if (items.length === 0) return;
       setLoading(true);
+
+      trackInitiateCheckout(
+        items.map((i) => ({
+          id: i.id,
+          name: i.product.name,
+          price: i.product.price,
+          qty: i.qty,
+          category: i.product.category,
+        })),
+        items.reduce((n, i) => n + i.lineTotal, 0),
+      );
 
       try {
         const res = await fetch("/api/create-order", {

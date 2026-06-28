@@ -244,3 +244,66 @@ export async function sendShippingUpdateWhatsApp(
     },
   ]);
 }
+
+// ── Abandoned-cart recovery ─────────────────────────────────────────────────
+
+/** A short, human summary of the cart for a recovery message. */
+function cartSummary(order: SupabaseOrder): string {
+  const items = order.items ?? [];
+  if (items.length === 0) return "your selection";
+  const first = `${items[0].qty}× ${items[0].name}`;
+  return items.length === 1 ? first : `${first} +${items.length - 1} more`;
+}
+
+/** Deep-link the customer back to the bead they were buying. */
+function recoveryLink(order: SupabaseOrder): string {
+  const firstId = order.items?.[0]?.id;
+  return firstId ? `${site.url}/shop/${firstId}` : `${site.url}/shop`;
+}
+
+export async function sendAbandonedCartWhatsApp(order: SupabaseOrder): Promise<void> {
+  if (!order.customer.phone || !process.env.WHATSAPP_ABANDONED_TEMPLATE_NAME) return;
+
+  // Example approved template body:
+  //   "Hi {{1}}, your {{2}} is still reserved at Amorfos. Complete your order
+  //    here: {{3}}. Questions? Just reply to this message."
+  await sendWhatsApp(order.customer.phone, process.env.WHATSAPP_ABANDONED_TEMPLATE_NAME, [
+    {
+      type: "body",
+      parameters: [
+        { type: "text", text: order.customer.name?.split(" ")[0] || "there" },
+        { type: "text", text: cartSummary(order) },
+        { type: "text", text: recoveryLink(order) },
+      ],
+    },
+  ]);
+}
+
+export async function sendAbandonedCartEmail(order: SupabaseOrder): Promise<void> {
+  if (!order.customer.email) return;
+
+  const link = recoveryLink(order);
+  const body = `
+    <p style="margin:0 0 16px;color:#5c4a2a;font-size:14px;line-height:1.7;">
+      Hi ${order.customer.name?.split(" ")[0] || "there"}, you left something with us —
+      and it&rsquo;s still here, certified and ready.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #d4c9b0;border-bottom:1px solid #d4c9b0;margin:16px 0;">
+      ${orderItemsHtml(order)}
+    </table>
+    <p style="margin:16px 0 20px;">
+      <a href="${link}" style="display:inline-block;background:#97712f;color:#f6f1e7;font-size:13px;padding:11px 26px;border-radius:2px;text-decoration:none;letter-spacing:0.08em;">
+        Complete your order
+      </a>
+    </p>
+    <p style="margin:0;color:#8a7355;font-size:12px;line-height:1.6;">
+      Every Amorfos bead is Lab Certified and sent sealed. If you have a question
+      before you decide, just reply or message us on WhatsApp — a real person answers.
+    </p>`;
+
+  await sendEmail(
+    order.customer.email,
+    `Your ${site.name} selection is still here`,
+    baseEmailHtml("Still here for you", body),
+  );
+}

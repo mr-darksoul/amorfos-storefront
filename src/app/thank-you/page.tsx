@@ -3,6 +3,9 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { CheckIcon } from "@/components/icons";
 import PaymentRef from "@/components/PaymentRef";
+import PurchaseTracker from "@/components/PurchaseTracker";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import type { TrackedItem } from "@/lib/analytics";
 import { site, waLink } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -12,9 +15,58 @@ export const metadata: Metadata = {
   alternates: { canonical: "/thank-you" },
 };
 
-export default function ThankYouPage() {
+interface OrderItemRow {
+  id: string;
+  name: string;
+  price: number;
+  qty: number;
+  category?: string;
+}
+
+/** Look up the paid order so the browser Purchase event carries a real value. */
+async function getPurchase(
+  paymentId: string | undefined,
+): Promise<{ value: number; items: TrackedItem[] } | null> {
+  if (!paymentId || !isSupabaseConfigured()) return null;
+  try {
+    const { data } = await supabase()
+      .from("orders")
+      .select("amount, items, status")
+      .eq("razorpay_payment_id", paymentId)
+      .maybeSingle();
+    if (!data || data.status !== "paid") return null;
+    const items: TrackedItem[] = ((data.items as OrderItemRow[]) ?? []).map(
+      (i) => ({
+        id: i.id,
+        name: i.name,
+        price: i.price,
+        qty: i.qty,
+        category: i.category,
+      }),
+    );
+    return { value: data.amount as number, items };
+  } catch {
+    return null;
+  }
+}
+
+export default async function ThankYouPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ payment?: string }>;
+}) {
+  const { payment } = await searchParams;
+  const purchase = await getPurchase(payment);
+
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-5 py-20 text-center sm:px-8">
+      {payment && purchase && (
+        <PurchaseTracker
+          eventId={payment}
+          value={purchase.value}
+          items={purchase.items}
+        />
+      )}
       <div className="grid size-16 place-items-center rounded-full border border-gold text-gold">
         <CheckIcon className="size-8" />
       </div>
