@@ -11,6 +11,7 @@ import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
 import { ShieldIcon, TruckIcon, ReturnIcon, CheckIcon } from "@/components/icons";
 import ReviewSection from "@/components/ReviewSection";
+import ReviewForm from "@/components/ReviewForm";
 import { getReviewsByMukhi, summariseReviews, getAllRatingSummaries } from "@/lib/reviews";
 
 export const revalidate = 60;
@@ -222,6 +223,9 @@ export default async function ProductPage({
 
         {/* Reviews */}
         <ReviewSection reviews={reviews} summary={reviewSummary} />
+        {product.mukhi && (
+          <ReviewForm mukhi={product.mukhi} productName={product.name} />
+        )}
 
         {/* Related */}
         {related.length > 0 && (

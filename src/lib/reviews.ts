@@ -49,6 +49,7 @@ export async function getReviewsByMukhi(mukhi: number): Promise<Review[]> {
     .from("reviews")
     .select("*")
     .eq("mukhi", mukhi)
+    .eq("status", "approved")
     .order("review_date", { ascending: false });
 
   if (error) {

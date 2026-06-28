@@ -91,7 +91,7 @@ function baseEmailHtml(title: string, body: string): string {
 </html>`;
 }
 
-export async function sendOrderConfirmationEmail(order: SupabaseOrder): Promise<void> {
+export async function sendOrderConfirmationEmail(order: SupabaseOrder, reviewUrl?: string): Promise<void> {
   if (!order.customer.email) return;
 
   const body = `
@@ -114,7 +114,16 @@ export async function sendOrderConfirmationEmail(order: SupabaseOrder): Promise<
       You can track your order at
       <a href="${site.url}/track" style="color:#97712f;">${site.url}/track</a>
       once it ships.
-    </p>`;
+    </p>
+    ${reviewUrl ? `
+    <div style="margin:24px 0 0;padding:20px;background:#f6f1e7;border-radius:4px;text-align:center;">
+      <p style="margin:0 0 12px;color:#5c4a2a;font-size:13px;line-height:1.6;">
+        Once your order arrives, we'd love to hear your thoughts.
+      </p>
+      <a href="${reviewUrl}" style="display:inline-block;background:#97712f;color:#f6f1e7;font-size:12px;padding:10px 24px;border-radius:2px;text-decoration:none;letter-spacing:0.1em;text-transform:uppercase;">
+        Leave a Review
+      </a>
+    </div>` : ""}`;
 
   await sendEmail(
     order.customer.email,

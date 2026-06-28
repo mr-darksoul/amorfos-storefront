@@ -117,9 +117,40 @@ export async function POST(req: Request) {
           console.error("[post-payment] stock decrement failed:", stockErr);
         }
 
+        // Generate post-purchase review token
+        let reviewUrl: string | undefined;
+        try {
+          const mukhiList = (order.items as { id: string }[])
+            .map((item) => {
+              const m = item.id.match(/^(\d+)-mukhi/);
+              return m ? parseInt(m[1], 10) : null;
+            })
+            .filter((m): m is number => m !== null && m >= 1 && m <= 21);
+
+          const uniqueMukhi = [...new Set(mukhiList)];
+          if (uniqueMukhi.length > 0) {
+            const { data: tokenRow } = await supabase()
+              .from("review_tokens")
+              .insert({
+                order_id: order.id,
+                customer_name: order.customer?.name ?? null,
+                customer_email: order.customer?.email ?? null,
+                mukhi_list: uniqueMukhi,
+              })
+              .select("token")
+              .single();
+            if (tokenRow?.token) {
+              const { site } = await import("@/lib/site");
+              reviewUrl = `${site.url}/reviews/${tokenRow.token}`;
+            }
+          }
+        } catch (e) {
+          console.error("[post-payment] review token generation failed:", e);
+        }
+
         // Send notifications (non-blocking on Shiprocket)
         await Promise.allSettled([
-          sendOrderConfirmationEmail(order),
+          sendOrderConfirmationEmail(order, reviewUrl),
           sendOrderConfirmationWhatsApp(order),
         ]);
 
