@@ -1,19 +1,9 @@
-import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 import { supabase } from "@/lib/supabase";
 import AdminReviewsClient from "./AdminReviewsClient";
 
-async function isAdminAuthenticated(): Promise<boolean> {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("admin_token")?.value;
-  if (!token || !process.env.ADMIN_PASSWORD) return false;
-  const { createHmac } = await import("crypto");
-  const expected = createHmac("sha256", process.env.ADMIN_PASSWORD).update("amorfos-admin").digest("hex");
-  return token === expected;
-}
+export const dynamic = "force-dynamic";
 
 export default async function AdminReviewsPage() {
-  if (!(await isAdminAuthenticated())) redirect("/admin/login");
 
   const { data: pending } = await supabase()
     .from("reviews")
