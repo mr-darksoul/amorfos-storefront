@@ -188,6 +188,13 @@ web/src/
                            shiprocket, notify, invoice, reviews, ratelimit
 ```
 
+**AI / LLM discovery:** `public/llms.txt` (concise brand brief + key links) and
+`public/llms-full.txt` (inlined brand story, catalogue overview, mukhi reference,
+policies, FAQs) follow the llms.txt convention so AI crawlers get an accurate,
+on-brand summary. Keep them in sync with the brand copy rules above (say "Lab
+Certified" only, no medical/miraculous claims). They are static files — edit by
+hand; nothing generates them.
+
 ## Editing the catalogue
 
 All products live in **`src/lib/products.ts`** — one typed object each (price,
