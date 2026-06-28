@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
 import { products } from "@/lib/products";
 import { collections } from "@/lib/collections";
+import { getPublishedArticles } from "@/lib/articles";
 import { site } from "@/lib/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const staticRoutes = ["", "/shop", "/collections", "/about", "/policies"].map((path) => ({
+  const staticRoutes = ["", "/shop", "/collections", "/journal", "/about", "/policies"].map((path) => ({
     url: `${site.url}${path}`,
     lastModified: now,
     changeFrequency: "weekly" as const,
@@ -27,5 +28,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  return [...staticRoutes, ...collectionRoutes, ...productRoutes];
+  // Journal articles — top-of-funnel SEO content (published only).
+  const articles = await getPublishedArticles();
+  const articleRoutes = articles.map((a) => ({
+    url: `${site.url}/journal/${a.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  return [...staticRoutes, ...collectionRoutes, ...articleRoutes, ...productRoutes];
 }

@@ -1,0 +1,85 @@
+{
+  "_comment": "Amorfos Journal content calendar. The generator (scripts/generate-articles.ts) drafts the next entries not yet present in the Supabase `articles` table, in order, up to BATCH (default 2). Edit freely — slugs are the unique key. See docs/content-marketing-strategy.md.",
+  "entries": [
+    {
+      "slug": "what-lab-certified-rudraksha-means",
+      "title": "What \"Lab Certified\" Rudraksha Really Means",
+      "targetKeyword": "lab certified rudraksha",
+      "cluster": "authenticity",
+      "eyebrow": "Buying & authenticity",
+      "outline": "Explain what Lab Certified means for a Rudraksha (authenticity + origin verification), why it matters to a buyer, what the certificate covers, and how Amorfos certifies every bead. Never name a specific lab.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "rudraksha-mala"]
+    },
+    {
+      "slug": "5-mukhi-rudraksha-meaning-deity",
+      "title": "5 Mukhi Rudraksha: Meaning, Deity & Who Wears It",
+      "targetKeyword": "5 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "The 5 Mukhi bead: ruling deity (Kalagni Rudra / Shiva), ruling planet (Jupiter), why it is the most common everyday bead, who traditionally wears it (on the recommendation of astrologers and pandits), and origin notes. No medical claims.",
+      "relatedProductIds": ["5-mukhi-nepal", "5-mukhi-nepal-2"],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "rudraksha-mala"]
+    },
+    {
+      "slug": "how-to-identify-original-rudraksha",
+      "title": "How to Identify an Original Rudraksha",
+      "targetKeyword": "original rudraksha identify",
+      "cluster": "authenticity",
+      "eyebrow": "Buying & authenticity",
+      "outline": "Traditional checks people use, the limits of home tests, and why Lab Certification is the reliable answer. Keep it practical and honest, framed as tradition only.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "loose-rudraksha-beads"]
+    },
+    {
+      "slug": "7-mukhi-rudraksha-lakshmi-bead",
+      "title": "7 Mukhi Rudraksha: The Lakshmi Bead",
+      "targetKeyword": "7 mukhi rudraksha",
+      "cluster": "mukhi",
+      "eyebrow": "Mukhi guides",
+      "outline": "7 Mukhi: ruling deity (Mahalakshmi), ruling planet (Saturn), traditional associations, who wears it on the recommendation of astrologers and pandits, origin notes.",
+      "relatedProductIds": ["7-mukhi-nepal", "7-mukhi-nepal-2"],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "rudraksha-mala"]
+    },
+    {
+      "slug": "nepal-vs-indonesia-rudraksha",
+      "title": "Nepal vs Indonesia Rudraksha: The Difference",
+      "targetKeyword": "nepali vs indonesian rudraksha",
+      "cluster": "authenticity",
+      "eyebrow": "Buying & authenticity",
+      "outline": "Differences in size, surface, mukhi lines and tradition between Nepal and Indonesia origin beads; both are authentic. Help the reader choose.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "loose-rudraksha-beads"]
+    },
+    {
+      "slug": "why-rudraksha-mala-has-108-beads",
+      "title": "Why a Rudraksha Mala Has 108 + 1 Beads",
+      "targetKeyword": "108 beads mala meaning",
+      "cluster": "mala",
+      "eyebrow": "Mala & japa",
+      "outline": "The meaning of 108 in japa, the role of the guru bead (+1), how the count is used, and how Amorfos malas are strung. Tradition, not claims.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-mala"]
+    },
+    {
+      "slug": "kaal-sarp-dosh-combination-explained",
+      "title": "The Kaal Sarp Dosh Combination Explained",
+      "targetKeyword": "kaal sarp dosh rudraksha",
+      "cluster": "remedies",
+      "eyebrow": "Remedies & combinations",
+      "outline": "The traditional 8, 9, 10 Mukhi combination, what Kaal Sarp Dosh means in tradition, and how the set is worn on the recommendation of astrologers and pandits. Explicitly make no medical or miraculous claims.",
+      "relatedProductIds": ["certified-kaal-sarp-dosh-nivarak-rudraksha-combination-of-8-mukhi-nepal"],
+      "relatedCollectionSlugs": ["rudraksha-combination"]
+    },
+    {
+      "slug": "how-to-wear-rudraksha-traditional-guidance",
+      "title": "How to Wear a Rudraksha: Traditional Guidance",
+      "targetKeyword": "how to wear rudraksha",
+      "cluster": "care",
+      "eyebrow": "Care & use",
+      "outline": "Traditional guidance on wearing a Rudraksha — thread, metal, when it is worn, and the note that it is worn on the recommendation of astrologers and pandits. Practical, respectful, no claims.",
+      "relatedProductIds": [],
+      "relatedCollectionSlugs": ["rudraksha-pendant", "rudraksha-mala"]
+    }
+  ]
+}
