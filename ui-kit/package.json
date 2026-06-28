@@ -1,0 +1,28 @@
+{
+  "name": "@amorfos/ui-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Amorfos brand UI kit — design tokens and components",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./styles": "./styles/index.css"
+  },
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.6",
+    "react": "19.1.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3"
+  }
+}

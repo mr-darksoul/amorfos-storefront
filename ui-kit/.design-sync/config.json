@@ -1,0 +1,10 @@
+{
+  "projectId": "1c569025-2a8d-4846-9da3-633dfcd04b59",
+  "pkg": "@amorfos/ui-kit",
+  "globalName": "AmorfosUIKit",
+  "shape": "package",
+  "buildCmd": "npm run build",
+  "cssEntry": "styles/index.css",
+  "readmeHeader": ".design-sync/conventions.md",
+  "runtimeFontPrefixes": ["Cormorant Garamond", "Inter"]
+}
