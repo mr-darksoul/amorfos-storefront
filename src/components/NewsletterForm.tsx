@@ -48,7 +48,8 @@ export default function NewsletterForm({
   if (status === "done") {
     return (
       <p className={compact ? "text-sm text-ink-dim" : "text-sm leading-relaxed text-ink-dim"}>
-        Thank you — your guide is on its way to your inbox. Keep an eye out from{" "}
+        Almost there — check your inbox and click the confirmation link to get your
+        guide. Look for an email from{" "}
         <span className="text-gold-soft">care@amorfos.in</span>.
       </p>
     );

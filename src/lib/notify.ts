@@ -174,6 +174,37 @@ export async function sendShippingUpdateEmail(
   );
 }
 
+// ── Newsletter double opt-in ─────────────────────────────────────────────────
+
+/**
+ * Sends a lightweight confirmation email (no attachment) to a new subscriber.
+ * Only once they click `confirmUrl` do we email the actual guide. This keeps a
+ * flood of fake/random signups from ever triggering a 5 MB PDF send, and keeps
+ * the confirmed audience clean.
+ */
+export async function sendConfirmationEmail(to: string, confirmUrl: string): Promise<void> {
+  const body = `
+    <p style="margin:0 0 16px;color:#5c4a2a;font-size:14px;line-height:1.7;">
+      Thank you for your interest in Amorfos. One quick step before we send your copy of
+      <em>The Complete Guide to Choosing Your Rudraksha Mukhi</em> — please confirm this is you.
+    </p>
+    <p style="margin:24px 0 0;">
+      <a href="${confirmUrl}" style="display:inline-block;background:#97712f;color:#f6f1e7;font-size:13px;padding:11px 26px;border-radius:2px;text-decoration:none;letter-spacing:0.08em;">
+        Confirm &amp; send me the guide
+      </a>
+    </p>
+    <p style="margin:20px 0 0;color:#8a7355;font-size:12px;line-height:1.6;">
+      If you didn&rsquo;t request this, you can safely ignore this email — nothing further
+      will be sent and your address won&rsquo;t be added to our list.
+    </p>`;
+
+  await sendEmail(
+    to,
+    `Confirm your guide to choosing a Rudraksha mukhi`,
+    baseEmailHtml("Just one step", body),
+  );
+}
+
 // ── Lead-magnet guide ───────────────────────────────────────────────────────
 
 // The PDF lives outside /public (so it isn't directly downloadable) and is
