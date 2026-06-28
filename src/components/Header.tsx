@@ -11,6 +11,7 @@ const nav = [
   { href: "/shop", label: "Shop" },
   { href: "/collections/rudraksha-pendant", label: "Pendants" },
   { href: "/collections/rudraksha-mala", label: "Malas" },
+  { href: "/journal", label: "Journal" },
   { href: "/about", label: "About" },
 ];
 

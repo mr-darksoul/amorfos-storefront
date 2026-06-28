@@ -2,8 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import ProductCard from "@/components/ProductCard";
+import ArticleCard from "@/components/ArticleCard";
 import { categoryMeta } from "@/lib/products";
 import { collectionHref } from "@/lib/collections";
+import { getPublishedArticles } from "@/lib/articles";
 import { getAdminProducts } from "@/lib/adminProducts";
 import { site } from "@/lib/site";
 import { ShieldIcon, TruckIcon, ReturnIcon, LeafIcon, ArrowIcon } from "@/components/icons";
@@ -38,6 +40,7 @@ export default async function Home() {
       : `Rudraksha ${heroProduct.categoryLabel}`;
   const flagged = products.filter((p) => p.bestseller);
   const bestsellers = (flagged.length ? flagged : products).slice(0, 4);
+  const recentArticles = (await getPublishedArticles()).slice(0, 3);
 
   return (
     <>
@@ -208,6 +211,32 @@ export default async function Home() {
           ))}
         </div>
       </section>
+
+      {/* ──────────────────────── From the Journal ─────────────── */}
+      {recentArticles.length > 0 && (
+        <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 md:py-28">
+          <Reveal className="mb-12 flex items-end justify-between gap-6">
+            <div>
+              <p className="eyebrow mb-3">Read</p>
+              <h2 className="display text-4xl sm:text-5xl">From the Journal</h2>
+            </div>
+            <Link
+              href="/journal"
+              className="hidden shrink-0 items-center gap-2 text-sm tracking-[0.16em] uppercase text-ink-dim hover:text-gold-soft sm:flex"
+            >
+              All guides <ArrowIcon className="size-4" />
+            </Link>
+          </Reveal>
+
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {recentArticles.map((a, i) => (
+              <Reveal key={a.slug} delay={i * 80}>
+                <ArticleCard article={a} />
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ─────────────────── Assurance band ────────────────────── */}
       <section className="grain relative overflow-hidden bg-paper">

@@ -78,3 +78,22 @@ BEGIN
   END LOOP;
 END;
 $$;
+
+-- ── Journal articles (migration 003) ───────────────────────────────────────
+-- See supabase/migrations/003_articles.sql. Content-marketing articles stored
+-- as a JSON blob mirroring the Article type in src/lib/types.ts. Nothing is
+-- public until status = 'published'.
+CREATE TABLE IF NOT EXISTS articles (
+  slug         text        PRIMARY KEY,
+  data         jsonb       NOT NULL,
+  status       text        NOT NULL DEFAULT 'draft',  -- draft | published
+  created_at   timestamptz NOT NULL DEFAULT now(),
+  updated_at   timestamptz NOT NULL DEFAULT now(),
+  published_at timestamptz
+);
+
+CREATE INDEX IF NOT EXISTS articles_status_published_idx
+  ON articles (status, published_at DESC);
+
+ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE articles FORCE  ROW LEVEL SECURITY;

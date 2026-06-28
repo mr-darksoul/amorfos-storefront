@@ -27,6 +27,7 @@ export default function Footer() {
 
         <FooterCol title="House">
           <FooterLink href="/about">Our story</FooterLink>
+          <FooterLink href="/journal">Journal</FooterLink>
           <FooterLink href="/policies#shipping">Shipping</FooterLink>
           <FooterLink href="/policies#returns">7-day returns</FooterLink>
           <FooterLink href="/policies#authenticity">Lab certification</FooterLink>

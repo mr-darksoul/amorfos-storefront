@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/lib/useCheckout";
 import { inr } from "@/lib/format";
 import { site } from "@/lib/site";
+import { validateCustomer, digitsOnly } from "@/lib/validateCustomer";
 import { ArrowIcon } from "@/components/icons";
 
 export default function CheckoutPage() {
@@ -39,33 +40,32 @@ export default function CheckoutPage() {
     };
   }
 
-  const nameErr = touched.name && !form.name.trim() ? "Required" : "";
-  const phoneErr =
-    touched.phone && !/^[6-9]\d{9}$/.test(form.phone.replace(/\s/g, ""))
-      ? "Enter a valid 10-digit mobile number"
-      : "";
-  const pincodeErr =
-    touched.pincode && form.pincode && !/^\d{6}$/.test(form.pincode)
-      ? "6-digit pincode"
-      : "";
-
-  const isValid =
-    form.name.trim() &&
-    /^[6-9]\d{9}$/.test(form.phone.replace(/\s/g, "")) &&
-    (!form.pincode || /^\d{6}$/.test(form.pincode));
+  const errors = validateCustomer(form);
+  const isValid = Object.keys(errors).length === 0;
+  // Only surface an error once the field has been touched (or submit attempted).
+  const errFor = (key: keyof typeof form) =>
+    touched[key] ? errors[key] : undefined;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setTouched({ name: true, phone: true, pincode: true });
+    setTouched({
+      name: true,
+      phone: true,
+      email: true,
+      address: true,
+      city: true,
+      state: true,
+      pincode: true,
+    });
     if (!isValid) return;
     await checkout({
       name: form.name.trim(),
-      phone: form.phone.replace(/\s/g, ""),
-      email: form.email.trim() || undefined,
-      address: form.address.trim() || undefined,
-      city: form.city.trim() || undefined,
-      state: form.state.trim() || undefined,
-      pincode: form.pincode.trim() || undefined,
+      phone: digitsOnly(form.phone),
+      email: form.email.trim(),
+      address: form.address.trim(),
+      city: form.city.trim(),
+      state: form.state.trim(),
+      pincode: form.pincode.trim(),
     });
   }
 
@@ -92,7 +92,7 @@ export default function CheckoutPage() {
               <div className="sm:col-span-2">
                 <Label>Full name *</Label>
                 <Input {...field("name")} placeholder="Rahul Sharma" autoComplete="name" />
-                {nameErr && <FieldError>{nameErr}</FieldError>}
+                {errFor("name") && <FieldError>{errFor("name")}</FieldError>}
               </div>
               <div>
                 <Label>Mobile number *</Label>
@@ -103,37 +103,41 @@ export default function CheckoutPage() {
                   autoComplete="tel"
                   inputMode="numeric"
                 />
-                {phoneErr && <FieldError>{phoneErr}</FieldError>}
+                {errFor("phone") && <FieldError>{errFor("phone")}</FieldError>}
               </div>
               <div>
-                <Label>Email <span className="text-ink-faint">(optional)</span></Label>
+                <Label>Email *</Label>
                 <Input
                   {...field("email")}
                   type="email"
                   placeholder="you@example.com"
                   autoComplete="email"
                 />
+                {errFor("email") && <FieldError>{errFor("email")}</FieldError>}
               </div>
             </div>
           </section>
 
           <section>
-            <h2 className="font-serif text-xl text-ink mb-4">Shipping address <span className="font-sans text-sm text-ink-faint">(optional)</span></h2>
+            <h2 className="font-serif text-xl text-ink mb-4">Shipping address</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label>Address line</Label>
+                <Label>Address line *</Label>
                 <Input {...field("address")} placeholder="House / flat, street, locality" autoComplete="street-address" />
+                {errFor("address") && <FieldError>{errFor("address")}</FieldError>}
               </div>
               <div>
-                <Label>City</Label>
+                <Label>City *</Label>
                 <Input {...field("city")} placeholder="Delhi" autoComplete="address-level2" />
+                {errFor("city") && <FieldError>{errFor("city")}</FieldError>}
               </div>
               <div>
-                <Label>State</Label>
+                <Label>State *</Label>
                 <Input {...field("state")} placeholder="Delhi" autoComplete="address-level1" />
+                {errFor("state") && <FieldError>{errFor("state")}</FieldError>}
               </div>
               <div>
-                <Label>Pincode</Label>
+                <Label>Pincode *</Label>
                 <Input
                   {...field("pincode")}
                   placeholder="110001"
@@ -141,7 +145,7 @@ export default function CheckoutPage() {
                   maxLength={6}
                   autoComplete="postal-code"
                 />
-                {pincodeErr && <FieldError>{pincodeErr}</FieldError>}
+                {errFor("pincode") && <FieldError>{errFor("pincode")}</FieldError>}
               </div>
             </div>
           </section>

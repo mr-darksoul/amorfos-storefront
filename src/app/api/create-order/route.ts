@@ -3,6 +3,7 @@ import Razorpay from "razorpay";
 import { getAdminProducts } from "@/lib/adminProducts";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { site } from "@/lib/site";
+import { validateCustomer, digitsOnly } from "@/lib/validateCustomer";
 
 export const runtime = "nodejs";
 
@@ -46,14 +47,26 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
   }
 
+  // Validate server-side — the client checks are convenience only and can be
+  // bypassed by calling this route directly. Every order ships a physical
+  // product, so name, phone, email and a full address are all required.
+  const fieldErrors = validateCustomer(body.customer ?? {});
+  if (Object.keys(fieldErrors).length > 0) {
+    return NextResponse.json(
+      { error: "Please check your contact and shipping details.", fields: fieldErrors },
+      { status: 400 },
+    );
+  }
+
+  const c = body.customer!;
   const customer: CustomerInfo = {
-    name: body.customer?.name?.trim() || "Guest",
-    phone: body.customer?.phone?.trim() || "",
-    email: body.customer?.email?.trim() || "",
-    address: body.customer?.address?.trim() || "",
-    city: body.customer?.city?.trim() || "",
-    state: body.customer?.state?.trim() || "",
-    pincode: body.customer?.pincode?.trim() || "",
+    name: c.name!.trim(),
+    phone: digitsOnly(c.phone!),
+    email: c.email!.trim(),
+    address: c.address!.trim(),
+    city: c.city!.trim(),
+    state: c.state!.trim(),
+    pincode: c.pincode!.trim(),
   };
 
   const products = await getAdminProducts();
