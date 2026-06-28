@@ -171,7 +171,7 @@ export default async function Image({
               textTransform: "uppercase",
             }}
           >
-            Lab Certified · {product.mukhiLabel}
+            {`Lab Certified · ${product.mukhiLabel}`}
           </div>
 
           {/* Name */}
@@ -213,7 +213,7 @@ export default async function Image({
                 {rating!.average.toFixed(1)}
               </div>
               <div style={{ fontSize: 26, color: "#7a5c3a", marginLeft: 10 }}>
-                ({rating!.total} review{rating!.total === 1 ? "" : "s"})
+                {`(${rating!.total} review${rating!.total === 1 ? "" : "s"})`}
               </div>
             </div>
           )}
