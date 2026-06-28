@@ -10,13 +10,14 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Bundled fonts (include the ₹ glyph, which Satori's default font lacks).
-// `new URL(..., import.meta.url)` lets the bundler trace + include the assets.
+// Served as static assets from /public and fetched over HTTPS — reliable in
+// the nodejs runtime (fetch(new URL(import.meta.url)) only works on edge).
 async function loadFonts() {
   const [regular, bold] = await Promise.all([
-    fetch(new URL("./NotoSans-Regular.ttf", import.meta.url)).then((r) =>
+    fetch(`${site.url}/og-fonts/NotoSans-Regular.ttf`).then((r) =>
       r.arrayBuffer(),
     ),
-    fetch(new URL("./NotoSans-Bold.ttf", import.meta.url)).then((r) =>
+    fetch(`${site.url}/og-fonts/NotoSans-Bold.ttf`).then((r) =>
       r.arrayBuffer(),
     ),
   ]);
