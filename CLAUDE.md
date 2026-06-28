@@ -57,18 +57,19 @@ Keep changes light/airy. Do not reintroduce a dark theme.
 ## Stack
 
 - **Next.js 15** (App Router) + **TypeScript** + **Tailwind CSS v4**
-- **Checkout:** dedicated `/checkout` page collects customer info (name + 10-digit
-  phone required; email/address optional), then opens the Razorpay modal via
-  `lib/useCheckout.ts`. "Buy it now" on a product routes straight here.
+- **Checkout:** dedicated `/checkout` page collects customer info (name, phone,
+  email, full address — all required, validated client + server via
+  `lib/validateCustomer.ts`), then opens the Razorpay modal via `lib/useCheckout.ts`.
+  "Buy it now" on a product routes straight here.
 - **Payments:** Razorpay (live keys) — order created server-side (`api/create-order`,
   amount recomputed from catalogue + shipping so a tampered client price can't change the
   charge), HMAC SHA-256 signature verified (`api/verify-payment`). If keys are
   missing/placeholder, both routes return `503` and checkout is disabled.
 - **Cart:** React Context + `localStorage` (`context/CartContext.tsx`). No Redux.
 - **Database:** **Supabase** (`lib/supabase.ts`, server-only `SUPABASE_SERVICE_ROLE_KEY`).
-  Two tables (`supabase/schema.sql`): `orders` (written pending → paid/failed across
-  the create/verify routes, holds customer PII + line items) and `products`. When
-  Supabase is unconfigured, everything **falls back to the hardcoded `products.ts`**.
+  Three tables (`supabase/schema.sql`): `orders`, `products`, and `articles`. All
+  have RLS enabled (service-role only). When Supabase is unconfigured, products fall
+  back to the hardcoded `products.ts`; the journal renders empty.
 - **Fulfillment:** Shiprocket (`lib/shiprocket.ts`) — JWT token cached module-level;
   `api/verify-payment` auto-syncs paid orders using Next 15 `after()` (keeps the
   serverless function alive post-response so the sync completes; plain fire-and-forget
@@ -81,9 +82,21 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   (not `/shiprocket` — Shiprocket blocks URLs containing "shiprocket"/"sr"/"kr").
 - **Admin:** `/admin` (cookie/HMAC gate via `ADMIN_PASSWORD` + `middleware.ts`, fails
   closed) → product CRUD (`/admin/products`), orders view with Ship action + PDF invoice
-  download (`/admin/orders`). Product data layer `lib/adminProducts.ts` reads Supabase
-  when configured, else `products.ts`. Image uploads go to **Vercel Blob**
-  (`BLOB_READ_WRITE_TOKEN`); without the token uploads return `503`.
+  download (`/admin/orders`), Journal CRUD (`/admin/journal` — list/edit/publish/unpublish/
+  delete drafts). Product data layer `lib/adminProducts.ts`; journal data layer
+  `lib/articles.ts`. Image uploads go to **Vercel Blob** (`BLOB_READ_WRITE_TOKEN`);
+  without the token uploads return `503`.
+- **Journal (SEO content engine):** `/journal` hub + `/journal/[slug]` article pages.
+  Data stored in Supabase `articles` table (`status = draft | published`). Article body
+  is typed blocks (paragraph/heading/list/quote) — no raw HTML. Each page emits
+  Article + BreadcrumbList + FAQPage JSON-LD. `revalidate = 60`.
+- **Content automation:** `vercel.json` schedules a daily Vercel Cron at **04:00 UTC
+  (9:30 AM IST)** → hits `api/cron/content-draft` → reads `scripts/content-calendar.json`
+  → generates next article via Claude API (`ANTHROPIC_API_KEY`) → validates compliance
+  (banned-phrase check) → inserts as draft. Nothing auto-publishes — Manav reviews at
+  `/admin/journal`. Generator logic shared in `lib/articleGenerator.ts`. Local equivalent:
+  `npm run content:draft`. Content calendar has 8 entries (add more from
+  `docs/content-marketing-strategy.md` §4–5 before they run out).
 - **Deploy target:** Vercel (project `web`, org `manavmba24-1516`) — **Root Directory = `web`**.
   GitHub→Vercel auto-deploy is **not** wired; deploy manually: `vercel --prod --yes` from `/web`.
 
@@ -105,21 +118,26 @@ web/src/
 │  ├─ thank-you/            Post-payment confirmation
 │  ├─ track/                Public order tracking page
 │  ├─ about/ · policies/ · privacy-policy/ · terms/   Brand + legal
-│  ├─ admin/                Gated: products CRUD + orders view
+│  ├─ journal/page.tsx       Journal hub (published articles, grouped by cluster)
+│  ├─ journal/[slug]/       Article page (JSON-LD, revalidate 60)
+│  ├─ admin/                Gated: products CRUD + orders view + journal CRUD
 │  ├─ api/create-order/ · api/verify-payment/          Razorpay (server)
 │  ├─ api/track/                                       Shiprocket tracking (server)
 │  ├─ api/admin/{login,logout,products,upload}/        Admin API
+│  ├─ api/admin/journal/[slug]/publish/                Publish/unpublish gate
 │  ├─ api/admin/orders/[id]/ship/                      Assign AWB + pickup + label
+│  ├─ api/cron/content-draft/                          Vercel Cron endpoint (CRON_SECRET)
 │  ├─ api/webhooks/delivery-status/                    Shiprocket status webhook
-│  ├─ sitemap.ts · robots.ts                           SEO
+│  ├─ sitemap.ts · robots.ts                           SEO (includes /journal + articles)
 │  └─ globals.css           ← brand design tokens (source of truth)
 ├─ components/              Header, Footer, CartDrawer, ProductCard,
-│                          ProductGallery, ProductPurchase, ShopClient, …
+│                          ProductGallery, ProductPurchase, ShopClient, ArticleCard, …
 ├─ context/CartContext.tsx  Cart state + localStorage persistence
 ├─ middleware.ts            Admin cookie/HMAC gate (fails closed)
 ├─ instrumentation.ts       Node localStorage shim (see gotcha)
 └─ lib/                     products, collections, site, format, types,
-                           useCheckout, supabase, adminProducts,
+                           useCheckout, supabase, adminProducts, articles,
+                           articleGenerator, validateCustomer,
                            shiprocket, notify, invoice
 ```
 
@@ -138,38 +156,41 @@ libraries that feature-detect it. Handled two ways, no action needed:
 `src/instrumentation.ts` strips the broken global on boot, and the `dev` script
 passes `--no-experimental-webstorage`.
 
-## Status (as of 2026-06-27) — LIVE
+## Status (as of 2026-06-28) — LIVE
 
 **https://amorfos.in** is live and processing real orders.
 
 All env vars are set in Vercel production:
-- **Supabase** project `amorfos` (ap-south-1 / Mumbai) — confirmed active.
+- **Supabase** project `amorfos` (ap-south-1 / Mumbai) — confirmed active. Migrations
+  001 (schema), 002 (RLS + stock), 003 (articles) all applied.
 - **Razorpay live keys** — smoke-tested + multiple real payments processed.
-- **Shiprocket** (`care@amorfos.in`, company 599101) — credentials smoke-tested;
-  end-to-end fulfillment confirmed: order → paid → Shiprocket order created → AWB
-  assigned (Shadowfax Surface) → pickup requested → label generated, all via `after()`.
+- **Shiprocket** (`care@amorfos.in`, company 599101) — end-to-end fulfillment confirmed.
 - **SMTP** (GoDaddy) + **WhatsApp Cloud API** — configured for notifications.
-- `ADMIN_PASSWORD` set. `BLOB_READ_WRITE_TOKEN` status: check Vercel dashboard.
+- `ADMIN_PASSWORD`, `ANTHROPIC_API_KEY`, `CRON_SECRET`, `BLOB_READ_WRITE_TOKEN` all set.
 
-**Shiprocket webhook** configured at `https://amorfos.in/api/webhooks/delivery-status`
-(Auth: `x-api-key` header = `SHIPROCKET_WEBHOOK_TOKEN`). Do not rename this path.
+**Shiprocket webhook** at `https://amorfos.in/api/webhooks/delivery-status`
+(Auth: `x-api-key` = `SHIPROCKET_WEBHOOK_TOKEN`). Do not rename this path.
 
-**Remaining gaps (not yet built):**
-- **~101 of 181 products have no images** (`images: []`) — render placeholder glyphs.
-  Add photos before promoting the store widely.
-- No order-placement email/SMS (Shiprocket notify covers *shipping* events only).
-- No COD (checkout is prepaid Razorpay only).
-- No product search, analytics pixel.
-- No admin UI to retry a failed Shiprocket sync (manual DB fix needed if `after()` errors).
+**Journal content pipeline:**
+- Vercel Cron fires daily at 04:00 UTC (9:30 AM IST) → `api/cron/content-draft`
+- Drafts land at `/admin/journal` — Manav reviews and publishes manually
+- Content calendar: `scripts/content-calendar.json` (8 entries as of 2026-06-28;
+  add more before they run out — see `docs/content-marketing-strategy.md` §4–5)
+- Google Search Console: verified (manav.mba24@gmail.com), sitemap submitted 2026-06-28
 
-**Inventory (added):** opt-in per product via `Product.stock` (`undefined`/`null`
-= untracked/unlimited; a number = tracked, `0` = sold out). Set it in the admin
-product form. Checkout (`api/create-order`) rejects qty over stock; confirmed
-payments decrement atomically via the `decrement_stock` Postgres function
-(`supabase/migrations/002_rls_and_stock.sql`). Sold-out shows on cards + PDP and
-sets `OutOfStock` in JSON-LD. Note: stock is reserved on *payment*, not at cart
-add, so a tiny oversell window remains under simultaneous checkouts — fine for
-low-volume one-of-a-kind beads. **Run migration 002 in Supabase** (it also turns
-on RLS) before relying on this in production.
+**Remaining gaps:**
+- **~101 of 181 products have no images** — render placeholder glyphs. Add photos
+  before promoting widely.
+- No order-placement email/SMS (Shiprocket covers shipping events only).
+- No COD (prepaid Razorpay only).
+- No product search, no analytics pixel.
+- No admin UI to retry a failed Shiprocket sync (manual DB fix needed).
+- Content calendar needs weeks 5–12 added (16 more articles).
+
+**Inventory:** opt-in per product via `Product.stock` (`undefined`/`null` =
+unlimited; a number = tracked, `0` = sold out). Checkout rejects qty over stock;
+payments decrement atomically via `decrement_stock` Postgres function
+(`supabase/migrations/002_rls_and_stock.sql`). Oversell window exists between
+cart-add and payment — acceptable for low-volume one-of-a-kind beads.
 
 See setup/deploy details in `README.md`.
