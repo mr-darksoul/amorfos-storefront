@@ -5,6 +5,9 @@ import { inr } from "@/lib/format";
 import { site } from "@/lib/site";
 
 export const runtime = "nodejs";
+// Regenerate the image periodically so price / rating / title changes flow
+// through without a redeploy (matches the product page's revalidate cadence).
+export const revalidate = 3600;
 export const alt = "Amorfos — Authentic, Lab Certified Rudraksha";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
