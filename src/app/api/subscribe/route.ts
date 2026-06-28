@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { sendLeadMagnetEmail } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
@@ -43,6 +44,17 @@ export async function POST(req: Request) {
     console.error("[subscribe] insert error:", error);
     return NextResponse.json({ error: "Could not subscribe. Try again." }, { status: 500 });
   }
+
+  // Email the guide without blocking the response. `after()` keeps the
+  // serverless function alive past the response so the attachment send completes;
+  // a send failure is logged but never fails the subscription itself.
+  after(async () => {
+    try {
+      await sendLeadMagnetEmail(email);
+    } catch (err) {
+      console.error("[subscribe] guide email failed:", err);
+    }
+  });
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }

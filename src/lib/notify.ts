@@ -1,3 +1,4 @@
+import path from "node:path";
 import nodemailer from "nodemailer";
 import { site, waLink } from "@/lib/site";
 import type { SupabaseOrder } from "@/lib/shiprocket";
@@ -37,14 +38,19 @@ function smtpTransport(): nodemailer.Transporter | null {
   return transporter;
 }
 
-async function sendEmail(to: string, subject: string, html: string): Promise<void> {
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  attachments?: nodemailer.SendMailOptions["attachments"],
+): Promise<void> {
   const transport = smtpTransport();
   if (!transport) {
     console.warn("[email] SMTP not configured, skipping:", subject);
     return;
   }
   const from = process.env.SMTP_FROM || `${site.name} <${site.email}>`;
-  await transport.sendMail({ from, to, subject, html });
+  await transport.sendMail({ from, to, subject, html, attachments });
 }
 
 function orderItemsHtml(order: SupabaseOrder): string {
@@ -165,6 +171,46 @@ export async function sendShippingUpdateEmail(
     order.customer.email,
     subject,
     baseEmailHtml(isDelivered ? "Delivered" : "Order shipped", body),
+  );
+}
+
+// ── Lead-magnet guide ───────────────────────────────────────────────────────
+
+// The PDF lives outside /public (so it isn't directly downloadable) and is
+// bundled into the subscribe function via `outputFileTracingIncludes` in
+// next.config.mjs. Read from cwd at runtime.
+const GUIDE_PATH = path.join(process.cwd(), "assets/lead-magnet/rudraksha-mukhi-guide.pdf");
+const GUIDE_FILENAME = "The Complete Guide to Choosing Your Rudraksha Mukhi.pdf";
+
+/** Emails the Rudraksha mukhi guide as a PDF attachment to a new subscriber. */
+export async function sendLeadMagnetEmail(to: string): Promise<void> {
+  const body = `
+    <p style="margin:0 0 16px;color:#5c4a2a;font-size:14px;line-height:1.7;">
+      Thank you for your interest in Amorfos. As promised, your copy of
+      <em>The Complete Guide to Choosing Your Rudraksha Mukhi</em> is attached to this email.
+    </p>
+    <p style="margin:0 0 16px;color:#5c4a2a;font-size:14px;line-height:1.7;">
+      Inside you&rsquo;ll find each mukhi from one to fourteen — its ruling deity and
+      planet, beej mantra, and who traditionally wears it — along with how to read a
+      bead and tell a genuine one from a fake. No miracles, just tradition and what
+      Lab Certification really means.
+    </p>
+    <p style="margin:24px 0 0;">
+      <a href="${site.url}/shop" style="display:inline-block;background:#97712f;color:#f6f1e7;font-size:13px;padding:11px 26px;border-radius:2px;text-decoration:none;letter-spacing:0.08em;">
+        Explore the collection
+      </a>
+    </p>
+    <p style="margin:20px 0 0;color:#8a7355;font-size:12px;line-height:1.6;">
+      Every Amorfos bead is Lab Certified and sent sealed. If you have a question
+      before you choose, just reply to this email or message us on WhatsApp — a real
+      person answers.
+    </p>`;
+
+  await sendEmail(
+    to,
+    `Your guide to choosing a Rudraksha mukhi`,
+    baseEmailHtml("Your guide is here", body),
+    [{ filename: GUIDE_FILENAME, path: GUIDE_PATH, contentType: "application/pdf" }],
   );
 }
 
