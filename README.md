@@ -69,6 +69,13 @@ vercel --prod     # production deploy
 3. Set **Root Directory** = `web`.
 4. Add the env vars below, then deploy.
 
+> **Stuck deploy?** A normal prod build is ~1 min. On the Hobby plan only **one
+> build runs at a time**, so if a deploy wedges (e.g. stuck in "Deploying outputs"
+> for many minutes — a Vercel-side stall, not a code issue) it blocks the slot and
+> any retry queues behind it. Free the slot and redeploy:
+> `vercel ls web --prod` → find the `● Building` one → `vercel rm <that-url> --yes`
+> → `vercel --prod --yes`.
+
 **Environment variables to set in Vercel** (Project → Settings → Environment Variables):
 
 | Key | Value |

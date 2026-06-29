@@ -137,6 +137,11 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   `docs/content-marketing-strategy.md` §4–5 before they run out).
 - **Deploy target:** Vercel (project `web`, org `manavmba24-1516`) — **Root Directory = `web`**.
   GitHub→Vercel auto-deploy is **not** wired; deploy manually: `vercel --prod --yes` from `/web`.
+  A normal prod build is ~1 min. The plan is **Hobby = 1 concurrent build**, so a deploy
+  that wedges (e.g. stuck in "Deploying outputs" for many minutes — a Vercel-side stall, not
+  a code issue) blocks the slot and queues any retry behind it. Remedy: free the slot by
+  removing the stuck deployment, then redeploy —
+  `vercel ls web --prod` (find the `● Building` one) → `vercel rm <that-url> --yes` → `vercel --prod --yes`.
 
 > Middleware **fails closed** (`src/middleware.ts`): a request is authorized only
 > when `ADMIN_PASSWORD` is set **and** the cookie carries the matching HMAC token.
@@ -180,6 +185,9 @@ web/src/
 │                          ProductGallery, ProductPurchase, ShopClient, ArticleCard,
 │                          ReviewSection, ReviewForm, …
 ├─ context/CartContext.tsx  Cart state + localStorage persistence
+│  (ProductGallery is responsive to image count: the product page grid uses
+│   `grid-cols-1` on mobile and the thumbnail strip scrolls horizontally below `sm`,
+│   so products with many images don't overflow the viewport — keep both when editing.)
 ├─ middleware.ts            Admin cookie/HMAC gate (fails closed)
 ├─ instrumentation.ts       Node localStorage shim (see gotcha)
 └─ lib/                     products, collections, site, format, types,
