@@ -150,7 +150,7 @@ export default async function ProductPage({
           </Link>
         </nav>
 
-        <div className="grid gap-10 md:grid-cols-2 md:gap-14 md:items-start">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-14 md:items-start">
           {/* Gallery — sticky on desktop so it doesn't stretch to the info column */}
           <div className="md:sticky md:top-28 md:self-start">
             <ProductGallery images={product.images} name={product.name} />

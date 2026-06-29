@@ -39,9 +39,9 @@ export default function ProductGallery({
   const hasImage = Boolean(images[active]);
 
   return (
-    <div className="flex flex-col-reverse gap-4 sm:flex-row">
+    <div className="flex min-w-0 flex-col-reverse gap-4 sm:flex-row">
       {images.length > 1 && (
-        <div className="flex gap-3 sm:flex-col">
+        <div className="flex max-w-full gap-3 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:max-w-none sm:overflow-visible sm:pb-0 sm:flex-col">
           {images.map((src, i) => (
             <button
               key={src}
@@ -72,7 +72,7 @@ export default function ProductGallery({
         onMouseEnter={() => canHover && setZooming(true)}
         onMouseMove={canHover ? handleMove : undefined}
         onMouseLeave={() => setZooming(false)}
-        className={`group relative aspect-square flex-1 overflow-hidden rounded-sm bg-white ${
+        className={`group relative aspect-square min-w-0 flex-1 overflow-hidden rounded-sm bg-white ${
           hasImage ? "cursor-zoom-in" : ""
         }`}
       >
