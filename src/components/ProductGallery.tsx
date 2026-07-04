@@ -46,7 +46,8 @@ export default function ProductGallery({
             <button
               key={src}
               onClick={() => setActive(i)}
-              className={`relative size-16 shrink-0 overflow-hidden rounded-sm bg-white sm:size-20 ${
+              onMouseEnter={() => setActive(i)}
+              className={`relative size-16 shrink-0 cursor-pointer overflow-hidden rounded-sm bg-white sm:size-20 ${
                 active === i ? "ring-2 ring-gold" : "ring-1 ring-line"
               }`}
               aria-label={`View image ${i + 1}`}
