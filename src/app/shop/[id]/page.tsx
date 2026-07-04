@@ -108,7 +108,9 @@ export default async function ProductPage({
     "@context": "https://schema.org",
     "@type": "Product",
     name: product.name,
-    image: product.images.map((i) => `${site.url}${i}`),
+    image: product.images.map((i) =>
+      /^https?:\/\//.test(i) ? i : `${site.url}${i}`,
+    ),
     description: product.tagline,
     brand: { "@type": "Brand", name: site.name },
     category: product.categoryLabel,
@@ -121,6 +123,41 @@ export default async function ProductPage({
         ? "https://schema.org/OutOfStock"
         : "https://schema.org/InStock",
       seller: { "@type": "Organization", name: site.name },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "IN",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 7,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: product.price >= site.freeShippingThreshold ? 0 : 79,
+          currency: "INR",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "IN",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: 2,
+            unitCode: "DAY",
+          },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: 3,
+            maxValue: 7,
+            unitCode: "DAY",
+          },
+        },
+      },
     },
     ...(reviewSummary.total > 0 && {
       aggregateRating: {
