@@ -3,6 +3,11 @@ import { getAdminProductListings } from "@/lib/adminProducts";
 import AdminProductsClient from "./AdminProductsClient";
 import AdminLogoutButton from "./AdminLogoutButton";
 
+// Always render fresh from Supabase — otherwise the product list is baked at
+// build time and never reflects products added/edited directly in the DB
+// (matches admin/orders, admin/journal, admin/reviews).
+export const dynamic = "force-dynamic";
+
 export const metadata = { title: "Products" };
 
 export default async function AdminProductsPage() {
