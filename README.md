@@ -124,6 +124,16 @@ All products live in **`src/lib/products.ts`** — one typed object each
 the shop, filters, product pages, sitemap and related-products all update
 automatically.
 
+**Combinations** may also set `beads[]` — one `{ mukhi, origin, note }` per bead —
+which renders a per-bead "Bead composition" table on the product page. When a
+combination's beads span more than one origin, set `origin: "Mixed"` (the shop
+filter surfaces a Mixed combination under any of its beads' origins). The admin
+product form (`/admin/products`) has a bead editor that auto-derives the top-level
+origin, plus a **✨ Generate copy** button that drafts the tagline, description,
+benefits and per-bead notes via the Anthropic API (deity/planet come from the
+canonical `src/lib/mukhi.ts` table, not the model). Requires `ANTHROPIC_API_KEY`;
+override the model with `PRODUCT_CONTENT_MODEL` (default `claude-opus-4-8`).
+
 ## Copy rules (baked in)
 "Lab Certified" only (never a lab name) · no medical/miraculous claims ·
 "worn on the recommendation of astrologers and pandits" · 7-day returns on

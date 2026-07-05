@@ -90,33 +90,69 @@ function contextBlock(p: ProductContext): string {
   return lines.join("\n");
 }
 
-function schemaFor(field: GenerateField, p: ProductContext): string {
-  const combo = p.mukhi == null;
+interface JsonSchema {
+  type: "object";
+  properties: Record<string, unknown>;
+  required: string[];
+  additionalProperties: false;
+}
+
+// Structured-output JSON schema for the requested field(s). Constraining the
+// response format guarantees valid JSON (Opus 4.8 with thinking off can otherwise
+// prepend reasoning prose that breaks brace-extraction parsing).
+function schemaFor(field: GenerateField, p: ProductContext): JsonSchema {
+  const str = { type: "string" };
+  const strArr = { type: "array", items: { type: "string" } };
+  const properties: Record<string, unknown> = {};
+  const required: string[] = [];
+  const add = (k: string, v: unknown) => {
+    properties[k] = v;
+    required.push(k);
+  };
+
   switch (field) {
     case "tagline":
-      return `Return ONLY a JSON object (no markdown fence): {"tagline": string}`;
+      add("tagline", str);
+      break;
     case "description":
-      return `Return ONLY a JSON object (no markdown fence): {"description": string}`;
+      add("description", str);
+      break;
     case "benefits":
-      return `Return ONLY a JSON object (no markdown fence): {"benefits": string[] (exactly 3)}`;
+      add("benefits", strArr);
+      break;
     case "beadNote":
-      return `Return ONLY a JSON object (no markdown fence): {"note": string} — one sentence for the specified bead.`;
+      add("note", str);
+      break;
     case "all":
     default:
-      return `Return ONLY a JSON object (no markdown fence) with this exact shape:
-{
-  "tagline": string,
-  "description": string,
-  "benefits": string[] (exactly 3),${
-    combo
-      ? `\n  "deity": string (the presiding deity for this combination),\n  "planet": string,`
-      : ""
-  }${
-    p.beads?.length
-      ? `\n  "beadNotes": string[] (one note per bead, in the same order as listed above)`
-      : ""
+      add("tagline", str);
+      add("description", str);
+      add("benefits", strArr);
+      if (p.mukhi == null) {
+        add("deity", str);
+        add("planet", str);
+      }
+      if (p.beads?.length) add("beadNotes", strArr);
   }
-}`;
+  return { type: "object", properties, required, additionalProperties: false };
+}
+
+// Human-readable constraints the JSON schema can't express (counts, lengths).
+function fieldGuidance(field: GenerateField, p: ProductContext): string {
+  switch (field) {
+    case "tagline":
+      return "Produce the tagline only (8-12 words).";
+    case "description":
+      return "Produce the description only (2-3 sentences).";
+    case "benefits":
+      return "Produce exactly 3 benefit bullets.";
+    case "beadNote":
+      return "Produce the one-line benefit note for the specified bead only.";
+    case "all":
+    default:
+      return `Produce all fields. "benefits" must have exactly 3 items.${
+        p.beads?.length ? ' "beadNotes" must have one note per bead, in the listed order.' : ""
+      }${p.mukhi == null ? " Propose the presiding deity and planet for the combination." : ""}`;
   }
 }
 
@@ -145,46 +181,88 @@ export async function generateProductContent({
 
 ${contextBlock(product)}
 
-${target}${schemaFor(field, product)}`;
+${target}${fieldGuidance(field, product)}`;
 
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
+  const requestBody = JSON.stringify({
+    model,
+    max_tokens: 1500,
+    system: PRODUCT_SYSTEM_RULES,
+    // Structured outputs → guaranteed valid JSON matching the schema.
+    output_config: {
+      format: { type: "json_schema", schema: schemaFor(field, product) },
     },
-    body: JSON.stringify({
-      model,
-      max_tokens: 1500,
-      system: PRODUCT_SYSTEM_RULES,
-      messages: [{ role: "user", content: prompt }],
-    }),
+    messages: [{ role: "user", content: prompt }],
   });
-  if (!res.ok) {
-    throw new Error(`Anthropic API ${res.status}: ${await res.text()}`);
+
+  const data = await callAnthropic(requestBody, apiKey);
+
+  if (data.stop_reason === "refusal") {
+    throw new Error("The model declined this request.");
   }
-  const data = (await res.json()) as { content: { type: string; text: string }[] };
   const text = data.content.find((c) => c.type === "text")?.text ?? "";
-  const start = text.indexOf("{");
-  const end = text.lastIndexOf("}");
-  if (start === -1 || end === -1 || end < start) {
-    throw new Error("Claude returned non-JSON output.");
-  }
   let parsed: GeneratedContent;
   try {
-    parsed = JSON.parse(text.slice(start, end + 1)) as GeneratedContent;
+    parsed = JSON.parse(text) as GeneratedContent;
   } catch {
-    throw new Error("Claude returned malformed JSON.");
+    // Defensive fallback: extract the JSON object if any prose slipped in.
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start === -1 || end === -1 || end < start) {
+      throw new Error("Model returned non-JSON output.");
+    }
+    parsed = JSON.parse(text.slice(start, end + 1)) as GeneratedContent;
   }
 
   // Deity/planet are canonical for a known mukhi — never trust the model there.
   const facts = mukhiFacts(product.mukhi);
-  if (facts && (field === "all")) {
+  if (facts && field === "all") {
     parsed.deity = facts.deity;
     parsed.planet = facts.planet;
   }
   return parsed;
+}
+
+interface AnthropicResponse {
+  content: { type: string; text: string }[];
+  stop_reason?: string;
+}
+
+/** Carries the HTTP status so callers can map (e.g. 429 → friendly message). */
+export class AnthropicError extends Error {
+  status: number;
+  constructor(status: number, detail: string) {
+    super(`Anthropic API ${status}: ${detail}`);
+    this.name = "AnthropicError";
+    this.status = status;
+  }
+}
+
+// POST to the Messages API. Retry only genuinely transient failures (network,
+// 5xx). Do NOT retry 429 — the org's per-minute limit won't recover within a
+// serverless request, and an immediate retry just burns more quota.
+async function callAnthropic(body: string, apiKey: string): Promise<AnthropicResponse> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body,
+      });
+      if (res.ok) return (await res.json()) as AnthropicResponse;
+      const err = new AnthropicError(res.status, await res.text());
+      if (res.status < 500) throw err; // 4xx incl. 429 — not retryable
+      lastErr = err; // 5xx — retry once
+    } catch (err) {
+      if (err instanceof AnthropicError && err.status < 500) throw err;
+      lastErr = err;
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Anthropic request failed.");
 }
 
 /** All human-readable strings in a generated result, for the compliance scan. */

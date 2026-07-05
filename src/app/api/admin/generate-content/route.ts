@@ -4,6 +4,7 @@ import { scanBannedPhrases } from "@/lib/articleGenerator";
 import {
   generateProductContent,
   generatedTexts,
+  AnthropicError,
   type GenerateField,
   type ProductContext,
 } from "@/lib/productContent";
@@ -85,8 +86,21 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     console.error("generate-content:", err);
+    // The AI provider rate-limited us — this Anthropic plan allows only a few
+    // requests/minute. Tell the admin plainly instead of a generic failure.
+    if (err instanceof AnthropicError && err.status === 429) {
+      return NextResponse.json(
+        {
+          error:
+            "The AI provider is rate-limiting (your Anthropic plan allows only a few requests per minute). Wait ~30–60s and try again — the single “Generate copy” button does everything in one request, so prefer it over several per-field clicks.",
+        },
+        { status: 429, headers: { "Retry-After": "60" } },
+      );
+    }
+    // Admin-only route — surface the real reason so failures are diagnosable.
+    const detail = err instanceof Error ? err.message : "unknown error";
     return NextResponse.json(
-      { error: "Generation failed. Please try again." },
+      { error: `Generation failed: ${detail}` },
       { status: 500 },
     );
   }

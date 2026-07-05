@@ -619,8 +619,8 @@ export default function ProductForm({ initial, mode }: Props) {
               placeholder="One-line benefit (optional)"
               className={`${inputCls} min-w-[10rem] flex-1`}
             />
-            <span className="py-2.5">
-              <GenBtn field="beadNote" beadIndex={i} label="✨" />
+            <span className="whitespace-nowrap py-2.5">
+              <GenBtn field="beadNote" beadIndex={i} label="✨ note" />
             </span>
             <button
               type="button"

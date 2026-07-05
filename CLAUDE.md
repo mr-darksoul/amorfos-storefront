@@ -220,6 +220,22 @@ pages, sitemap and related-products all derive from it. Source assets (logo,
 photos, `Pendant Catalogue/`, `ASINS_updated.csv` of Amazon prices) live in the
 repo root one level up (`../`).
 
+- **Combinations** may set an optional `beads: { mukhi, origin, note }[]` — one entry
+  per bead (any number). The PDP renders a "Bead composition" table from it, and the
+  admin form has a repeatable bead editor. `Origin` includes **`"Mixed"`**: when a
+  combination's beads span >1 origin the top-level origin should be `"Mixed"` (the admin
+  form auto-derives this from the beads). The shop origin filter matches a Mixed
+  combination under any of its beads' origins (`ShopClient.tsx`).
+- **`deity` / `planet` are factual per-mukhi**, not free text — the canonical map lives
+  in `lib/mukhi.ts` (`MUKHI_META`, 1–16 + Gauri Shankar) and is the source of truth. The
+  admin form auto-fills them on mukhi change; the AI generator injects them as ground
+  truth. Keep the exact wording (e.g. `"Jupiter (Guru)"`) if you edit the map.
+
+> **Live data caveat:** the storefront reads products from **Supabase** in production;
+> `products.ts` is only the fallback when Supabase is unconfigured. Editing `products.ts`
+> alone will NOT change the live site — re-seed (`npm run seed`) or edit via `/admin/products`.
+> New optional fields like `beads` won't appear live until the Supabase row carries them.
+
 ## Gotcha — Node 22+ `localStorage`
 
 Node 22+/25 exposes a non-functional global `localStorage` that crashes SSR for
