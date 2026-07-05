@@ -282,6 +282,28 @@ export default async function ProductPage({
               </dl>
             </div>
 
+            {/* Bead composition — combinations with a per-bead breakdown */}
+            {product.beads && product.beads.length > 0 && (
+              <div className="mt-8">
+                <h2 className="eyebrow mb-4">Bead composition</h2>
+                <dl className="divide-y divide-line rounded-sm border border-line">
+                  {product.beads.map((bead, i) => (
+                    <div key={i} className="px-4 py-3 text-sm">
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-ink-faint">{bead.mukhi} Mukhi</dt>
+                        <dd className="text-right text-ink">{bead.origin}</dd>
+                      </div>
+                      {bead.note && (
+                        <p className="mt-1 text-xs leading-relaxed text-ink-faint">
+                          {bead.note}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+
             {/* WhatsApp help */}
             <a
               href={waLink(`Hi Amorfos, I'd like to know more about the ${product.name}.`)}

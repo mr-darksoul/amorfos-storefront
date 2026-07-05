@@ -1,6 +1,16 @@
 export type Category = "mala" | "pendant" | "combination" | "loose";
 
-export type Origin = "Nepal" | "Indonesia" | "India";
+export type Origin = "Nepal" | "Indonesia" | "India" | "Mixed";
+
+// A single physical bead is always from one place — never "Mixed".
+export type BeadOrigin = "Nepal" | "Indonesia" | "India";
+
+// One bead within a combination piece. Combinations can have any number.
+export interface Bead {
+  mukhi: number; // face count of this bead
+  origin: BeadOrigin; // where this individual bead is from
+  note?: string; // optional one-line benefit / description
+}
 
 export interface Product {
   id: string; // slug, used in /shop/[id]
@@ -9,7 +19,8 @@ export interface Product {
   categoryLabel: string;
   mukhi: number | null; // null for multi-bead combinations
   mukhiLabel: string;
-  origin: Origin;
+  origin: Origin; // "Mixed" for multi-origin combinations
+  beads?: Bead[]; // per-bead composition; combinations only
   beadSize: string; // e.g. "18–22 mm"
   deity: string;
   planet: string;

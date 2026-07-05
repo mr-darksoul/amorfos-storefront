@@ -34,20 +34,28 @@ const ALLOWED_PHRASES = [
   "without making medical or miraculous claims",
 ];
 
+/**
+ * Scan arbitrary copy for banned medical/miraculous/lab-name phrases. Shared by
+ * the journal compliance check and the product-content generator so both use one
+ * banned-phrase list. Strips the standard negated house disclaimer first, then
+ * substring-matches (case-insensitive). Returns the list of violations found.
+ */
+export function scanBannedPhrases(texts: string[]): string[] {
+  let haystack = texts.join(" ").toLowerCase();
+  for (const phrase of ALLOWED_PHRASES) {
+    haystack = haystack.split(phrase).join(" ");
+  }
+  return BANNED.filter((term) => haystack.includes(term));
+}
+
 export function complianceCheck(article: Article): string[] {
-  let haystack = [
+  return scanBannedPhrases([
     article.title, article.h1, article.metaDescription, article.excerpt,
     ...article.body.map((b) =>
       "text" in b ? b.text : "items" in b ? b.items.join(" ") : "",
     ),
     ...(article.faqs ?? []).flatMap((f) => [f.q, f.a]),
-  ]
-    .join(" ")
-    .toLowerCase();
-  for (const phrase of ALLOWED_PHRASES) {
-    haystack = haystack.split(phrase).join(" ");
-  }
-  return BANNED.filter((term) => haystack.includes(term));
+  ]);
 }
 
 export function validateShape(a: Partial<Article>): string[] {

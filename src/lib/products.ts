@@ -503,6 +503,11 @@ export const products: Product[] = [
     mukhi: null,
     mukhiLabel: "4 + 4 + 6 Mukhi Combination",
     origin: "Nepal",
+    beads: [
+      { mukhi: 4, origin: "Nepal", note: "Ruled by Brahma — traditionally associated with knowledge and clear thinking." },
+      { mukhi: 4, origin: "Nepal", note: "A second 4 Mukhi to reinforce focus and learning." },
+      { mukhi: 6, origin: "Nepal", note: "Ruled by Kartikeya — traditionally worn for confidence and expression." },
+    ],
     beadSize: "varies",
     deity: "Shiva",
     planet: "All planets",

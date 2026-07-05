@@ -124,6 +124,15 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   delete drafts), Reviews moderation (`/admin/reviews`). Product data layer `lib/adminProducts.ts`;
   journal data layer `lib/articles.ts`. Image uploads go to **Vercel Blob** (`BLOB_READ_WRITE_TOKEN`);
   without the token uploads return `503`.
+  - **AI listing copy:** the product form has a "✨ Generate copy" button (+ per-field ✨
+    buttons) that POST to `api/admin/generate-content` → `lib/productContent.ts` (raw fetch
+    to the Anthropic API, `PRODUCT_CONTENT_MODEL` env, default `claude-opus-4-8`). It writes
+    tagline / description / benefits / per-bead notes; **deity + planet are NOT invented** —
+    they come from the canonical `mukhi → {deity, planet}` table in `lib/mukhi.ts` (also
+    auto-filled on mukhi change) and are passed to the model as ground truth. Generated copy
+    is scanned with the shared `scanBannedPhrases` (from `lib/articleGenerator.ts`); a hit
+    returns `422`. No key → `503`. Generation only *proposes* copy; nothing saves until the
+    admin submits the form.
 - **Journal (SEO content engine):** `/journal` hub + `/journal/[slug]` article pages.
   Data stored in Supabase `articles` table (`status = draft | published`). Article body
   is typed blocks (paragraph/heading/list/quote) — no raw HTML. Each page emits

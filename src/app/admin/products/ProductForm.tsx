@@ -2,7 +2,8 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { Product, Category, Origin } from "@/lib/types";
+import type { Product, Category, Origin, Bead, BeadOrigin } from "@/lib/types";
+import { mukhiFacts } from "@/lib/mukhi";
 
 const CATEGORIES: { value: Category; label: string }[] = [
   { value: "pendant", label: "Pendant" },
@@ -18,7 +19,8 @@ const CATEGORY_LABELS: Record<Category, string> = {
   loose: "Loose Bead",
 };
 
-const ORIGINS: Origin[] = ["Nepal", "Indonesia", "India"];
+const ORIGINS: Origin[] = ["Nepal", "Indonesia", "India", "Mixed"];
+const BEAD_ORIGINS: BeadOrigin[] = ["Nepal", "Indonesia", "India"];
 
 function slugify(name: string): string {
   return name
@@ -91,6 +93,14 @@ export default function ProductForm({ initial, mode }: Props) {
   const [error, setError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  // Which field is currently generating ("all" | "tagline" | ... | "beadNote:<i>").
+  const [genField, setGenField] = useState<string | null>(null);
+  const [genError, setGenError] = useState("");
+  // Last deity/planet we auto-filled from the mukhi table — lets us overwrite
+  // our own auto value on a mukhi change while leaving a manual edit untouched.
+  const autoFacts = useRef<{ deity: string; planet: string } | null>(
+    initial ? mukhiFacts(initial.mukhi) : null,
+  );
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -104,6 +114,89 @@ export default function ProductForm({ initial, mode }: Props) {
   function handleCategoryChange(cat: Category) {
     set("category", cat);
     set("categoryLabel", CATEGORY_LABELS[cat]);
+  }
+
+  // Deity/planet are factual per-mukhi. Auto-fill them on a mukhi change, but
+  // only overwrite when the field is empty or still holds our last auto value —
+  // a manual edit sticks.
+  function handleMukhiChange(raw: string) {
+    const mukhi = raw === "" ? null : Number(raw);
+    const facts = mukhiFacts(mukhi);
+    const prev = autoFacts.current;
+    setForm((f) => {
+      const next = { ...f, mukhi };
+      if (facts) {
+        if (!f.deity || f.deity === prev?.deity) next.deity = facts.deity;
+        if (!f.planet || f.planet === prev?.planet) next.planet = facts.planet;
+      }
+      return next;
+    });
+    autoFacts.current = facts;
+  }
+
+  // Ask the API to generate copy for one field (or "all"), then merge the
+  // result into the form. The admin still reviews/edits before saving.
+  async function generate(field: string, beadIndex?: number) {
+    setGenError("");
+    setGenField(field === "beadNote" ? `beadNote:${beadIndex}` : field);
+    try {
+      const res = await fetch("/api/admin/generate-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          field,
+          beadIndex,
+          product: {
+            name: form.name,
+            category: form.category,
+            categoryLabel: form.categoryLabel,
+            mukhi: form.mukhi === null ? null : Number(form.mukhi),
+            mukhiLabel: form.mukhiLabel,
+            origin: form.origin,
+            beads: form.beads,
+          },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setGenError(data.error ?? "Generation failed.");
+        return;
+      }
+      if (typeof data.tagline === "string") set("tagline", data.tagline);
+      if (typeof data.description === "string") set("description", data.description);
+      if (Array.isArray(data.benefits) && data.benefits.length)
+        set("benefits", data.benefits);
+      if (typeof data.deity === "string" && data.deity) set("deity", data.deity);
+      if (typeof data.planet === "string" && data.planet) set("planet", data.planet);
+      if (field === "beadNote" && typeof beadIndex === "number" && typeof data.note === "string")
+        handleBead(beadIndex, { note: data.note });
+      if (Array.isArray(data.beadNotes) && (form.beads?.length ?? 0) > 0)
+        applyBeads(
+          (form.beads ?? []).map((b, i) =>
+            typeof data.beadNotes[i] === "string" ? { ...b, note: data.beadNotes[i] } : b,
+          ),
+        );
+    } catch {
+      setGenError("Network error.");
+    } finally {
+      setGenField(null);
+    }
+  }
+
+  // Small "generate" affordance reused across fields.
+  function GenBtn({ field, beadIndex, label }: { field: string; beadIndex?: number; label?: string }) {
+    const key = field === "beadNote" ? `beadNote:${beadIndex}` : field;
+    return (
+      <button
+        type="button"
+        onClick={() => generate(field, beadIndex)}
+        disabled={genField !== null || !form.name.trim()}
+        title={!form.name.trim() ? "Enter a product name first" : "Generate with AI"}
+        className="text-xs text-gold-soft hover:text-gold disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {genField === key ? "Generating…" : (label ?? "✨ Generate")}
+      </button>
+    );
   }
 
   function handleBenefit(i: number, value: string) {
@@ -132,6 +225,41 @@ export default function ProductForm({ initial, mode }: Props) {
 
   function removeImage(i: number) {
     set("images", form.images.filter((_, idx) => idx !== i));
+  }
+
+  // ── Beads (combination composition) ──────────────────────────────
+  // Whenever the bead list changes we re-derive the top-level origin:
+  //   0 beads → leave the manually chosen origin alone
+  //   1 distinct bead origin → that origin
+  //   >1 distinct bead origins → "Mixed"
+  // The origin <select> stays enabled so the admin can still override.
+  function applyBeads(beads: Bead[]) {
+    setForm((f) => {
+      const distinct = [
+        ...new Set(beads.map((b) => b.origin).filter(Boolean)),
+      ];
+      const origin: Origin =
+        distinct.length === 0
+          ? f.origin
+          : distinct.length === 1
+            ? distinct[0]
+            : "Mixed";
+      return { ...f, beads, origin };
+    });
+  }
+
+  function handleBead(i: number, patch: Partial<Bead>) {
+    const next = [...(form.beads ?? [])];
+    next[i] = { ...next[i], ...patch };
+    applyBeads(next);
+  }
+
+  function addBead() {
+    applyBeads([...(form.beads ?? []), { mukhi: 0, origin: "Nepal", note: "" }]);
+  }
+
+  function removeBead(i: number) {
+    applyBeads((form.beads ?? []).filter((_, idx) => idx !== i));
   }
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -171,6 +299,16 @@ export default function ProductForm({ initial, mode }: Props) {
     if (form.mrp < form.price) { setError("MRP must be ≥ price."); return; }
     if (form.benefits.every((b) => !b.trim())) { setError("Add at least one benefit."); return; }
 
+    // Keep only fully-specified beads; drop the field entirely when empty so
+    // old single-bead products stay clean in the JSON blob.
+    const beads = (form.beads ?? [])
+      .filter((b) => b.mukhi)
+      .map((b) => ({
+        mukhi: Number(b.mukhi),
+        origin: b.origin,
+        ...(b.note?.trim() ? { note: b.note.trim() } : {}),
+      }));
+
     const product: Product = {
       ...form,
       id: id.trim(),
@@ -179,6 +317,7 @@ export default function ProductForm({ initial, mode }: Props) {
       mukhi: form.mukhi === null ? null : Number(form.mukhi),
       price: Number(form.price),
       mrp: Number(form.mrp),
+      ...(beads.length ? { beads } : { beads: undefined }),
     };
 
     setSaving(true);
@@ -301,9 +440,7 @@ export default function ProductForm({ initial, mode }: Props) {
             <input
               type="number"
               value={form.mukhi ?? ""}
-              onChange={(e) =>
-                set("mukhi", e.target.value === "" ? null : Number(e.target.value))
-              }
+              onChange={(e) => handleMukhiChange(e.target.value)}
               min={0}
               max={21}
               className={inputCls}
@@ -437,17 +574,95 @@ export default function ProductForm({ initial, mode }: Props) {
         </div>
       </section>
 
+      {/* Beads (combination composition) */}
+      <section className="space-y-4 rounded-sm border border-line bg-paper p-5">
+        <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">
+          Beads (composition)
+        </h2>
+        <p className="text-xs text-ink-faint">
+          For <strong>combinations</strong> made of multiple beads. Add one row
+          per bead — mukhi, origin, and an optional one-line benefit. Origin
+          above auto-sets to “Mixed” when beads span more than one origin. Leave
+          empty for single-bead products.
+        </p>
+
+        {(form.beads ?? []).map((bead, i) => (
+          <div key={i} className="flex flex-wrap items-start gap-2">
+            <input
+              type="number"
+              value={bead.mukhi || ""}
+              onChange={(e) =>
+                handleBead(i, { mukhi: Number(e.target.value) })
+              }
+              min={0}
+              max={21}
+              placeholder="Mukhi"
+              className={`${inputCls} w-24`}
+            />
+            <select
+              value={bead.origin}
+              onChange={(e) =>
+                handleBead(i, { origin: e.target.value as BeadOrigin })
+              }
+              className={`${inputCls} w-36`}
+            >
+              {BEAD_ORIGINS.map((o) => (
+                <option key={o} value={o}>
+                  {o}
+                </option>
+              ))}
+            </select>
+            <input
+              type="text"
+              value={bead.note ?? ""}
+              onChange={(e) => handleBead(i, { note: e.target.value })}
+              placeholder="One-line benefit (optional)"
+              className={`${inputCls} min-w-[10rem] flex-1`}
+            />
+            <span className="py-2.5">
+              <GenBtn field="beadNote" beadIndex={i} label="✨" />
+            </span>
+            <button
+              type="button"
+              onClick={() => removeBead(i)}
+              className="px-2 py-2.5 text-red-400 hover:text-red-300"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={addBead}
+          className="text-xs text-gold-soft hover:text-gold"
+        >
+          + Add bead
+        </button>
+      </section>
+
       {/* Copy */}
       <section className="space-y-4 rounded-sm border border-line bg-paper p-5">
-        <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">Copy</h2>
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-xs uppercase tracking-[0.18em] text-ink-faint">Copy</h2>
+          <GenBtn field="all" label="✨ Generate copy" />
+        </div>
+        <p className="text-xs text-ink-faint">
+          Fills tagline, description, benefits{form.beads?.length ? " and bead notes" : ""} from the
+          details above. Review and edit before saving. Uses the brand voice and never makes medical claims.
+        </p>
+        {genError && <p className="text-sm text-red-400">{genError}</p>}
 
         <Field label="Tagline" hint="Short one-liner shown on cards and hero.">
-          <input
-            type="text"
-            value={form.tagline}
-            onChange={(e) => set("tagline", e.target.value)}
-            className={inputCls}
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              value={form.tagline}
+              onChange={(e) => set("tagline", e.target.value)}
+              className={`${inputCls} flex-1`}
+            />
+            <GenBtn field="tagline" label="✨" />
+          </div>
         </Field>
 
         <Field label="Description" hint="1–2 paragraphs for the product detail page.">
@@ -457,6 +672,9 @@ export default function ProductForm({ initial, mode }: Props) {
             onChange={(e) => set("description", e.target.value)}
             className={`${inputCls} resize-y`}
           />
+          <div className="mt-1">
+            <GenBtn field="description" label="✨ Generate description" />
+          </div>
         </Field>
 
         <Field label="Benefits" hint='One per line. No medical claims — frame as "traditionally associated with…"'>
@@ -479,13 +697,16 @@ export default function ProductForm({ initial, mode }: Props) {
               )}
             </div>
           ))}
-          <button
-            type="button"
-            onClick={addBenefit}
-            className="mt-1 text-xs text-gold-soft hover:text-gold"
-          >
-            + Add benefit
-          </button>
+          <div className="mt-1 flex items-center gap-4">
+            <button
+              type="button"
+              onClick={addBenefit}
+              className="text-xs text-gold-soft hover:text-gold"
+            >
+              + Add benefit
+            </button>
+            <GenBtn field="benefits" label="✨ Generate benefits" />
+          </div>
         </Field>
       </section>
 

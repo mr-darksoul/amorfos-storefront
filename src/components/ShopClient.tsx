@@ -10,7 +10,7 @@ import type { RatingMap } from "@/lib/reviews";
 type Sort = "featured" | "price-asc" | "price-desc";
 
 const allCategories = Object.keys(categoryMeta) as Category[];
-const allOrigins: Origin[] = ["Nepal", "Indonesia", "India"];
+const allOrigins: Origin[] = ["Nepal", "Indonesia", "India", "Mixed"];
 
 export default function ShopClient({ products, ratings }: { products: Product[]; ratings?: RatingMap }) {
   const allMukhi = useMemo(
@@ -46,7 +46,15 @@ export default function ShopClient({ products, ratings }: { products: Product[];
   const filtered = useMemo(() => {
     let list = products.filter((p) => {
       if (category !== "all" && p.category !== category) return false;
-      if (origins.length && !origins.includes(p.origin)) return false;
+      if (origins.length) {
+        // A Mixed combination matches Nepal/Indonesia/India when any of its
+        // beads is from that origin — not just its top-level origin.
+        const beadOrigins = p.beads?.map((b) => b.origin) ?? [];
+        const match =
+          origins.includes(p.origin) ||
+          beadOrigins.some((o) => origins.includes(o));
+        if (!match) return false;
+      }
       if (mukhiSel.length && (p.mukhi === null || !mukhiSel.includes(p.mukhi))) return false;
       return true;
     });
