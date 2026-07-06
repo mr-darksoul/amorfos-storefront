@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createHmac, timingSafeEqual } from "crypto";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { rateLimitGlobal, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -23,8 +23,8 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export async function POST(req: Request) {
-  // Throttle brute-force: 5 attempts per IP per 15 minutes.
-  const rl = rateLimit(`admin-login:${clientIp(req)}`, 5, 15 * 60 * 1000);
+  // Throttle brute-force: 5 attempts per IP per 15 minutes (global window).
+  const rl = await rateLimitGlobal(`admin-login:${clientIp(req)}`, 5, 15 * 60 * 1000);
   if (!rl.ok) {
     return NextResponse.json(
       { error: "Too many attempts. Try again later." },

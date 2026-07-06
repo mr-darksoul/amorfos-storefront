@@ -95,14 +95,40 @@ export default async function ProductPage({
   ]);
   const reviewSummary = summariseReviews(reviews);
 
-  const specs: [string, string][] = [
+  const specs: [string, React.ReactNode][] = [
     ["Mukhi", product.mukhiLabel],
     ["Origin", product.origin],
     ["Bead size", product.beadSize],
     ["Ruling deity", product.deity],
     ["Ruling planet", product.planet],
-    ["Certification", "Lab Certified"],
+    [
+      "Certification",
+      // Certification is the core trust claim — let the curious read how it works.
+      <Link
+        key="cert"
+        href="/policies#authenticity"
+        className="text-gold-soft underline-offset-4 hover:underline"
+      >
+        Lab Certified
+      </Link>,
+    ],
   ];
+
+  // Mirrors the visual breadcrumb <nav> below for Google's breadcrumb trail.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Shop", item: `${site.url}/shop` },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: product.categoryLabel,
+        item: `${site.url}${collectionHref(product.category)}`,
+      },
+      { "@type": "ListItem", position: 3, name: product.name },
+    ],
+  };
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -176,6 +202,10 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 md:py-12">
         {/* Breadcrumb */}
@@ -200,7 +230,11 @@ export default async function ProductPage({
 
             {/* Inline rating */}
             {reviewSummary.total > 0 && (
-              <a href="#reviews" className="mt-3 inline-flex items-center gap-2 group">
+              <a
+                href="#reviews"
+                className="mt-3 inline-flex items-center gap-2 group"
+                aria-label={`Rated ${reviewSummary.average.toFixed(1)} out of 5 from ${reviewSummary.total} review${reviewSummary.total !== 1 ? "s" : ""} — jump to reviews`}
+              >
                 <span className="flex items-center gap-px">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <svg key={n} viewBox="0 0 20 20" className="size-4 shrink-0" aria-hidden>
@@ -236,7 +270,9 @@ export default async function ProductPage({
                 </>
               )}
             </div>
-            <p className="mt-1 text-xs text-ink-faint">Inclusive of all taxes</p>
+            <p className="mt-1 text-xs text-ink-faint">
+              Inclusive of all taxes · Ships within 1–2 days, arrives in 3–7
+            </p>
 
             <ProductPurchase product={product} />
 

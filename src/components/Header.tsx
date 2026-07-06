@@ -50,6 +50,7 @@ export default function Header() {
             onClick={() => setMenuOpen((v) => !v)}
             className="md:hidden text-ink p-1 -ml-1"
             aria-label="Toggle menu"
+            aria-expanded={menuOpen}
           >
             {menuOpen ? <CloseIcon className="size-6" /> : <MenuIcon className="size-6" />}
           </button>

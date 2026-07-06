@@ -94,13 +94,18 @@ export function useCheckout() {
               router.push(`/thank-you?payment=${response.razorpay_payment_id}`);
             } else {
               setError(
-                "Payment could not be verified. If you were charged, contact us on WhatsApp.",
+                "Payment could not be verified. If money left your account it is safe with Razorpay — message us on WhatsApp and we'll confirm your order right away.",
               );
               setLoading(false);
             }
           },
           modal: {
-            ondismiss: () => setLoading(false),
+            // Also clear any error from a previous attempt so a fresh try
+            // doesn't sit under stale failure text.
+            ondismiss: () => {
+              setError(null);
+              setLoading(false);
+            },
           },
         });
         rzp.open();

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/lib/useCheckout";
 import { inr } from "@/lib/format";
-import { site } from "@/lib/site";
+import { site, waLink } from "@/lib/site";
 import { validateCustomer, digitsOnly } from "@/lib/validateCustomer";
 import { ArrowIcon } from "@/components/icons";
 
@@ -90,30 +90,37 @@ export default function CheckoutPage() {
             <h2 className="font-serif text-xl text-ink mb-4">Contact</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label>Full name *</Label>
-                <Input {...field("name")} placeholder="Rahul Sharma" autoComplete="name" />
-                {errFor("name") && <FieldError>{errFor("name")}</FieldError>}
+                <FormField
+                  id="co-name"
+                  label="Full name *"
+                  error={errFor("name")}
+                  {...field("name")}
+                  placeholder="Rahul Sharma"
+                  autoComplete="name"
+                />
               </div>
               <div>
-                <Label>Mobile number *</Label>
-                <Input
+                <FormField
+                  id="co-phone"
+                  label="Mobile number *"
+                  error={errFor("phone")}
                   {...field("phone")}
                   type="tel"
                   placeholder="98765 43210"
                   autoComplete="tel"
                   inputMode="numeric"
                 />
-                {errFor("phone") && <FieldError>{errFor("phone")}</FieldError>}
               </div>
               <div>
-                <Label>Email *</Label>
-                <Input
+                <FormField
+                  id="co-email"
+                  label="Email *"
+                  error={errFor("email")}
                   {...field("email")}
                   type="email"
                   placeholder="you@example.com"
                   autoComplete="email"
                 />
-                {errFor("email") && <FieldError>{errFor("email")}</FieldError>}
               </div>
             </div>
           </section>
@@ -122,38 +129,70 @@ export default function CheckoutPage() {
             <h2 className="font-serif text-xl text-ink mb-4">Shipping address</h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label>Address line *</Label>
-                <Input {...field("address")} placeholder="House / flat, street, locality" autoComplete="street-address" />
-                {errFor("address") && <FieldError>{errFor("address")}</FieldError>}
+                <FormField
+                  id="co-address"
+                  label="Address line *"
+                  error={errFor("address")}
+                  {...field("address")}
+                  placeholder="House / flat, street, locality"
+                  autoComplete="street-address"
+                />
               </div>
               <div>
-                <Label>City *</Label>
-                <Input {...field("city")} placeholder="Delhi" autoComplete="address-level2" />
-                {errFor("city") && <FieldError>{errFor("city")}</FieldError>}
+                <FormField
+                  id="co-city"
+                  label="City *"
+                  error={errFor("city")}
+                  {...field("city")}
+                  placeholder="Delhi"
+                  autoComplete="address-level2"
+                />
               </div>
               <div>
-                <Label>State *</Label>
-                <Input {...field("state")} placeholder="Delhi" autoComplete="address-level1" />
-                {errFor("state") && <FieldError>{errFor("state")}</FieldError>}
+                <FormField
+                  id="co-state"
+                  label="State *"
+                  error={errFor("state")}
+                  {...field("state")}
+                  placeholder="Delhi"
+                  autoComplete="address-level1"
+                />
               </div>
               <div>
-                <Label>Pincode *</Label>
-                <Input
+                <FormField
+                  id="co-pincode"
+                  label="Pincode *"
+                  error={errFor("pincode")}
                   {...field("pincode")}
                   placeholder="110001"
                   inputMode="numeric"
                   maxLength={6}
                   autoComplete="postal-code"
                 />
-                {errFor("pincode") && <FieldError>{errFor("pincode")}</FieldError>}
               </div>
             </div>
           </section>
 
           {error && (
-            <p className="rounded border border-rudra/30 bg-rudra/10 px-4 py-3 text-sm text-rudra">
-              {error}
-            </p>
+            <div className="rounded border border-rudra/30 bg-rudra/10 px-4 py-3 text-sm text-rudra">
+              <p>{error}</p>
+              <p className="mt-1.5 text-xs">
+                Need help?{" "}
+                <a
+                  href={waLink("Hi Amorfos, I had trouble paying for my order.")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  WhatsApp us
+                </a>{" "}
+                or{" "}
+                <Link href="/track" className="underline">
+                  check your order status
+                </Link>
+                .
+              </p>
+            </div>
           )}
 
           <button
@@ -166,6 +205,9 @@ export default function CheckoutPage() {
           </button>
           <p className="text-center text-xs text-ink-faint">
             Secure checkout via Razorpay · UPI · Cards · Netbanking
+          </p>
+          <p className="text-center text-xs text-ink-faint">
+            Ships within 1–2 days · arrives in 3–7 days
           </p>
         </form>
 
@@ -207,7 +249,12 @@ export default function CheckoutPage() {
               <span className="tabular-nums">{inr(subtotal)}</span>
             </div>
             <div className="flex justify-between text-ink-dim">
-              <span>Shipping</span>
+              <span>
+                Shipping
+                <span className="ml-1 text-xs text-ink-faint">
+                  (free above {inr(site.freeShippingThreshold)})
+                </span>
+              </span>
               <span className="tabular-nums">{shipping === 0 ? "Free" : inr(shipping)}</span>
             </div>
             <div className="flex justify-between border-t border-line pt-2 font-serif text-lg text-ink">
@@ -225,9 +272,12 @@ export default function CheckoutPage() {
   );
 }
 
-function Label({ children }: { children: React.ReactNode }) {
+function Label({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
   return (
-    <label className="mb-1.5 block text-xs uppercase tracking-[0.14em] text-ink-dim">
+    <label
+      htmlFor={htmlFor}
+      className="mb-1.5 block text-xs uppercase tracking-[0.14em] text-ink-dim"
+    >
       {children}
     </label>
   );
@@ -242,6 +292,34 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   );
 }
 
-function FieldError({ children }: { children: React.ReactNode }) {
-  return <p className="mt-1 text-xs text-rudra">{children}</p>;
+function FieldError({ id, children }: { id: string; children: React.ReactNode }) {
+  return (
+    <p id={id} className="mt-1 text-xs text-rudra">
+      {children}
+    </p>
+  );
+}
+
+// Label + input + error wired together for screen readers: the label is
+// attached via htmlFor, "required" is announced (the visual cue is only the
+// asterisk), and the error text is linked with aria-describedby.
+function FormField({
+  id,
+  label,
+  error,
+  ...inputProps
+}: { id: string; label: string; error?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <>
+      <Label htmlFor={id}>{label}</Label>
+      <Input
+        id={id}
+        aria-required="true"
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? `${id}-err` : undefined}
+        {...inputProps}
+      />
+      {error && <FieldError id={`${id}-err`}>{error}</FieldError>}
+    </>
+  );
 }

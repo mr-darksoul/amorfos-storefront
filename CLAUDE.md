@@ -142,8 +142,9 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   → generates next article via Claude API (`ANTHROPIC_API_KEY`) → validates compliance
   (banned-phrase check) → inserts as draft. Nothing auto-publishes — Manav reviews at
   `/admin/journal`. Generator logic shared in `lib/articleGenerator.ts`. Local equivalent:
-  `npm run content:draft`. Content calendar has 8 entries (add more from
-  `docs/content-marketing-strategy.md` §4–5 before they run out).
+  `npm run content:draft`. Content calendar has 30 entries (~8 consumed as of
+  2026-07-06 — top up from `docs/content-marketing-strategy.md` §4–5 before they
+  run out).
 - **Deploy target:** Vercel (project `web`, org `manavmba24-1516`) — **Root Directory = `web`**.
   GitHub→Vercel auto-deploy is **not** wired; deploy manually: `vercel --prod --yes` from `/web`.
   A normal prod build is ~1 min. The plan is **Hobby = 1 concurrent build**, so a deploy
@@ -275,17 +276,35 @@ All env vars are set in Vercel production:
 **Journal content pipeline:**
 - Vercel Cron fires daily at 04:00 UTC (9:30 AM IST) → `api/cron/content-draft`
 - Drafts land at `/admin/journal` — Manav reviews and publishes manually
-- Content calendar: `scripts/content-calendar.json` (8 entries as of 2026-06-28;
-  add more before they run out — see `docs/content-marketing-strategy.md` §4–5)
+- Content calendar: `scripts/content-calendar.json` (30 entries; ~8 consumed as
+  of 2026-07-06 — see `docs/content-marketing-strategy.md` §4–5 to add more)
 - Google Search Console: verified (manav.mba24@gmail.com), sitemap submitted 2026-06-28
 
 **Remaining gaps:**
-- **~101 of 181 products have no images** — render placeholder glyphs. Add photos
-  before promoting widely.
+- **~107 of 181 products have no images** — render placeholder glyphs. Add photos
+  before promoting widely. (Manav is sourcing photos as of 2026-07-06.)
 - No COD (prepaid Razorpay only).
-- No product search, no analytics pixel.
-- No admin UI to retry a failed Shiprocket sync (manual DB fix needed).
-- Content calendar needs weeks 5–12 added (16 more articles).
+- No product search.
+- No social links in the footer (no handles configured yet).
+
+**Closed gaps (2026-07-06 review fixes):**
+- Analytics ARE implemented: `components/Analytics.tsx` (browser pixels) +
+  `lib/metaCapi.ts` (server-side Meta CAPI, deduped via `event_id` on /thank-you).
+- Abandoned-cart recovery IS implemented: `api/cron/abandoned-cart` (daily 09:00
+  UTC cron, WhatsApp + email nudge, once per cart via `recovery_sent_at`).
+- Failed Shiprocket sync now sets `fulfillment_status = 'failed'`, emails an ops
+  alert to care@, and `/admin/orders` has a **Retry sync** button
+  (`api/admin/orders/[id]/retry-sync`). The Shiprocket JWT cache invalidates on
+  401/403.
+- Sensitive endpoints (admin login, track, subscribe, reviews) use a
+  distributed rate limiter: `rateLimitGlobal` in `lib/ratelimit.ts` backed by
+  the `rate_limit_hit` Postgres function (`supabase/migrations/007_rate_limits.sql`).
+  It fails open if the RPC is missing/unreachable.
+- Security headers (nosniff, X-Frame-Options, Referrer-Policy,
+  Permissions-Policy) in `next.config.mjs`. Deliberately no CSP (Razorpay +
+  GA/Meta inline scripts).
+- Review tokens now cover combinations: verify-payment resolves mukhi from the
+  product rows (`mukhi` + `beads[].mukhi`), slug regex is only a fallback.
 
 **Inventory:** opt-in per product via `Product.stock` (`undefined`/`null` =
 unlimited; a number = tracked, `0` = sold out). Checkout rejects qty over stock;

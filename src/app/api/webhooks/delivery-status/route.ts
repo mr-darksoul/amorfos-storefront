@@ -21,16 +21,20 @@ export async function POST(req: Request) {
   // a missing env var. (SHIPROCKET_WEBHOOK_TOKEN is set in production.)
   const webhookToken = process.env.SHIPROCKET_WEBHOOK_TOKEN;
   // Shiprocket sends the configured token in the x-api-key header.
-  // Accept a few header variants for robustness.
-  const provided =
-    req.headers.get("x-api-key") ||
-    req.headers.get("x-shiprocket-signature") ||
-    req.headers.get("authorization");
+  // Accept a few header variants for robustness; the log below records which
+  // one actually arrives so the unused fallbacks can eventually be removed.
+  const headerUsed = ["x-api-key", "x-shiprocket-signature", "authorization"].find((h) =>
+    req.headers.get(h),
+  );
+  const provided = headerUsed ? req.headers.get(headerUsed) : null;
   const ok =
     !!webhookToken &&
     (provided === webhookToken || provided === `Bearer ${webhookToken}`);
   if (!ok) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  if (headerUsed !== "x-api-key") {
+    console.warn(`[delivery-status] webhook authenticated via fallback header: ${headerUsed}`);
   }
 
   let payload: Record<string, unknown>;

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { isShiprocketConfigured, trackShipment } from "@/lib/shiprocket";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { rateLimitGlobal, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -17,8 +17,9 @@ export async function GET(req: Request) {
 
   // Phone-based lookup is a deliberate customer convenience (most buyers won't
   // have an AWB handy), but it makes the endpoint enumerable. Rate-limit per IP
-  // — 20 lookups per 10 minutes — to blunt scraping of order/shipment status.
-  const rl = rateLimit(`track:${clientIp(req)}`, 20, 10 * 60 * 1000);
+  // — 20 lookups per 10 minutes, enforced globally across serverless instances
+  // — to blunt scraping of order/shipment status.
+  const rl = await rateLimitGlobal(`track:${clientIp(req)}`, 20, 10 * 60 * 1000);
   if (!rl.ok) {
     return NextResponse.json(
       { error: "Too many lookups. Please try again shortly." },

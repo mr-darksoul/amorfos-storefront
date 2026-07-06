@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { NextResponse, after } from "next/server";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { rateLimitGlobal, clientIp } from "@/lib/ratelimit";
 import { sendConfirmationEmail } from "@/lib/notify";
 import { site } from "@/lib/site";
 
@@ -11,7 +11,7 @@ export const runtime = "nodejs";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(req: Request) {
-  const { ok } = rateLimit(`subscribe:${clientIp(req)}`, 5, 3_600_000); // 5/hr/IP
+  const { ok } = await rateLimitGlobal(`subscribe:${clientIp(req)}`, 5, 3_600_000); // 5/hr/IP
   if (!ok) {
     return NextResponse.json({ error: "Too many attempts" }, { status: 429 });
   }

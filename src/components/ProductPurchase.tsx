@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { trackViewContent } from "@/lib/analytics";
+import { waLink } from "@/lib/site";
 import type { Product } from "@/lib/types";
 import { MinusIcon, PlusIcon, CheckIcon } from "./icons";
 
@@ -49,7 +50,16 @@ export default function ProductPurchase({ product }: { product: Product }) {
           Sold out
         </button>
         <p className="mt-4 text-center text-[0.7rem] tracking-wide text-ink-faint">
-          This piece is currently unavailable. Message us on WhatsApp for restock.
+          This piece is currently unavailable.{" "}
+          <a
+            href={waLink(`Hi Amorfos, when will the ${product.name} be back in stock?`)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gold-soft underline-offset-2 hover:underline"
+          >
+            Message us on WhatsApp
+          </a>{" "}
+          for restock.
         </p>
       </div>
     );

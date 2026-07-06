@@ -38,8 +38,12 @@ export default function ProductCard({
             }`}
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-serif text-3xl text-ink-faint opacity-40">
+          <div
+            role="img"
+            aria-label={`${product.name} — photo coming soon`}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <span aria-hidden className="font-serif text-3xl text-ink-faint opacity-40">
               {product.mukhi ?? "✦"}
             </span>
           </div>
@@ -112,7 +116,11 @@ export default function ProductCard({
         </div>
         {rating && (
           <div className="mt-1 flex items-center gap-1">
-            <span className="flex items-center gap-px">
+            <span
+              role="img"
+              aria-label={`Rated ${rating.average.toFixed(1)} out of 5 from ${rating.total} reviews`}
+              className="flex items-center gap-px"
+            >
               {[1, 2, 3, 4, 5].map((n) => (
                 <svg key={n} viewBox="0 0 20 20" className="size-3 shrink-0" aria-hidden>
                   <path

@@ -82,6 +82,7 @@ export async function generateWithClaude(
   entry: CalendarEntry,
   apiKey: string,
   model = "claude-sonnet-4-6",
+  priorViolations: string[] = [],
 ): Promise<Article> {
   const schema = `Return ONLY a JSON object (no markdown fence) with this exact shape:
 {
@@ -105,12 +106,18 @@ export async function generateWithClaude(
   "author": "Amorfos"
 }`;
 
+  const correction = priorViolations.length
+    ? `\n\nIMPORTANT — your previous attempt was REJECTED by the compliance filter for using these forbidden word(s): ${priorViolations
+        .map((v) => `"${v}"`)
+        .join(", ")}. Rewrite so NONE of these words (or their variants) appear anywhere in the output. This topic must be framed as traditional astrological guidance only — describe what the beads are "traditionally worn for on the recommendation of astrologers and pandits", never as a certain outcome, cure, remedy, or guaranteed/miraculous result.`
+    : "";
+
   const prompt = `Write a Journal article.
 Working title: ${entry.title}
 Target search keyword (use naturally, do not stuff): ${entry.targetKeyword}
 Outline / brief: ${entry.outline}
 
-${schema}`;
+${schema}${correction}`;
 
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",

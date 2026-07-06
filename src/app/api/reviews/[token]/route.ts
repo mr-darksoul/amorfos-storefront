@@ -50,7 +50,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ token: 
   if (
     typeof mukhi !== "number" || !tokenRow.mukhi_list.includes(mukhi) ||
     typeof rating !== "number" || rating < 1 || rating > 5 ||
-    typeof reviewBody !== "string" || reviewBody.trim().length < 5
+    typeof reviewBody !== "string" || reviewBody.trim().length < 10
   ) {
     return NextResponse.json({ error: "Invalid review data" }, { status: 422 });
   }

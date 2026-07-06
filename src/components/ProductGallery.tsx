@@ -114,8 +114,12 @@ export default function ProductGallery({
             </span>
           </>
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-5xl text-stone-200 font-serif">
-            ✦
+          <div
+            role="img"
+            aria-label={`${name} — photo coming soon`}
+            className="absolute inset-0 flex items-center justify-center text-5xl text-stone-200 font-serif"
+          >
+            <span aria-hidden>✦</span>
           </div>
         )}
         <div className="absolute inset-0 rounded-sm ring-1 ring-inset ring-black/5" />

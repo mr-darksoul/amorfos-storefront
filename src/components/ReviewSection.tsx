@@ -27,7 +27,11 @@ function StarFill({ filled, half }: { filled: boolean; half?: boolean }) {
 function StarRow({ rating, size = "sm" }: { rating: number; size?: "sm" | "lg" }) {
   const sizeClass = size === "lg" ? "size-5" : "size-3.5";
   return (
-    <span className={`flex items-center gap-0.5 ${size === "lg" ? "gap-1" : ""}`}>
+    <span
+      role="img"
+      aria-label={`${rating} out of 5 stars`}
+      className={`flex items-center gap-0.5 ${size === "lg" ? "gap-1" : ""}`}
+    >
       {[1, 2, 3, 4, 5].map((n) => (
         <svg key={n} viewBox="0 0 20 20" className={`${sizeClass} shrink-0`} aria-hidden>
           <path

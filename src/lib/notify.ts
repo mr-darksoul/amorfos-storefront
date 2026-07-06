@@ -53,6 +53,18 @@ async function sendEmail(
   await transport.sendMail({ from, to, subject, html, attachments });
 }
 
+// Internal ops alert to the brand inbox — used when a paid order's Shiprocket
+// sync fails, so the failure never dies silently in serverless logs.
+export async function sendOpsAlertEmail(subject: string, lines: string[]): Promise<void> {
+  const body = lines
+    .map(
+      (line) =>
+        `<p style="margin:0 0 10px;color:#5c4a2a;font-size:14px;line-height:1.6;">${line}</p>`,
+    )
+    .join("");
+  await sendEmail(site.email, `[${site.name} ops] ${subject}`, baseEmailHtml(subject, body));
+}
+
 function orderItemsHtml(order: SupabaseOrder): string {
   return order.items
     .map(

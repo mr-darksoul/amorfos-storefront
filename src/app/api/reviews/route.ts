@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { rateLimitGlobal, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const { ok } = rateLimit(`reviews:${clientIp(req)}`, 3, 3_600_000); // 3 per hour per IP
+  const { ok } = await rateLimitGlobal(`reviews:${clientIp(req)}`, 3, 3_600_000); // 3 per hour per IP
   if (!ok) {
     return NextResponse.json({ error: "Too many submissions" }, { status: 429 });
   }

@@ -76,6 +76,7 @@ const FULFILLMENT_CLASS: Record<string, string> = {
 export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [shipping, setShipping] = useState<Record<string, { loading: boolean; awb?: string; labelUrl?: string; error?: string }>>({});
+  const [syncing, setSyncing] = useState<Record<string, { loading: boolean; shipmentId?: string; srOrderId?: string; error?: string }>>({});
 
   if (orders.length === 0) {
     return (
@@ -84,6 +85,24 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
         <p className="mt-2 text-sm">Orders will appear here once customers complete checkout.</p>
       </div>
     );
+  }
+
+  async function handleRetrySync(orderId: string) {
+    setSyncing((prev) => ({ ...prev, [orderId]: { loading: true } }));
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}/retry-sync`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setSyncing((prev) => ({ ...prev, [orderId]: { loading: false, error: data.error || "Failed" } }));
+      } else {
+        setSyncing((prev) => ({
+          ...prev,
+          [orderId]: { loading: false, shipmentId: data.shipmentId, srOrderId: data.shiprocketOrderId },
+        }));
+      }
+    } catch {
+      setSyncing((prev) => ({ ...prev, [orderId]: { loading: false, error: "Network error" } }));
+    }
   }
 
   async function handleShip(orderId: string) {
@@ -119,9 +138,12 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
         <tbody className="divide-y divide-line">
           {orders.map((o) => {
             const shipState = shipping[o.id];
+            const syncState = syncing[o.id];
             const awb = shipState?.awb || o.shiprocket_awb;
             const labelUrl = shipState?.labelUrl || o.shiprocket_label_url;
-            const fulfillment = o.fulfillment_status || "unfulfilled";
+            const shipmentId = syncState?.shipmentId || o.shiprocket_shipment_id;
+            const srOrderId = syncState?.srOrderId || o.shiprocket_order_id;
+            const fulfillment = syncState?.shipmentId ? "synced" : o.fulfillment_status || "unfulfilled";
 
             return (
               <>
@@ -234,12 +256,32 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                         {o.status === "paid" && (
                           <div>
                             <p className="eyebrow mb-2">Fulfillment</p>
-                            {!o.shiprocket_shipment_id && !o.shiprocket_order_id && (
-                              <p className="text-xs text-ink-faint">Not yet synced to Shiprocket.</p>
+                            {!shipmentId && !srOrderId && (
+                              <div className="space-y-2">
+                                <p className="text-xs text-ink-faint">
+                                  {fulfillment === "failed"
+                                    ? "Automatic Shiprocket sync failed."
+                                    : "Not yet synced to Shiprocket."}
+                                </p>
+                                <button
+                                  type="button"
+                                  disabled={syncState?.loading}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRetrySync(o.id);
+                                  }}
+                                  className="btn btn-outline px-3 py-1.5 text-xs disabled:opacity-50"
+                                >
+                                  {syncState?.loading ? "Syncing…" : "Retry sync"}
+                                </button>
+                                {syncState?.error && (
+                                  <p className="text-xs text-rudra">{syncState.error}</p>
+                                )}
+                              </div>
                             )}
-                            {o.shiprocket_order_id && (
+                            {srOrderId && (
                               <p className="font-mono text-xs text-ink-dim break-all">
-                                SR #{o.shiprocket_order_id}
+                                SR #{srOrderId}
                               </p>
                             )}
                             {awb ? (
@@ -259,7 +301,7 @@ export default function AdminOrdersClient({ orders }: { orders: Order[] }) {
                                   </a>
                                 )}
                               </div>
-                            ) : o.shiprocket_shipment_id ? (
+                            ) : shipmentId ? (
                               <div className="mt-2">
                                 <button
                                   type="button"

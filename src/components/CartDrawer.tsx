@@ -151,7 +151,7 @@ export default function CartDrawer() {
               <span className="font-serif text-2xl">{inr(subtotal)}</span>
             </div>
             <p className="mb-4 text-xs text-ink-faint">
-              {freeShip ? "Shipping is free." : "Shipping calculated at checkout."} Taxes included.
+              {freeShip ? "Shipping is free." : "Shipping ₹79 — free above ₹999."} Taxes included.
             </p>
 
             <button

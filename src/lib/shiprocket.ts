@@ -114,6 +114,10 @@ async function sr<T = unknown>(path: string, options: RequestInit = {}): Promise
 
   const data = await res.json();
   if (!res.ok) {
+    // A 401/403 means the cached JWT was revoked server-side (password change,
+    // Shiprocket-side reset) — drop it so the next call re-authenticates
+    // instead of failing for the rest of the 23h cache window.
+    if (res.status === 401 || res.status === 403) tokenCache = null;
     throw new Error(`Shiprocket ${path} (${res.status}): ${JSON.stringify(data)}`);
   }
   return data as T;

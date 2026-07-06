@@ -2,7 +2,11 @@ import { NextResponse, after } from "next/server";
 import crypto from "crypto";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { createShiprocketOrder, isShiprocketConfigured } from "@/lib/shiprocket";
-import { sendOrderConfirmationEmail, sendOrderConfirmationWhatsApp } from "@/lib/notify";
+import {
+  sendOrderConfirmationEmail,
+  sendOrderConfirmationWhatsApp,
+  sendOpsAlertEmail,
+} from "@/lib/notify";
 import { sendMetaPurchaseEvent } from "@/lib/metaCapi";
 
 export const runtime = "nodejs";
@@ -141,14 +145,37 @@ export async function POST(req: Request) {
         // Generate post-purchase review token
         let reviewUrl: string | undefined;
         try {
-          const mukhiList = (order.items as { id: string }[])
-            .map((item) => {
-              const m = item.id.match(/^(\d+)-mukhi/);
-              return m ? parseInt(m[1], 10) : null;
-            })
-            .filter((m): m is number => m !== null && m >= 1 && m <= 21);
+          // Reviews are keyed by mukhi. Resolve each item's mukhi from the
+          // product record — combinations carry it per bead in `beads[]`, and
+          // single-bead products in `mukhi` — so combination buyers get review
+          // links too. The slug regex remains as fallback for items whose
+          // product row no longer exists.
+          const itemIds = (order.items as { id: string }[]).map((i) => i.id);
+          const { data: productRows } = await supabase()
+            .from("products")
+            .select("id, data")
+            .in("id", itemIds);
 
-          const uniqueMukhi = [...new Set(mukhiList)];
+          const mukhiList: number[] = [];
+          const resolvedIds = new Set<string>();
+          for (const row of productRows ?? []) {
+            const p = row.data as {
+              mukhi?: number | null;
+              beads?: { mukhi?: number }[];
+            };
+            resolvedIds.add(row.id as string);
+            if (typeof p.mukhi === "number") mukhiList.push(p.mukhi);
+            for (const bead of p.beads ?? []) {
+              if (typeof bead.mukhi === "number") mukhiList.push(bead.mukhi);
+            }
+          }
+          for (const id of itemIds) {
+            if (resolvedIds.has(id)) continue;
+            const m = id.match(/^(\d+)-mukhi/);
+            if (m) mukhiList.push(parseInt(m[1], 10));
+          }
+
+          const uniqueMukhi = [...new Set(mukhiList.filter((m) => m >= 1 && m <= 21))];
           if (uniqueMukhi.length > 0) {
             const { data: tokenRow } = await supabase()
               .from("review_tokens")
@@ -177,15 +204,32 @@ export async function POST(req: Request) {
 
         if (!isShiprocketConfigured()) return;
 
-        const result = await createShiprocketOrder(order);
-        await supabase()
-          .from("orders")
-          .update({
-            shiprocket_order_id: result.shiprocket_order_id,
-            shiprocket_shipment_id: result.shipment_id,
-            fulfillment_status: "synced",
-          })
-          .eq("id", order.id);
+        try {
+          const result = await createShiprocketOrder(order);
+          await supabase()
+            .from("orders")
+            .update({
+              shiprocket_order_id: result.shiprocket_order_id,
+              shiprocket_shipment_id: result.shipment_id,
+              fulfillment_status: "synced",
+            })
+            .eq("id", order.id);
+        } catch (syncErr) {
+          // A paid order that never reached Shiprocket must not die silently in
+          // the logs: mark it failed (admin sees a Retry sync button) and alert
+          // the brand inbox.
+          console.error(`[post-payment] Shiprocket sync failed for ${order.id}:`, syncErr);
+          await supabase()
+            .from("orders")
+            .update({ fulfillment_status: "failed" })
+            .eq("id", order.id);
+          await sendOpsAlertEmail("Shiprocket sync failed for a paid order", [
+            `Order <strong>${razorpay_order_id}</strong> (payment ${razorpay_payment_id}) is paid but did not sync to Shiprocket.`,
+            `Customer: ${order.customer?.name ?? "—"} · ${order.customer?.phone ?? "—"}`,
+            `Use the <strong>Retry sync</strong> button in /admin/orders, or create the order in Shiprocket manually.`,
+            `Error: ${syncErr instanceof Error ? syncErr.message : String(syncErr)}`,
+          ]);
+        }
       } catch (err) {
         console.error("[post-payment] background sync failed:", err);
       }

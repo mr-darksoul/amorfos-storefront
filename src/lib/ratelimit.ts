@@ -51,6 +51,46 @@ export function rateLimit(
 }
 
 /**
+ * Distributed fixed-window limiter for the sensitive endpoints (admin login,
+ * order tracking, subscribe, reviews). The in-memory check runs first — free,
+ * and it alone stops single-instance abuse — then the count is confirmed
+ * against the global `rate_limit_hits` table (migration 007) so a burst spread
+ * across serverless instances can't sidestep the window.
+ *
+ * Fails open: if Supabase is unconfigured or the RPC errors, the in-memory
+ * verdict stands — a limiter outage must never take the endpoints down.
+ */
+export async function rateLimitGlobal(
+  key: string,
+  limit: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  const local = rateLimit(key, limit, windowMs);
+  if (!local.ok) return local;
+
+  const { supabase, isSupabaseConfigured } = await import("./supabase");
+  if (!isSupabaseConfigured()) return local;
+
+  try {
+    const { data, error } = await supabase().rpc("rate_limit_hit", {
+      p_key: key,
+      p_limit: limit,
+      p_window_ms: windowMs,
+    });
+    if (error || !data) return local;
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | { allowed: boolean; retry_after: number }
+      | undefined;
+    if (!row) return local;
+    return row.allowed
+      ? { ok: true, retryAfter: 0 }
+      : { ok: false, retryAfter: row.retry_after || 60 };
+  } catch {
+    return local;
+  }
+}
+
+/**
  * Best-effort client IP from the proxy headers Vercel sets.
  *
  * Prefer `x-real-ip`: on Vercel this is set by the edge to the actual connecting

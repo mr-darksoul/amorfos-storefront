@@ -86,45 +86,57 @@ async function main() {
   const model = process.env.CONTENT_MODEL || "claude-sonnet-4-6";
   console.log(`Drafting ${todo.length} article(s) via ${apiKey ? `Claude (${model})` : "offline scaffold"}…`);
 
+  const MAX_ATTEMPTS = 3;
   let inserted = 0;
   for (const entry of todo) {
-    try {
-      const article = apiKey ? await generateWithClaude(entry, apiKey, model) : scaffold(entry);
-      article.slug = entry.slug;
-      article.cluster = entry.cluster;
+    // Retry generation, feeding compliance violations back so the model can
+    // self-correct (mirrors /api/cron/content-draft).
+    let violations: string[] = [];
+    let ok = false;
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS && !ok; attempt++) {
+      try {
+        const article = apiKey
+          ? await generateWithClaude(entry, apiKey, model, violations)
+          : scaffold(entry);
+        article.slug = entry.slug;
+        article.cluster = entry.cluster;
 
-      const shapeErrs = validateShape(article);
-      if (shapeErrs.length) {
-        console.warn(`  ✗ ${entry.slug}: invalid shape — ${shapeErrs.join(", ")} (skipped)`);
-        continue;
-      }
-      const violations = complianceCheck(article);
-      if (violations.length) {
-        console.warn(`  ✗ ${entry.slug}: compliance violation — "${violations.join('", "')}" (skipped)`);
-        continue;
-      }
+        const shapeErrs = validateShape(article);
+        if (shapeErrs.length) {
+          console.warn(`  … ${entry.slug} attempt ${attempt}: invalid shape — ${shapeErrs.join(", ")}`);
+          continue;
+        }
+        violations = complianceCheck(article);
+        if (violations.length) {
+          console.warn(`  … ${entry.slug} attempt ${attempt}: compliance — "${violations.join('", "')}"`);
+          continue;
+        }
 
-      if (!supabase) {
-        console.log(`  ✓ ${entry.slug} OK (dry run — not inserted)`);
+        if (!supabase) {
+          console.log(`  ✓ ${entry.slug} OK (dry run — not inserted)`);
+          inserted++;
+          ok = true;
+          break;
+        }
+
+        const { error } = await supabase.from("articles").insert({
+          slug: article.slug,
+          data: article,
+          status: "draft",
+          published_at: null,
+        });
+        if (error) {
+          console.warn(`  ✗ ${entry.slug}: insert failed — ${error.message}`);
+          break;
+        }
+        console.log(`  ✓ ${entry.slug} drafted (attempt ${attempt})`);
         inserted++;
-        continue;
+        ok = true;
+      } catch (err) {
+        console.warn(`  … ${entry.slug} attempt ${attempt}: ${(err as Error).message}`);
       }
-
-      const { error } = await supabase.from("articles").insert({
-        slug: article.slug,
-        data: article,
-        status: "draft",
-        published_at: null,
-      });
-      if (error) {
-        console.warn(`  ✗ ${entry.slug}: insert failed — ${error.message}`);
-        continue;
-      }
-      console.log(`  ✓ ${entry.slug} drafted`);
-      inserted++;
-    } catch (err) {
-      console.warn(`  ✗ ${entry.slug}: ${(err as Error).message}`);
     }
+    if (!ok) console.warn(`  ✗ ${entry.slug}: could not draft after ${MAX_ATTEMPTS} attempts (skipped)`);
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://amorfos.in";

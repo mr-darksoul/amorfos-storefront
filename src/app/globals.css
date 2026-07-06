@@ -103,6 +103,16 @@ body {
   .reveal { opacity: 1; transform: none; transition: none; }
 }
 
+/* ── Keyboard focus ───────────────────────────────────────────────
+   Visible ring for keyboard navigation only (:focus-visible leaves
+   mouse/touch interactions untouched). Inputs keep their own gold
+   border+ring focus treatment. */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 /* ── Buttons ──────────────────────────────────────────────────── */
 .btn {
   display: inline-flex;

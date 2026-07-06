@@ -75,7 +75,8 @@ export default async function ThankYouPage({
       <p className="mx-auto mt-5 max-w-md leading-relaxed text-ink-dim">
         Your payment was received and your order is being prepared with care. A
         confirmation will reach you shortly, and your Lab Certificate travels with
-        the bead.
+        the bead. Once your bead arrives, we&rsquo;ll email you a link to share
+        your experience.
       </p>
 
       <Suspense fallback={null}>
@@ -85,6 +86,9 @@ export default async function ThankYouPage({
       <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row">
         <Link href="/shop" className="btn btn-primary">
           Continue shopping
+        </Link>
+        <Link href="/track" className="btn btn-outline">
+          Track your order
         </Link>
         <a
           href={waLink("Hi Amorfos, I just placed an order and have a question.")}
