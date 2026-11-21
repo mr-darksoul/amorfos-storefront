@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * Client-side analytics dispatch for GA4, Google Ads and the Meta Pixel.
  *
