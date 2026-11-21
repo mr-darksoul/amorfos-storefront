@@ -8,6 +8,7 @@ import {
   sendOpsAlertEmail,
 } from "@/lib/notify";
 import { sendMetaPurchaseEvent } from "@/lib/metaCapi";
+import { site } from "@/lib/site";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,12 @@ export async function POST(req: Request) {
     req.headers.get("x-real-ip") ||
     undefined;
   const userAgent = req.headers.get("user-agent") || undefined;
+  const sourceUrl = req.headers.get("referer") || `${site.url}/checkout`;
+  const cookieHeader = req.headers.get("cookie") ?? "";
+  const readCookie = (name: string) =>
+    cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`))?.[1];
+  const fbp = readCookie("_fbp");
+  const fbc = readCookie("_fbc");
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
   if (!keySecret || keySecret.includes("REPLACE_ME")) {
     return NextResponse.json(
@@ -127,9 +134,16 @@ export async function POST(req: Request) {
           currency: "INR",
           email: order.customer?.email,
           phone: order.customer?.phone,
+          name: order.customer?.name,
+          city: order.customer?.city,
+          state: order.customer?.state,
+          pincode: order.customer?.pincode,
           contentIds: (order.items as { id: string }[]).map((i) => i.id),
+          sourceUrl,
           clientIp,
           userAgent,
+          fbp,
+          fbc,
         });
 
         // Decrement inventory for stock-tracked products. The SQL function

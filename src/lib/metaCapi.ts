@@ -33,6 +33,13 @@ function hashPhone(phone?: string): string | undefined {
   return digits ? sha256(digits) : undefined;
 }
 
+/** Names, city, state and postcode: lowercase, letters/digits only, then hashed. */
+function hashField(value?: string): string | undefined {
+  if (!value) return undefined;
+  const v = value.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+  return v ? sha256(v) : undefined;
+}
+
 export interface PurchaseEvent {
   /** Razorpay payment id — the de-dup key shared with the browser pixel. */
   eventId: string;
@@ -40,12 +47,19 @@ export interface PurchaseEvent {
   currency?: string;
   email?: string;
   phone?: string;
+  name?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
   contentIds?: string[];
-  /** The /thank-you URL, used as event_source_url when known. */
-  sourceUrl?: string;
+  /** Page the purchase happened on; Meta requires it for website events. */
+  sourceUrl: string;
   /** Best-effort client IP / user agent for better match quality. */
   clientIp?: string;
   userAgent?: string;
+  /** Meta's first-party `_fbp` / `_fbc` cookies, sent unhashed. */
+  fbp?: string;
+  fbc?: string;
 }
 
 export function isMetaCapiConfigured(): boolean {
@@ -64,8 +78,23 @@ export async function sendMetaPurchaseEvent(e: PurchaseEvent): Promise<void> {
   const ph = hashPhone(e.phone);
   if (em) userData.em = [em];
   if (ph) userData.ph = [ph];
+  const nameParts = (e.name ?? "").trim().split(/\s+/).filter(Boolean);
+  const fn = hashField(nameParts[0]);
+  const ln = nameParts.length > 1 ? hashField(nameParts[nameParts.length - 1]) : undefined;
+  const ct = hashField(e.city);
+  const st = hashField(e.state);
+  const zp = hashField(e.pincode);
+  if (fn) userData.fn = [fn];
+  if (ln) userData.ln = [ln];
+  if (ct) userData.ct = [ct];
+  if (st) userData.st = [st];
+  if (zp) userData.zp = [zp];
+  // Checkout only accepts Indian addresses.
+  userData.country = [sha256("in")];
   if (e.clientIp) userData.client_ip_address = e.clientIp;
   if (e.userAgent) userData.client_user_agent = e.userAgent;
+  if (e.fbp) userData.fbp = e.fbp;
+  if (e.fbc) userData.fbc = e.fbc;
 
   const payload = {
     data: [
@@ -74,7 +103,7 @@ export async function sendMetaPurchaseEvent(e: PurchaseEvent): Promise<void> {
         event_time: Math.floor(Date.now() / 1000),
         event_id: e.eventId,
         action_source: "website",
-        ...(e.sourceUrl ? { event_source_url: e.sourceUrl } : {}),
+        event_source_url: e.sourceUrl,
         user_data: userData,
         custom_data: {
           currency: e.currency || "INR",
