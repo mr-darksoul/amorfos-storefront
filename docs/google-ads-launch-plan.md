@@ -1,0 +1,149 @@
+# Amorfos — Google Ads Launch Plan (v1, 23 Nov 2026)
+
+> Companion to [`meta-ads-launch-plan.md`](./meta-ads-launch-plan.md) (Meta is paused on an
+> account issue) and [`brand.md`](./brand.md). Every ad must pass `brand.md` §8–10.
+
+---
+
+## 0. What's already in place
+
+| Piece | Status |
+|---|---|
+| Google Ads account | `475-290-1970`, India / IST / INR, billing on, **no campaigns yet** |
+| Purchase tracking | Conversion "Purchase - amorfos.in" (`AW-18589606865`), live on the site, real order value + payment ID. Enhanced conversions **off** (needs privacy policy wording first) |
+| GA4 | Linked to Google Ads (property 543504086) |
+| Merchant Center | `5913999099`, site verified, India, shipping + returns set, feed of **37 products** (`/feeds/google.xml`, daily), linked to Google Ads |
+| Free Shopping listings | Products in Google review (up to ~3 working days) |
+| Offer | **Spend ₹20,000 by 21 Jan 2027 → ₹20,000 credit.** At ₹600/day from ~26 Nov, you pass ₹20,000 around 28 Dec |
+
+---
+
+## 1. Keyword research (Google Keyword Planner, India, last 12 months)
+
+| Keyword | Searches / month | Top-of-page CPC | We sell | Use? |
+|---|---|---|---|---|
+| 5 mukhi rudraksha | 10K–100K | ₹5–20 | ₹599 pendant | **Yes — core** |
+| 7 mukhi rudraksha | 10K–100K | ₹7–23 | ₹599 / ₹999 | **Yes — core** |
+| 1 mukhi rudraksha | 10K–100K | ₹3–16 | ₹2,499 (India) | **Yes — high value** |
+| gauri shankar rudraksha | 10K–100K | ₹5–26 | ₹4,499 / ₹9,999 | **Yes — high value** |
+| rudraksha mala | 10K–100K | ₹4–16 | malas lack photos | **Later** (after mala photos) |
+| 6 mukhi rudraksha | 1K–10K | ₹5–19 | ₹599 | Yes |
+| 4 mukhi rudraksha | 1K–10K | ₹6–19 | ₹599 | Yes |
+| 5 mukhi rudraksha price | 1K–10K | ₹2–10 | ₹599 | Yes (cheap clicks, price is our strength) |
+| original rudraksha | 1K–10K | ₹4–17 | pendants | Yes |
+| certified rudraksha | 1K–10K | ₹7–32 | pendants | Yes (our differentiator) |
+| rudraksha pendant | 1K–10K | ₹6–27 | pendants | Yes |
+| 11 / 12 / 14 mukhi rudraksha | 1K–10K each | ₹4–22 | ₹2,499–51,000 | Phase 2 |
+| nepali rudraksha | 1K–10K | ₹7–55 | yes | No for now (expensive clicks) |
+| lab certified rudraksha | 100–1K | ₹4–19 | yes | Yes (exact match) |
+| rudraksha pendant silver | 100–1K | ₹4–18 | yes | Yes |
+| buy rudraksha online / rudraksha online | 100–1K | ₹8–38 | yes | Yes (watch cost) |
+| rudraksha for students | 100–1K | ₹1–15 | Study Success ₹1,499 | Phase 2 (exam season) |
+| kaal sarp dosh rudraksha | 10–100 | — | yes | No (too few searches) |
+
+Planner shows ranges until the account has spent; we'll get exact numbers after week 1.
+
+---
+
+## 2. Campaign 1 — Search (start first)
+
+**Name:** `AMF | Search | India` · **Budget:** ₹600/day · **Networks:** Google Search only
+(untick Search Partners and Display) · **Locations:** India, *"Presence: people in or regularly in"*
+· **Languages:** English, Hindi · **Bidding:** *Maximize clicks* with max CPC **₹15** for the first
+2 weeks → switch to *Maximize conversions* once there are ~15 purchases in 30 days.
+
+### Ad groups (keywords in "phrase" and [exact] match)
+
+| Ad group | Keywords | Landing page |
+|---|---|---|
+| 5 Mukhi | "5 mukhi rudraksha", [5 mukhi rudraksha original], "5 mukhi rudraksha pendant", "5 mukhi rudraksha price", "buy 5 mukhi rudraksha" | `/shop/5-mukhi-nepal` (₹599) |
+| 7 Mukhi | "7 mukhi rudraksha", "7 mukhi rudraksha original", "7 mukhi rudraksha pendant" | `/shop/7-mukhi-nepal` (₹999, free shipping) |
+| 6 Mukhi | "6 mukhi rudraksha", "6 mukhi rudraksha pendant" | `/shop/6-mukhi-nepal` (₹599) |
+| 4 Mukhi | "4 mukhi rudraksha", "4 mukhi rudraksha pendant" | `/shop/4-mukhi-nepal` (₹599) |
+| 1 Mukhi | "1 mukhi rudraksha", "ek mukhi rudraksha" | `/shop/1-mukhi-india` (₹2,499) |
+| Gauri Shankar | "gauri shankar rudraksha", "gauri shankar rudraksha pendant" | `/shop/lab-certified-gauri-shankar-rudraksha-pendant-nepal` (₹9,999) |
+| Certified (trust) | [certified rudraksha], [lab certified rudraksha], "original rudraksha", "rudraksha pendant", "rudraksha pendant silver", "buy rudraksha online" | `/collections/rudraksha-pendant` |
+
+### Negative keywords (campaign level)
+`free, meaning, benefits, wikipedia, pdf, video, youtube, image, images, photo, wallpaper,
+drawing, how to wear, how to identify, identify, test, real or fake, fake, side effects, rules,
+mantra, tree, plant, seed, seeds, wholesale, bulk, manufacturer, supplier, job, jobs, course,
+book, bracelet, amazon, flipkart, meesho, round` ("round" because people searching
+"1 mukhi round" want a Nepal round bead, which we don't sell.)
+
+Review the **search terms report every Monday** and add new irrelevant terms here.
+
+### Ad copy (Responsive Search Ads — Google checks lengths as you type)
+
+**Shared headlines (≤30 characters):**
+`Lab Certified Rudraksha` · `Sent Sealed With Certificate` · `Free Shipping Above ₹999` ·
+`7-Day Returns on Sealed Items` · `Silver Capping, Red Thread` · `Sold on Amazon & Flipkart` ·
+`Ask Us on WhatsApp` · `Hand-Selected Beads`
+
+**Per-group headlines (examples):**
+- 5 Mukhi: `5 Mukhi Rudraksha Pendant` · `Certified 5 Mukhi Rudraksha` · `5 Mukhi Nepal Bead, ₹599`
+- 7 Mukhi: `7 Mukhi Rudraksha Pendant` · `Certified 7 Mukhi Rudraksha` · `7 Mukhi Nepal, Free Shipping`
+- 1 Mukhi: `1 Mukhi Rudraksha (India)` · `Certified 1 Mukhi Rudraksha`
+- Gauri Shankar: `Gauri Shankar Rudraksha` · `Certified Gauri Shankar Bead`
+
+**Descriptions (≤90 characters):**
+1. `Every bead is Lab Certified and sent sealed with its certificate. Free shipping over ₹999.`
+2. `Hand-selected Nepal bead in silver capping on red thread. Questions? Ask us on WhatsApp.`
+3. `Traditionally worn on the advice of astrologers and pandits. 7-day returns if sealed.`
+4. Per group, from the canonical table in `lib/mukhi.ts`, e.g. 5 Mukhi:
+   `The 5 Mukhi is traditionally linked to Kalagni Rudra and Jupiter. Certified, from ₹599.`
+   (7 Mukhi: Goddess Mahalakshmi + Saturn · 6: Kartikeya + Venus · 4: Brahma + Mercury ·
+   1: Shiva + Sun · Gauri Shankar: Shiva, all planets.)
+
+**Rules:** no exclamation marks in headlines (Google rejects them), no "miracle / cures /
+guaranteed", no religion-targeted phrasing ("Are you a Shiva devotee?"), never name a lab.
+
+### Assets (add at campaign level)
+- **Sitelinks:** 5 Mukhi Pendant · 7 Mukhi Pendant · Combination Pendants · How We Certify (`/policies#authenticity`)
+- **Callouts:** Lab Certified · Sent Sealed · Free Shipping Above ₹999 · 7-Day Returns · WhatsApp Support
+- **Structured snippet (Types):** Pendants, Combinations, Malas
+- **Images:** 3–5 product photos on white · **Business name:** Amorfos · **Logo:** `public/brand/logo-dark.png`
+
+---
+
+## 3. Campaign 2 — Shopping (after Merchant Center approves products)
+
+**Name:** `AMF | Shopping | All` · Standard Shopping (not Performance Max yet; it needs
+conversion history) · **Budget:** ₹200/day, taken from Search if Search isn't spending its
+budget · **Bidding:** Maximize clicks, max CPC ₹10 · all 37 feed products.
+Shopping ads show the photo and price, so they suit ₹599 pendants well.
+
+---
+
+## 4. What good looks like (recalibrate after week 2)
+
+| Metric | Target | Where |
+|---|---|---|
+| Purchases | ≥15 in the first 30 days | Google Ads → Conversions, `/admin/orders` |
+| Cost per purchase | ≤ break-even (needs your product cost per item) | Google Ads |
+| Search CTR | ≥4% | Google Ads |
+| Average CPC | ₹6–15 | Google Ads |
+| Conversion rate (click → order) | ≥1.5% | Google Ads |
+| Return on ad spend | ≥1.5× by week 6 | Google Ads |
+
+**Honest expectation:** at ₹600/day and ~₹12 per click that's ~50 clicks a day. At 1–2%
+conversion, that's roughly 15–30 orders a month to start. The first two weeks are about learning
+which searches buy, not profit.
+
+### Weekly routine (Monday, 15 minutes)
+1. Search terms report → add irrelevant terms as negatives.
+2. Pause keywords that spent ₹1,000+ with no purchase.
+3. Raise budget by ≤20% where cost per purchase is under target.
+4. After ~15 purchases, switch bidding to Maximize conversions.
+
+---
+
+## 5. Next steps
+
+1. **Claude (with your OK):** build Campaign 1 in Google Ads exactly as above and leave it
+   **paused**, so you can review it before anything spends.
+2. **You:** review, then switch it on (proposed start: as soon as you approve).
+3. **After Merchant Center approval:** add the Shopping campaign.
+4. **Phase 2 (week 3+):** 11 / 12 / 14 Mukhi ad groups, Study Success for exam season,
+   "rudraksha mala" once mala photos are in.
+5. **Later:** turn on enhanced conversions after adding one line to the privacy policy.
