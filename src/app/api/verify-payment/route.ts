@@ -1,31 +1,22 @@
 import { NextResponse, after } from "next/server";
 import crypto from "crypto";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import { createShiprocketOrder, isShiprocketConfigured } from "@/lib/shiprocket";
 import {
-  sendOrderConfirmationEmail,
-  sendOrderConfirmationWhatsApp,
-  sendOpsAlertEmail,
-} from "@/lib/notify";
-import { sendMetaPurchaseEvent } from "@/lib/metaCapi";
-import { site } from "@/lib/site";
+  clientContextFromRequest,
+  markOrderPaid,
+  runPostPaymentWork,
+} from "@/lib/paidOrder";
 
 export const runtime = "nodejs";
 
+/**
+ * Browser-side confirmation from the Razorpay checkout handler. The Razorpay
+ * webhook (`api/webhooks/razorpay`) covers the case where this call never
+ * arrives — e.g. the tab is closed or reloaded after paying in a UPI app.
+ */
 export async function POST(req: Request) {
-  // Captured up front for the server-side Meta CAPI Purchase event (better
-  // match quality); the request object isn't available inside after().
-  const clientIp =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    undefined;
-  const userAgent = req.headers.get("user-agent") || undefined;
-  const sourceUrl = req.headers.get("referer") || `${site.url}/checkout`;
-  const cookieHeader = req.headers.get("cookie") ?? "";
-  const readCookie = (name: string) =>
-    cookieHeader.match(new RegExp(`(?:^|;\\s*)${name}=([^;]+)`))?.[1];
-  const fbp = readCookie("_fbp");
-  const fbc = readCookie("_fbc");
+  // The request object isn't available inside after().
+  const clientContext = clientContextFromRequest(req);
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
   if (!keySecret || keySecret.includes("REPLACE_ME")) {
     return NextResponse.json(
@@ -64,9 +55,8 @@ export async function POST(req: Request) {
       await supabase()
         .from("orders")
         .update({ status: "failed" })
-        // Only a still-pending order may be flipped to failed. Without this an
-        // unauthenticated request carrying a real order id + junk signature
-        // could mark an already-paid order failed.
+        // Only a still-pending order may be flipped to failed, so a junk
+        // signature can never un-pay an order.
         .eq("razorpay_order_id", razorpay_order_id)
         .eq("status", "pending");
     }
@@ -74,180 +64,17 @@ export async function POST(req: Request) {
   }
 
   if (isSupabaseConfigured()) {
-    // Only a still-pending order transitions to paid. This makes the whole
-    // post-payment side-effect block idempotent: a duplicate/replayed verify
-    // call (Razorpay retry, double network request) updates 0 rows and skips
-    // fulfillment, so we never send duplicate emails or create a second
-    // Shiprocket order.
-    const { data: paidRows } = await supabase()
-      .from("orders")
-      .update({
-        status: "paid",
-        razorpay_payment_id,
-        paid_at: new Date().toISOString(),
-      })
-      .eq("razorpay_order_id", razorpay_order_id)
-      .eq("status", "pending")
-      .select("id");
-
-    if (!paidRows || paidRows.length === 0) {
-      // Nothing transitioned. Either the order was already paid (a harmless
-      // replay — just confirm again) or there is genuinely no row, which is a
-      // critical data gap (customer charged, nothing to fulfill). Distinguish
-      // the two so we only alert on the real problem, and never re-run
-      // fulfillment for an already-paid order.
-      const { data: existing } = await supabase()
-        .from("orders")
-        .select("status")
-        .eq("razorpay_order_id", razorpay_order_id)
-        .maybeSingle();
-
-      if (!existing) {
-        console.error(
-          `[verify-payment] CRITICAL: verified payment ${razorpay_payment_id} ` +
-            `for order ${razorpay_order_id} matched no DB row — manual recovery needed.`,
-        );
+    try {
+      const result = await markOrderPaid(razorpay_order_id, razorpay_payment_id);
+      // Only the caller that flips the order to paid runs fulfilment, so a
+      // replayed call or the webhook arriving first never duplicates it.
+      if (result === "transitioned") {
+        after(() => runPostPaymentWork(razorpay_order_id, razorpay_payment_id, clientContext));
       }
-
-      // Payment is real, so still confirm to the customer either way.
-      return NextResponse.json({ verified: true, paymentId: razorpay_payment_id });
+    } catch (err) {
+      // The payment is genuine; the Razorpay webhook will retry the update.
+      console.error("[verify-payment] could not mark order paid:", err);
     }
-
-    // Run after the response is sent, but keep the serverless function alive
-    // until it completes (plain fire-and-forget is killed on Vercel once the
-    // response flushes). Errors here must never block payment confirmation.
-    after(async () => {
-      try {
-        const { data: order } = await supabase()
-          .from("orders")
-          .select("*")
-          .eq("razorpay_order_id", razorpay_order_id)
-          .single();
-
-        if (!order) return;
-
-        // Server-side Purchase (Meta Conversions API). De-duplicated against the
-        // browser pixel on /thank-you via event_id = razorpay_payment_id.
-        await sendMetaPurchaseEvent({
-          eventId: razorpay_payment_id,
-          value: order.amount,
-          currency: "INR",
-          email: order.customer?.email,
-          phone: order.customer?.phone,
-          name: order.customer?.name,
-          city: order.customer?.city,
-          state: order.customer?.state,
-          pincode: order.customer?.pincode,
-          contentIds: (order.items as { id: string }[]).map((i) => i.id),
-          sourceUrl,
-          clientIp,
-          userAgent,
-          fbp,
-          fbc,
-        });
-
-        // Decrement inventory for stock-tracked products. The SQL function
-        // clamps at 0 and ignores products that don't track stock, so this is
-        // safe to call for every order. Errors are non-fatal.
-        const { error: stockErr } = await supabase().rpc("decrement_stock", {
-          p_items: order.items,
-        });
-        if (stockErr) {
-          console.error("[post-payment] stock decrement failed:", stockErr);
-        }
-
-        // Generate post-purchase review token
-        let reviewUrl: string | undefined;
-        try {
-          // Reviews are keyed by mukhi. Resolve each item's mukhi from the
-          // product record — combinations carry it per bead in `beads[]`, and
-          // single-bead products in `mukhi` — so combination buyers get review
-          // links too. The slug regex remains as fallback for items whose
-          // product row no longer exists.
-          const itemIds = (order.items as { id: string }[]).map((i) => i.id);
-          const { data: productRows } = await supabase()
-            .from("products")
-            .select("id, data")
-            .in("id", itemIds);
-
-          const mukhiList: number[] = [];
-          const resolvedIds = new Set<string>();
-          for (const row of productRows ?? []) {
-            const p = row.data as {
-              mukhi?: number | null;
-              beads?: { mukhi?: number }[];
-            };
-            resolvedIds.add(row.id as string);
-            if (typeof p.mukhi === "number") mukhiList.push(p.mukhi);
-            for (const bead of p.beads ?? []) {
-              if (typeof bead.mukhi === "number") mukhiList.push(bead.mukhi);
-            }
-          }
-          for (const id of itemIds) {
-            if (resolvedIds.has(id)) continue;
-            const m = id.match(/^(\d+)-mukhi/);
-            if (m) mukhiList.push(parseInt(m[1], 10));
-          }
-
-          const uniqueMukhi = [...new Set(mukhiList.filter((m) => m >= 1 && m <= 21))];
-          if (uniqueMukhi.length > 0) {
-            const { data: tokenRow } = await supabase()
-              .from("review_tokens")
-              .insert({
-                order_id: order.id,
-                customer_name: order.customer?.name ?? null,
-                customer_email: order.customer?.email ?? null,
-                mukhi_list: uniqueMukhi,
-              })
-              .select("token")
-              .single();
-            if (tokenRow?.token) {
-              const { site } = await import("@/lib/site");
-              reviewUrl = `${site.url}/reviews/${tokenRow.token}`;
-            }
-          }
-        } catch (e) {
-          console.error("[post-payment] review token generation failed:", e);
-        }
-
-        // Send notifications (non-blocking on Shiprocket)
-        await Promise.allSettled([
-          sendOrderConfirmationEmail(order, reviewUrl),
-          sendOrderConfirmationWhatsApp(order),
-        ]);
-
-        if (!isShiprocketConfigured()) return;
-
-        try {
-          const result = await createShiprocketOrder(order);
-          await supabase()
-            .from("orders")
-            .update({
-              shiprocket_order_id: result.shiprocket_order_id,
-              shiprocket_shipment_id: result.shipment_id,
-              fulfillment_status: "synced",
-            })
-            .eq("id", order.id);
-        } catch (syncErr) {
-          // A paid order that never reached Shiprocket must not die silently in
-          // the logs: mark it failed (admin sees a Retry sync button) and alert
-          // the brand inbox.
-          console.error(`[post-payment] Shiprocket sync failed for ${order.id}:`, syncErr);
-          await supabase()
-            .from("orders")
-            .update({ fulfillment_status: "failed" })
-            .eq("id", order.id);
-          await sendOpsAlertEmail("Shiprocket sync failed for a paid order", [
-            `Order <strong>${razorpay_order_id}</strong> (payment ${razorpay_payment_id}) is paid but did not sync to Shiprocket.`,
-            `Customer: ${order.customer?.name ?? "—"} · ${order.customer?.phone ?? "—"}`,
-            `Use the <strong>Retry sync</strong> button in /admin/orders, or create the order in Shiprocket manually.`,
-            `Error: ${syncErr instanceof Error ? syncErr.message : String(syncErr)}`,
-          ]);
-        }
-      } catch (err) {
-        console.error("[post-payment] background sync failed:", err);
-      }
-    });
   }
 
   return NextResponse.json({ verified: true, paymentId: razorpay_payment_id });

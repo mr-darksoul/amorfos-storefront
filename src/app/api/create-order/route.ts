@@ -4,6 +4,7 @@ import { getAdminProducts } from "@/lib/adminProducts";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { site } from "@/lib/site";
 import { validateCustomer, digitsOnly } from "@/lib/validateCustomer";
+import { clientContextFromRequest } from "@/lib/paidOrder";
 
 export const runtime = "nodejs";
 
@@ -136,6 +137,7 @@ export async function POST(req: Request) {
         status: "pending",
         customer,
         items: orderItems,
+        client_context: clientContextFromRequest(req),
       });
       if (insertErr) {
         console.error("Failed to persist pending order:", insertErr);

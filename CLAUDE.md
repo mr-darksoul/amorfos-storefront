@@ -65,6 +65,13 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   amount recomputed from catalogue + shipping so a tampered client price can't change the
   charge), HMAC SHA-256 signature verified (`api/verify-payment`). If keys are
   missing/placeholder, both routes return `503` and checkout is disabled.
+  **Razorpay webhook** (`api/webhooks/razorpay`, events `order.paid` + `payment.captured`,
+  secret `RAZORPAY_WEBHOOK_SECRET`) completes paid orders server-side when the browser never
+  calls verify-payment (tab closed/reloaded after a UPI app). Both paths go through
+  `lib/paidOrder.ts`: `markOrderPaid` atomically flips pending/failed → paid, and only the
+  winner runs `runPostPaymentWork` (CAPI, stock, review token, email/WhatsApp, Shiprocket).
+  Browser details for CAPI are stored on the order at checkout (`orders.client_context`,
+  migration 008) so webhook-completed orders still match well in Meta.
 - **Cart:** React Context + `localStorage` (`context/CartContext.tsx`). No Redux.
 - **Database:** **Supabase** (`lib/supabase.ts`, server-only `SUPABASE_SERVICE_ROLE_KEY`).
   Seven tables: `orders`, `products`, `articles`, `reviews`, `review_tokens`,
@@ -189,6 +196,7 @@ web/src/
 │  ├─ api/subscribe/ · api/subscribe/confirm/          Newsletter double opt-in (lead-magnet)
 │  ├─ api/cron/content-draft/                          Vercel Cron endpoint (CRON_SECRET)
 │  ├─ api/webhooks/delivery-status/                    Shiprocket status webhook
+│  ├─ api/webhooks/razorpay/                           Razorpay payment webhook (order.paid)
 │  ├─ sitemap.ts · robots.ts                           SEO (includes /journal + articles)
 │  └─ globals.css           ← brand design tokens (source of truth)
 ├─ components/              Header, Footer, CartDrawer, ProductCard,
