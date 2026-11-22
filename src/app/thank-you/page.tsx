@@ -6,6 +6,7 @@ import PaymentRef from "@/components/PaymentRef";
 import PurchaseTracker from "@/components/PurchaseTracker";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { TrackedItem } from "@/lib/analytics";
+import { googleUserData, type GoogleUserData } from "@/lib/googleUserData";
 import { site, waLink } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -26,12 +27,16 @@ interface OrderItemRow {
 /** Look up the paid order so the browser Purchase event carries a real value. */
 async function getPurchase(
   paymentId: string | undefined,
-): Promise<{ value: number; items: TrackedItem[] } | null> {
+): Promise<{
+  value: number;
+  items: TrackedItem[];
+  userData?: GoogleUserData;
+} | null> {
   if (!paymentId || !isSupabaseConfigured()) return null;
   try {
     const { data } = await supabase()
       .from("orders")
-      .select("amount, items, status")
+      .select("amount, items, status, customer")
       .eq("razorpay_payment_id", paymentId)
       .maybeSingle();
     if (!data || data.status !== "paid") return null;
@@ -44,7 +49,13 @@ async function getPurchase(
         category: i.category,
       }),
     );
-    return { value: data.amount as number, items };
+    return {
+      value: data.amount as number,
+      items,
+      userData: googleUserData(
+        data.customer as { email?: string; phone?: string } | null,
+      ),
+    };
   } catch {
     return null;
   }
@@ -65,6 +76,7 @@ export default async function ThankYouPage({
           eventId={payment}
           value={purchase.value}
           items={purchase.items}
+          userData={purchase.userData}
         />
       )}
       <div className="grid size-16 place-items-center rounded-full border border-gold text-gold">

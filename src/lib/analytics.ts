@@ -24,6 +24,12 @@ export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
 const CURRENCY = "INR";
 
+/** SHA-256 hashes for Google Ads enhanced conversions (built server-side). */
+export interface GoogleUserDataHashes {
+  sha256_email_address?: string;
+  sha256_phone_number?: string;
+}
+
 export interface TrackedItem {
   id: string;
   name: string;
@@ -109,14 +115,19 @@ export function trackInitiateCheckout(items: TrackedItem[], value: number): void
 /**
  * A completed purchase. `eventId` (the Razorpay payment id) is sent as the
  * Meta `eventID` and the GA4/Ads `transaction_id` so the server-side CAPI
- * event and the Google Ads conversion are de-duplicated.
+ * event and the Google Ads conversion are de-duplicated. `userData` (hashed
+ * email/phone) is set first so the Ads conversion carries enhanced-conversion
+ * match data.
  */
 export function trackPurchase(opts: {
   eventId: string;
   value: number;
   items: TrackedItem[];
+  userData?: GoogleUserDataHashes;
 }): void {
-  const { eventId, value, items } = opts;
+  const { eventId, value, items, userData } = opts;
+
+  if (userData) gtag("set", "user_data", userData);
 
   gtag("event", "purchase", {
     transaction_id: eventId,

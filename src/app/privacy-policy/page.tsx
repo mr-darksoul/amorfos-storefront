@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/privacy-policy" },
 };
 
-const lastUpdated = "21 November 2026";
+const lastUpdated = "22 November 2026";
 
 export default function PrivacyPolicyPage() {
   return (
@@ -113,8 +113,8 @@ export default function PrivacyPolicyPage() {
               <li>
                 <strong className="text-ink">Google and Meta</strong> — browsing and purchase
                 activity collected by Google Analytics, Google Ads and the Meta Pixel. When you
-                complete a purchase, we also send Meta your email and phone number in scrambled
-                (hashed) form, so it can measure which ads led to sales. Meta also delivers our
+                complete a purchase, we also send Google and Meta your email and phone number in
+                scrambled (hashed) form, so they can measure which ads led to sales. Meta also delivers our
                 WhatsApp order updates.
               </li>
               <li>

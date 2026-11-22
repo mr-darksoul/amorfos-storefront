@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { trackPurchase, type TrackedItem } from "@/lib/analytics";
+import {
+  trackPurchase,
+  type GoogleUserDataHashes,
+  type TrackedItem,
+} from "@/lib/analytics";
 
 /**
  * Fires the browser-side Purchase (GA4 + Google Ads conversion + Meta Pixel)
@@ -14,10 +18,13 @@ export default function PurchaseTracker({
   eventId,
   value,
   items,
+  userData,
 }: {
   eventId: string;
   value: number;
   items: TrackedItem[];
+  /** Server-hashed email/phone for Google Ads enhanced conversions. */
+  userData?: GoogleUserDataHashes;
 }) {
   useEffect(() => {
     if (!eventId) return;
@@ -28,8 +35,8 @@ export default function PurchaseTracker({
     } catch {
       /* private mode — fall through and fire once per mount */
     }
-    trackPurchase({ eventId, value, items });
-  }, [eventId, value, items]);
+    trackPurchase({ eventId, value, items, userData });
+  }, [eventId, value, items, userData]);
 
   return null;
 }
