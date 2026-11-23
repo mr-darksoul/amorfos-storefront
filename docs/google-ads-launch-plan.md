@@ -10,7 +10,7 @@
 | Piece | Status |
 |---|---|
 | Google Ads account | `475-290-1970`, India / IST / INR, billing on, **no campaigns yet** |
-| Purchase tracking | Conversion "Purchase - amorfos.in" (`AW-18589606865`), live on the site, real order value + payment ID. Enhanced conversions **off** (needs privacy policy wording first) |
+| Purchase tracking | Conversion "Purchase - amorfos.in" (`AW-18589606865`), live on the site, real order value + payment ID. Enhanced conversions **on** since 22 Nov (hashed email + phone from the thank-you page; privacy policy updated) |
 | GA4 | Linked to Google Ads (property 543504086) |
 | Merchant Center | `5913999099`, site verified, India, shipping + returns set, feed of **37 products** (`/feeds/google.xml`, daily), linked to Google Ads |
 | Free Shopping listings | Products in Google review (up to ~3 working days) |
@@ -33,7 +33,10 @@
 | original rudraksha | 1K–10K | ₹4–17 | pendants | Yes |
 | certified rudraksha | 1K–10K | ₹7–32 | pendants | Yes (our differentiator) |
 | rudraksha pendant | 1K–10K | ₹6–27 | pendants | Yes |
-| 11 / 12 / 14 mukhi rudraksha | 1K–10K each | ₹4–22 | ₹2,499–51,000 | Phase 2 |
+| 2 / 3 mukhi rudraksha | 1K–10K each | ₹5–20 / ₹5–18 | ₹599 (India) | **Yes — added 22 Nov** ("2 mukhi rudraksha price" 1K–10K at ₹2–11; "do mukhi" 1K–10K) |
+| 9 mukhi rudraksha | 1K–10K | ₹4–20 | ₹999 (Indonesia, free shipping) | **Yes — added 22 Nov** ("9 mukhi rudraksha price" up 900% YoY) |
+| 8 / 10 mukhi rudraksha | 1K–10K each | ₹6–23 / ₹5–21 | ₹999 / ₹1,499 (Indonesia) | Next after week 1 (dearer clicks) |
+| 11 / 12 / 13 / 14 mukhi rudraksha | 1K–10K each | ₹4–24 | ₹2,499–51,000 | Phase 2 (clicks above ₹15 cap) |
 | nepali rudraksha | 1K–10K | ₹7–55 | yes | No for now (expensive clicks) |
 | lab certified rudraksha | 100–1K | ₹4–19 | yes | Yes (exact match) |
 | rudraksha pendant silver | 100–1K | ₹4–18 | yes | Yes |
@@ -56,13 +59,22 @@ Planner shows ranges until the account has spent; we'll get exact numbers after 
 
 | Ad group | Keywords | Landing page |
 |---|---|---|
-| 5 Mukhi | "5 mukhi rudraksha", [5 mukhi rudraksha original], "5 mukhi rudraksha pendant", "5 mukhi rudraksha price", "buy 5 mukhi rudraksha" | `/shop/5-mukhi-nepal` (₹599) |
-| 7 Mukhi | "7 mukhi rudraksha", "7 mukhi rudraksha original", "7 mukhi rudraksha pendant" | `/shop/7-mukhi-nepal` (₹999, free shipping) |
-| 6 Mukhi | "6 mukhi rudraksha", "6 mukhi rudraksha pendant" | `/shop/6-mukhi-nepal` (₹599) |
-| 4 Mukhi | "4 mukhi rudraksha", "4 mukhi rudraksha pendant" | `/shop/4-mukhi-nepal` (₹599) |
-| 1 Mukhi | "1 mukhi rudraksha", "ek mukhi rudraksha" | `/shop/1-mukhi-india` (₹2,499) |
-| Gauri Shankar | "gauri shankar rudraksha", "gauri shankar rudraksha pendant" | `/shop/lab-certified-gauri-shankar-rudraksha-pendant-nepal` (₹9,999) |
-| Certified (trust) | [certified rudraksha], [lab certified rudraksha], "original rudraksha", "rudraksha pendant", "rudraksha pendant silver", "buy rudraksha online" | `/collections/rudraksha-pendant` |
+| 5 Mukhi | "5 mukhi rudraksha", [5 mukhi rudraksha original], "5 mukhi rudraksha pendant", "5 mukhi rudraksha price", "buy 5 mukhi rudraksha", "panchmukhi rudraksha", [panchmukhi rudraksha], "5 face rudraksha", "five mukhi rudraksha" | `/shop/5-mukhi-nepal` (₹599) |
+| 7 Mukhi | "7 mukhi rudraksha", "7 mukhi rudraksha original", "7 mukhi rudraksha pendant", "7 face rudraksha", "seven mukhi rudraksha" | `/shop/7-mukhi-nepal` (₹999, free shipping) |
+| 6 Mukhi | "6 mukhi rudraksha", "6 mukhi rudraksha pendant", "6 face rudraksha", "chhe mukhi rudraksha" | `/shop/6-mukhi-nepal` (₹599) |
+| 4 Mukhi | "4 mukhi rudraksha", "4 mukhi rudraksha pendant", "chaturmukhi rudraksha", "4 face rudraksha" | `/shop/4-mukhi-nepal` (₹599) |
+| 1 Mukhi | "1 mukhi rudraksha", "ek mukhi rudraksha", "1 face rudraksha", "one mukhi rudraksha" | `/shop/1-mukhi-india` (₹2,499) |
+| Gauri Shankar | "gauri shankar rudraksha", "gauri shankar rudraksha pendant", "gauri shankar pendant", "gauri shankar rudraksha locket" | `/shop/lab-certified-gauri-shankar-rudraksha-pendant-nepal` (₹9,999) |
+| Certified (trust) | [certified rudraksha], [lab certified rudraksha], "original rudraksha", "asli rudraksha", "real rudraksha", "rudraksha pendant", "rudraksha pendant silver", "buy rudraksha online", "rudraksha locket", "rudraksha locket silver", "original rudraksha locket", "rudraksha price" | `/collections/rudraksha-pendant` |
+| 7 Mukhi Mala | "7 mukhi rudraksha mala", "7 mukhi mala", [rudraksha mala], "lakshmi mala rudraksha", "7 mukhi lakshmi mala" | `/shop/7-mukhi-nepal-2` (₹4,499, Indonesian beads) |
+| 9 Mukhi Mala | "9 mukhi rudraksha mala", "9 mukhi mala" | `/shop/9-mukhi-nepal-2` (₹9,999) |
+| 2 Mukhi | "2 mukhi rudraksha", [2 mukhi rudraksha original], "2 mukhi rudraksha pendant", "2 mukhi rudraksha price", "buy 2 mukhi rudraksha", "do mukhi rudraksha", "2 face rudraksha", "two mukhi rudraksha" | `/shop/2-mukhi-india` (₹599) |
+| 3 Mukhi | "3 mukhi rudraksha", [3 mukhi rudraksha original], "3 mukhi rudraksha pendant", "3 mukhi rudraksha price", "buy 3 mukhi rudraksha", "teen mukhi rudraksha", "3 face rudraksha", "three mukhi rudraksha" | `/shop/3-mukhi-india` (₹599) |
+| 9 Mukhi | "9 mukhi rudraksha", [9 mukhi rudraksha original], "9 mukhi rudraksha pendant", "9 mukhi rudraksha price", "buy 9 mukhi rudraksha", "nau mukhi rudraksha", "9 face rudraksha", "nine mukhi rudraksha" | `/shop/9-mukhi-indonesia` (₹999) |
+
+**Built in Google Ads** as `AMF | Search | India` (ID 24528597072). **Went live 22 Nov 2026** (start
+date moved up from 30 Nov, budget ₹600/day). 12 ad groups, 91 keywords and 64 negatives are in (reviewed and extended 22 Nov; 2, 3 and 9 Mukhi added the same day). Mala ads show the price up front so
+shoppers looking for cheap japa malas skip them.
 
 ### Negative keywords (campaign level)
 `free, meaning, benefits, wikipedia, pdf, video, youtube, image, images, photo, wallpaper,
@@ -71,13 +83,15 @@ mantra, tree, plant, seed, seeds, wholesale, bulk, manufacturer, supplier, job, 
 book, bracelet, amazon, flipkart, meesho, round` ("round" because people searching
 "1 mukhi round" want a Nepal round bead, which we don't sell.)
 
+**Ad-group negatives:** Certified gets every mukhi name it has a group for (1/ek, 2/do, 3/teen, 4/chaturmukhi, 5/panchmukhi/panch, 6, 7/saat, 9/nau), "gauri shankar" and "mala", so it only catches generic searches. Each single-bead group (1–7, 9, Gauri Shankar) has "mala" so mala searches go to the mala groups.
+
 Review the **search terms report every Monday** and add new irrelevant terms here.
 
 ### Ad copy (Responsive Search Ads — Google checks lengths as you type)
 
 **Shared headlines (≤30 characters):**
 `Lab Certified Rudraksha` · `Sent Sealed With Certificate` · `Free Shipping Above ₹999` ·
-`7-Day Returns on Sealed Items` · `Silver Capping, Red Thread` · `Sold on Amazon & Flipkart` ·
+`7-Day Returns on Sealed Items` · `Silver Capping, Red Thread` · `Thousands of Beads Sold` ·
 `Ask Us on WhatsApp` · `Hand-Selected Beads`
 
 **Per-group headlines (examples):**
@@ -95,18 +109,26 @@ Review the **search terms report every Monday** and add new irrelevant terms her
    (7 Mukhi: Goddess Mahalakshmi + Saturn · 6: Kartikeya + Venus · 4: Brahma + Mercury ·
    1: Shiva + Sun · Gauri Shankar: Shiva, all planets.)
 
-**Rules:** no exclamation marks in headlines (Google rejects them), no "miracle / cures /
+**Rules:** never name Amazon / Flipkart (trademark disapprovals), no exclamation marks in headlines (Google rejects them), no "miracle / cures /
 guaranteed", no religion-targeted phrasing ("Are you a Shiva devotee?"), never name a lab.
 
 ### Assets (add at campaign level)
-- **Sitelinks:** 5 Mukhi Pendant · 7 Mukhi Pendant · Combination Pendants · How We Certify (`/policies#authenticity`)
+- **Sitelinks:** All Rudraksha Pendants · 5 Mukhi Pendant · 7 Mukhi Pendant · Gauri Shankar Pendant · How We Certify (`/policies#authenticity`). Combination Pendants was dropped because that page lists health-named products.
 - **Callouts:** Lab Certified · Sent Sealed · Free Shipping Above ₹999 · 7-Day Returns · WhatsApp Support
-- **Structured snippet (Types):** Pendants, Combinations, Malas
+- **Structured snippet (Types):** Pendants, Combination Pendants, Japa Malas, Gauri Shankar Beads
 - **Images:** 3–5 product photos on white · **Business name:** Amorfos · **Logo:** `public/brand/logo-dark.png`
 
 ---
 
 ## 3. Campaign 2 — Shopping (after Merchant Center approves products)
+
+**Status 23 Nov 2026:** feed fixed (5 product ids were over Merchant Center's 50-character limit;
+long ids are now shortened with a hash in `feeds/google.xml`), all 37 products in Merchant Center
+and under review. Campaign drafted in Google Ads but **not published**: Standard Shopping,
+₹200/day, Manual CPC with ₹10 bid on "All Products", India (presence), Google Search only, AI Max
+off. Publishing makes it live, so it waits for Manav's go-ahead (ideally once products are approved).
+Merchant Center also says the account "isn't set up to show products in ads yet" — enable the
+Shopping ads programme there before launch.
 
 **Name:** `AMF | Shopping | All` · Standard Shopping (not Performance Max yet; it needs
 conversion history) · **Budget:** ₹200/day, taken from Search if Search isn't spending its
@@ -144,6 +166,6 @@ which searches buy, not profit.
    **paused**, so you can review it before anything spends.
 2. **You:** review, then switch it on (proposed start: as soon as you approve).
 3. **After Merchant Center approval:** add the Shopping campaign.
-4. **Phase 2 (week 3+):** 11 / 12 / 14 Mukhi ad groups, Study Success for exam season,
+4. **After week 1:** 8 and 10 Mukhi (Indonesian, ₹999 / ₹1,499) if budget allows. **Phase 2 (week 3+):** 11 / 12 / 13 / 14 Mukhi ad groups, Study Success for exam season,
    "rudraksha mala" once mala photos are in.
-5. **Later:** turn on enhanced conversions after adding one line to the privacy policy.
+5. ~~Turn on enhanced conversions~~ — done 22 Nov 2026.
