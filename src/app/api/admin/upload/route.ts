@@ -53,9 +53,14 @@ function sniffImageType(buf: Uint8Array): string | null {
 }
 
 export async function POST(req: Request) {
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  // The project is connected to the Blob store via Vercel's OIDC flow, so
+  // BLOB_READ_WRITE_TOKEN is legitimately blank in that mode — auth instead
+  // flows through the platform-injected VERCEL_OIDC_TOKEN, scoped by
+  // BLOB_STORE_ID. Only treat uploads as unconfigured when neither auth path
+  // is available.
+  if (!process.env.BLOB_READ_WRITE_TOKEN && !process.env.BLOB_STORE_ID) {
     return NextResponse.json(
-      { error: "Image uploads require BLOB_READ_WRITE_TOKEN to be configured." },
+      { error: "Image uploads require a connected Vercel Blob store." },
       { status: 503 },
     );
   }
