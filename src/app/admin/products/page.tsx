@@ -33,6 +33,9 @@ export default async function AdminProductsPage() {
           <Link href="/admin/reviews" className="text-sm text-gold-soft hover:underline">
             Reviews
           </Link>
+          <Link href="/admin/instagram" className="text-sm text-gold-soft hover:underline">
+            Instagram
+          </Link>
           <Link href="/admin/products/new" className="btn btn-primary text-sm">
             + Add product
           </Link>

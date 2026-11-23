@@ -144,6 +144,22 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   Data stored in Supabase `articles` table (`status = draft | published`). Article body
   is typed blocks (paragraph/heading/list/quote) — no raw HTML. Each page emits
   Article + BreadcrumbList + FAQPage JSON-LD. `revalidate = 60`.
+- **Instagram posting (API):** `/admin/instagram` queues posts (single image, carousel
+  2–10, reel by public video URL) into Supabase `instagram_posts` (migration 009); a daily
+  Vercel Cron at **13:30 UTC (7 PM IST)** → `api/cron/instagram-publish` publishes **one**
+  due post per run ("Publish now" in admin for more). Uploads are re-encoded in the browser
+  to IG-safe JPEG (≤1440px wide, white-padded into 4:5–1.91:1). Captions run through
+  `scanBannedPhrases`. Logic in `lib/instagram.ts` — **Instagram API with Unified login**
+  (Facebook Login for Business; new Meta apps cannot use plain "Instagram login"), host
+  `graph.facebook.com` v27.0. Meta app "Amorfos Social" (owned by the Amorfos business
+  portfolio) has a login *configuration* with a never-expiring system-user token, asset =
+  Instagram account only (no ad accounts). Connect flow: admin `api/admin/instagram/connect`
+  sets a one-time state cookie → Facebook dialog → **public** `api/instagram/callback`
+  (state cookie authenticates it, because the admin cookie is `SameSite=Strict` and isn't
+  sent on the cross-site return; it hands back via a same-origin HTML hop for the same
+  reason) → token + IG account id (`/me/assigned_instagram_accounts`) stored in
+  `social_tokens`. Env: `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `INSTAGRAM_CONFIG_ID`,
+  `INSTAGRAM_USERNAME`. App is in Development mode; @amorfos.in is an Instagram Tester.
 - **Content automation:** `vercel.json` schedules a daily Vercel Cron at **04:00 UTC
   (9:30 AM IST)** → hits `api/cron/content-draft` → reads `scripts/content-calendar.json`
   → generates next article via Claude API (`ANTHROPIC_API_KEY`) → validates compliance
