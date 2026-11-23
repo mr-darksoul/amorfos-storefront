@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { getAdminProducts } from "@/lib/adminProducts";
 import { site } from "@/lib/site";
 import type { Category, Product } from "@/lib/types";
@@ -32,13 +33,26 @@ function absoluteUrl(path: string): string {
 
 const isImagePath = (s: string) => /^(https?:\/\/|\/)\S+$/.test(s.trim());
 
+/**
+ * Merchant Center rejects ids over 50 characters, and some product slugs are
+ * longer. Long ids become their first 41 characters + "-" + an 8-character hash
+ * of the full slug: stable across fetches and still unique. Short ids are
+ * unchanged (keep them stable — changing an id resets the item's history).
+ */
+const MC_ID_MAX = 50;
+function feedId(id: string): string {
+  if (id.length <= MC_ID_MAX) return id;
+  const hash = crypto.createHash("sha1").update(id).digest("hex").slice(0, 8);
+  return `${id.slice(0, MC_ID_MAX - 9)}-${hash}`;
+}
+
 function item(p: Product): string {
   const [image, ...more] = p.images.filter(isImagePath).map((s) => absoluteUrl(s.trim()));
   const description = (p.description || p.tagline || p.name).replace(/\s+/g, " ").trim();
   const availability = p.stock === 0 ? "out_of_stock" : "in_stock";
   return [
     "<item>",
-    `<g:id>${xml(p.id)}</g:id>`,
+    `<g:id>${xml(feedId(p.id))}</g:id>`,
     `<g:title>${xml(p.name.slice(0, 150))}</g:title>`,
     `<g:description>${xml(description.slice(0, 5000))}</g:description>`,
     `<g:link>${xml(`${site.url}/shop/${p.id}`)}</g:link>`,
