@@ -5,6 +5,7 @@ import {
   getConnection,
   isInstagramConfigured,
   listPosts,
+  nextFeedNo,
   publishingQuota,
   type IgPost,
 } from "@/lib/instagram";
@@ -26,6 +27,7 @@ export default async function AdminInstagramPage({
   let posts: IgPost[] = [];
   let quota: { used: number; total: number } | null = null;
   let loadError: string | null = null;
+  let nextFeed = 1;
   if (dbReady) {
     try {
       const conn = await getConnection();
@@ -34,6 +36,7 @@ export default async function AdminInstagramPage({
         quota = await publishingQuota(conn);
       }
       posts = await listPosts();
+      nextFeed = await nextFeedNo();
     } catch (err) {
       loadError = (err as Error).message;
     }
@@ -75,6 +78,7 @@ export default async function AdminInstagramPage({
         quota={quota}
         posts={posts}
         result={result ?? null}
+        nextFeed={nextFeed}
       />
     </div>
   );

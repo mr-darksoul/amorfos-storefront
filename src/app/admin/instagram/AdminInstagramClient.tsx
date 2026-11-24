@@ -42,6 +42,9 @@ async function toInstagramJpeg(file: File): Promise<Blob> {
   );
 }
 
+const igPage = "amorfos.in/ig";
+const feedNo = (n: number) => `No. ${String(n).padStart(2, "0")}`;
+
 function fmt(iso: string) {
   return new Date(iso).toLocaleString("en-IN", {
     dateStyle: "medium",
@@ -63,12 +66,14 @@ export default function AdminInstagramClient({
   quota,
   posts,
   result,
+  nextFeed,
 }: {
   configured: boolean;
   connection: { username: string | null; expires_at: string } | null;
   quota: { used: number; total: number } | null;
   posts: IgPost[];
   result: string | null;
+  nextFeed: number;
 }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -77,6 +82,9 @@ export default function AdminInstagramClient({
   const [videoUrl, setVideoUrl] = useState("");
   const [caption, setCaption] = useState("");
   const [when, setWhen] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkLabel, setLinkLabel] = useState("Read the full guide");
+  const [addLine, setAddLine] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
 
   const banner = (() => {
@@ -127,6 +135,9 @@ export default function AdminInstagramClient({
           media_urls,
           caption,
           scheduled_for: when ? new Date(when).toISOString() : undefined,
+          link_url: linkUrl.trim() || undefined,
+          link_label: linkLabel.trim() || undefined,
+          add_link_line: addLine,
         }),
       });
       const data = await res.json();
@@ -135,6 +146,7 @@ export default function AdminInstagramClient({
       setVideoUrl("");
       setCaption("");
       setWhen("");
+      setLinkUrl("");
       router.refresh();
     } catch (err) {
       alert((err as Error).message);
@@ -155,6 +167,43 @@ export default function AdminInstagramClient({
       const data = await res.json();
       if (!res.ok) alert(data.error ?? "Action failed.");
       else if (data.post?.status === "processing") alert("Instagram is still processing the video. The daily run will finish publishing it, or press Publish again in a minute.");
+      router.refresh();
+    } catch {
+      alert("Network error.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function addComment(p: IgPost) {
+    if (!confirm(`Post the link comment on ${p.feed_no ? feedNo(p.feed_no) : "this post"} now? It appears publicly under the post.`)) return;
+    setBusy(p.id);
+    try {
+      const res = await fetch(`/api/admin/instagram/posts/${p.id}/comment`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) alert(data.error ?? "Could not post the comment.");
+      router.refresh();
+    } catch {
+      alert("Network error.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function editLink(p: IgPost) {
+    const url = prompt("Link for this post (amorfos.in path, e.g. /journal/some-article). Leave empty to remove.", p.link_url ?? "");
+    if (url === null) return;
+    const label = url.trim() ? prompt("Link label", p.link_label ?? "Read the full guide") : "";
+    if (label === null) return;
+    setBusy(p.id);
+    try {
+      const res = await fetch(`/api/admin/instagram/posts/${p.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ link_url: url, link_label: label }),
+      });
+      const data = await res.json();
+      if (!res.ok) alert(data.error ?? "Could not save the link.");
       router.refresh();
     } catch {
       alert("Network error.");
@@ -285,6 +334,38 @@ export default function AdminInstagramClient({
             <span className="mt-1 block text-right text-xs text-ink-faint">{caption.length}/{CAPTION_MAX}</span>
           </label>
 
+          <fieldset className="space-y-3 rounded-sm border border-line p-4">
+            <legend className="px-1 text-xs uppercase tracking-[0.16em] text-ink-faint">Link (shown on {igPage})</legend>
+            <label className="block text-sm text-ink-dim">
+              Journal article or product on amorfos.in
+              <input
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                placeholder="/journal/what-lab-certified-rudraksha-means  or  /shop/5-mukhi-nepal"
+                className="mt-1 w-full rounded-sm border border-line bg-paper-raised px-3 py-2 text-ink"
+              />
+            </label>
+            {linkUrl.trim() && (
+              <>
+                <label className="block text-sm text-ink-dim">
+                  Label
+                  <input
+                    value={linkLabel}
+                    onChange={(e) => setLinkLabel(e.target.value)}
+                    className="mt-1 w-full rounded-sm border border-line bg-paper-raised px-3 py-2 text-ink"
+                  />
+                </label>
+                <label className="flex items-center gap-2 text-sm text-ink-dim">
+                  <input type="checkbox" checked={addLine} onChange={(e) => setAddLine(e.target.checked)} />
+                  Add to caption: <span className="text-ink">{feedNo(nextFeed)} · {linkLabel || "Read more"} at {igPage}</span>
+                </label>
+                <p className="text-xs text-ink-faint">
+                  On publish, the link is also posted as the first comment (Instagram doesn&apos;t make caption links clickable; the tappable path is the bio link → {igPage}).
+                </p>
+              </>
+            )}
+          </fieldset>
+
           <label className="block text-sm text-ink-dim">
             Publish on or after (IST, optional — blank means the next daily run)
             <input
@@ -311,7 +392,7 @@ export default function AdminInstagramClient({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-line bg-paper text-left">
-                  {["Media", "Caption", "Scheduled", "Status", ""].map((h) => (
+                  {["No.", "Media", "Caption", "Scheduled", "Status", ""].map((h) => (
                     <th key={h} className="px-4 py-3 text-xs font-normal uppercase tracking-[0.16em] text-ink-faint">{h}</th>
                   ))}
                 </tr>
@@ -319,6 +400,7 @@ export default function AdminInstagramClient({
               <tbody className="divide-y divide-line">
                 {posts.map((p) => (
                   <tr key={p.id} className="align-top hover:bg-paper/50">
+                    <td className="whitespace-nowrap px-4 py-3 font-serif text-ink">{p.feed_no ? feedNo(p.feed_no) : "—"}</td>
                     <td className="px-4 py-3">
                       {p.media_type === "REELS" ? (
                         <span className="text-xs text-ink-faint">Reel</span>
@@ -331,6 +413,17 @@ export default function AdminInstagramClient({
                     <td className="max-w-xs px-4 py-3 text-ink-dim">
                       <p className="line-clamp-3 whitespace-pre-line">{p.caption || <em className="text-ink-faint">No caption</em>}</p>
                       {p.error && <p className="mt-1 text-xs text-rudra">{p.error}</p>}
+                      <p className="mt-1 text-xs">
+                        {p.link_url ? (
+                          <a href={p.link_url} target="_blank" rel="noreferrer" className="text-gold-soft hover:underline">
+                            🔗 {p.link_label ?? "Link"}: {p.link_url}
+                          </a>
+                        ) : (
+                          <span className="text-ink-faint">No link</span>
+                        )}
+                        {p.comment_id && <span className="ml-2 text-ink-faint">· comment posted</span>}
+                      </p>
+                      {p.comment_error && <p className="mt-1 text-xs text-rudra">Link comment failed: {p.comment_error}</p>}
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-ink-dim">{fmt(p.published_at ?? p.scheduled_for)}</td>
                     <td className={`px-4 py-3 capitalize ${STATUS_STYLE[p.status]}`}>
@@ -350,6 +443,22 @@ export default function AdminInstagramClient({
                           {busy === p.id ? "Publishing…" : p.status === "failed" ? "Retry" : "Publish now"}
                         </button>
                       )}
+                      {p.status === "published" && p.link_url && !p.comment_id && (
+                        <button
+                          onClick={() => addComment(p)}
+                          disabled={busy === p.id || !connection}
+                          className="mr-3 text-xs uppercase tracking-[0.16em] text-gold-soft hover:underline disabled:opacity-40"
+                        >
+                          Add link comment
+                        </button>
+                      )}
+                      <button
+                        onClick={() => editLink(p)}
+                        disabled={busy === p.id}
+                        className="mr-3 text-xs uppercase tracking-[0.16em] text-ink-faint hover:text-ink"
+                      >
+                        Link
+                      </button>
                       <button
                         onClick={() => act(p.id, "delete")}
                         disabled={busy === p.id}

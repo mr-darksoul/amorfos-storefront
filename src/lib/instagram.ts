@@ -53,6 +53,110 @@ export interface IgPost {
   attempts: number;
   created_at: string;
   published_at: string | null;
+  feed_no: number | null;
+  link_url: string | null;
+  link_label: string | null;
+  first_comment: string | null;
+  comment_id: string | null;
+  comment_error: string | null;
+  thumbnail_url: string | null;
+}
+
+// ── Links ("From the feed" system) ─────────────────────────────────────────
+// Instagram doesn't make links in captions/comments clickable. Each post gets a
+// feed number and a site link; the public /ig page (the bio link) lists posts by
+// number, and the publisher adds the link as the first comment.
+
+const SITE_HOST = "amorfos.in";
+export const IG_LINK_PAGE = `${SITE_HOST}/ig`;
+export const DEFAULT_LINK_LABEL = "Read more";
+
+/**
+ * Accepts "/journal/x", "journal/x", "amorfos.in/journal/x" or
+ * "https://amorfos.in/journal/x?…" and returns a clean site path (no query or
+ * hash — UTMs are added at render time). Off-site links are rejected: the link
+ * system only ever points to our own pages.
+ */
+export function normalizeLinkPath(input: string): { path: string } | { error: string } {
+  const raw = input.trim();
+  if (!raw) return { error: "Link is empty." };
+  let url: URL;
+  try {
+    url = raw.startsWith("/")
+      ? new URL(raw, `https://${SITE_HOST}`)
+      : new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw.startsWith(SITE_HOST) ? raw : `${SITE_HOST}/${raw}`}`);
+  } catch {
+    return { error: "Link is not a valid URL or path." };
+  }
+  const host = url.hostname.replace(/^www\./, "");
+  if (host !== SITE_HOST) return { error: `Link must point to ${SITE_HOST}.` };
+  const path = url.pathname.replace(/\/+$/, "") || "/";
+  return { path };
+}
+
+/** Full tracked URL for a post's link (used on /ig). */
+export function trackedLink(path: string, feedNo: number | null): string {
+  const u = new URL(path, `https://${SITE_HOST}`);
+  u.searchParams.set("utm_source", "instagram");
+  u.searchParams.set("utm_medium", "social");
+  u.searchParams.set("utm_campaign", "ig_feed");
+  if (feedNo) u.searchParams.set("utm_content", `no${String(feedNo).padStart(2, "0")}`);
+  return u.toString();
+}
+
+export function feedLabel(feedNo: number): string {
+  return `No. ${String(feedNo).padStart(2, "0")}`;
+}
+
+/** The caption line that points readers to the bio link page. */
+export function captionLinkLine(feedNo: number, label: string): string {
+  return `${feedLabel(feedNo)} · ${label} at ${IG_LINK_PAGE}`;
+}
+
+/**
+ * Inserts the link line before a trailing all-hashtag paragraph (so hashtags
+ * stay last), otherwise appends it. No-op if the caption already mentions
+ * amorfos.in/ig.
+ */
+export function withLinkLine(caption: string, line: string): string {
+  if (caption.includes(IG_LINK_PAGE)) return caption;
+  const paras = caption.trim().split(/\n\s*\n/);
+  const last = paras[paras.length - 1] ?? "";
+  const isHashtags = /^(\s*#[\p{L}\p{N}_]+\s*)+$/u.test(last);
+  if (isHashtags && paras.length > 1) {
+    return [...paras.slice(0, -1), line, last].join("\n\n");
+  }
+  return caption.trim() ? `${caption.trim()}\n\n${line}` : line;
+}
+
+/** Default first comment: the readable (not clickable) link. */
+export function defaultFirstComment(label: string, path: string): string {
+  return `📖 ${label}: ${SITE_HOST}${path === "/" ? "" : path}`;
+}
+
+/** Next free feed number (max + 1). */
+export async function nextFeedNo(): Promise<number> {
+  const { data, error } = await supabase()
+    .from("instagram_posts")
+    .select("feed_no")
+    .not("feed_no", "is", null)
+    .order("feed_no", { ascending: false })
+    .limit(1);
+  if (error) throw new Error(error.message);
+  return ((data?.[0]?.feed_no as number | undefined) ?? 0) + 1;
+}
+
+/** Published posts for the public /ig page, newest first. */
+export async function listFeedPosts(): Promise<IgPost[]> {
+  const { data, error } = await supabase()
+    .from("instagram_posts")
+    .select("*")
+    .eq("status", "published")
+    .order("feed_no", { ascending: false, nullsFirst: false })
+    .order("published_at", { ascending: false })
+    .limit(200);
+  if (error) throw new Error(error.message);
+  return (data ?? []) as IgPost[];
 }
 
 export interface IgConnection {
@@ -371,6 +475,7 @@ export async function publishPost(post: IgPost, budgetMs = 45_000): Promise<IgPo
   const deadline = Date.now() + budgetMs;
   const conn = await getFreshConnection();
   const attempts = post.attempts + 1;
+  let publishedPost: IgPost;
 
   try {
     let containerId = post.container_id;
@@ -395,29 +500,59 @@ export async function publishPost(post: IgPost, budgetMs = 45_000): Promise<IgPo
     const published = await igPost(conn, `${conn.account_id}/media_publish`, { creation_id: containerId }, "publish");
 
     let permalink: string | null = null;
+    let thumbnail_url: string | null = null;
     try {
       const u = new URL(`${GRAPH}/${published.id}`);
-      u.searchParams.set("fields", "permalink");
+      u.searchParams.set("fields", "permalink,thumbnail_url");
       const r = await fetch(u, { headers: { Authorization: `Bearer ${conn.access_token}` } });
-      if (r.ok) permalink = ((await r.json()) as { permalink?: string }).permalink ?? null;
+      if (r.ok) {
+        const meta = (await r.json()) as { permalink?: string; thumbnail_url?: string };
+        permalink = meta.permalink ?? null;
+        thumbnail_url = meta.thumbnail_url ?? null; // reels only
+      }
     } catch {
-      /* permalink is nice-to-have */
+      /* permalink/thumbnail are nice-to-have */
     }
 
     const patch = {
       status: "published" as const,
       ig_media_id: published.id,
       permalink,
+      thumbnail_url,
       published_at: new Date().toISOString(),
       attempts,
       error: null,
     };
     await updatePost(post.id, patch);
-    return { ...post, container_id: containerId, ...patch };
+    publishedPost = { ...post, container_id: containerId, ...patch };
   } catch (err) {
     const message = (err as Error).message.slice(0, 500);
     await updatePost(post.id, { status: "failed", error: message, attempts });
     return { ...post, status: "failed", error: message, attempts };
+  }
+
+  // Outside the try above on purpose: the post is already live, so a comment
+  // failure must never mark it failed (a retry would publish it twice).
+  return await postFirstComment(publishedPost, conn);
+}
+
+/**
+ * Adds the post's first comment (its link) once it is published. Never throws;
+ * failures are recorded in comment_error. Skips if there's no comment text or
+ * one was already posted. Also used by the admin "Add link comment" action.
+ */
+export async function postFirstComment(post: IgPost, existingConn?: IgConnection): Promise<IgPost> {
+  if (post.status !== "published" || !post.ig_media_id || !post.first_comment || post.comment_id) return post;
+  try {
+    const conn = existingConn ?? (await getFreshConnection());
+    const c = await igPost(conn, `${post.ig_media_id}/comments`, { message: post.first_comment }, "first comment");
+    await updatePost(post.id, { comment_id: c.id, comment_error: null, first_comment: post.first_comment });
+    return { ...post, comment_id: c.id, comment_error: null };
+  } catch (err) {
+    const message = (err as Error).message.slice(0, 300);
+    console.error(`[instagram] first comment on post ${post.id} failed: ${message}`);
+    await updatePost(post.id, { comment_error: message });
+    return { ...post, comment_error: message };
   }
 }
 

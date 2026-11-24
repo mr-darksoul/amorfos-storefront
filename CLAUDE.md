@@ -160,6 +160,14 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   reason) → token + IG account id (`/me/assigned_instagram_accounts`) stored in
   `social_tokens`. Env: `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `INSTAGRAM_CONFIG_ID`,
   `INSTAGRAM_USERNAME`. App is in Development mode; @amorfos.in is an Instagram Tester.
+  **Link system** (migration 010): Instagram links in captions/comments aren't clickable, so each
+  queued post gets a **feed number** (`feed_no`, "No. 07") and an optional site `link_url`
+  (amorfos.in paths only, `normalizeLinkPath`). On queue, a "No. 07 · <label> at amorfos.in/ig"
+  line is inserted above the hashtags; on publish, the link is posted as the **first comment**
+  (`postFirstComment` — runs after the post is marked published and never fails it). The public
+  **`/ig`** page ("From the feed", noindex) is the bio link: published posts by number, each tile →
+  its link with UTMs (`utm_source=instagram&utm_medium=social&utm_campaign=ig_feed&utm_content=noNN`).
+  Admin can edit a post's link and add the link comment to an already-published post.
 - **Content automation:** `vercel.json` schedules a daily Vercel Cron at **04:00 UTC
   (9:30 AM IST)** → hits `api/cron/content-draft` → reads `scripts/content-calendar.json`
   → generates next article via Claude API (`ANTHROPIC_API_KEY`) → validates compliance
