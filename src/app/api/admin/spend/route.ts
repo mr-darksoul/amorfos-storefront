@@ -24,7 +24,15 @@ export async function GET() {
     .order("channel")
     .limit(60);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ entries: data ?? [] }, { headers: { "Cache-Control": "no-store" } });
+  const { data: sync } = await supabase()
+    .from("admin_settings")
+    .select("value")
+    .eq("key", "spend_sync_google_ads")
+    .maybeSingle();
+  return NextResponse.json(
+    { entries: data ?? [], googleAdsSync: sync?.value ?? null },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }
 
 export async function POST(req: NextRequest) {

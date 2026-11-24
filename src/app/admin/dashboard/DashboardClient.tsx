@@ -312,7 +312,7 @@ export default function DashboardClient({ initial }: { initial: DashboardData | 
         />
       </Card>
 
-      <Card id="spend" title="Ad spend" subtitle="Log each day's spend per channel (from Google Ads → Campaigns → Cost). Saving the same day and channel again overwrites it.">
+      <Card id="spend" title="Ad spend" subtitle="Google Ads spend syncs automatically every hour. Log other channels here — saving the same day and channel again overwrites it.">
         <SpendManager onChange={() => load(range)} refreshKey={data.generatedAt} />
       </Card>
 
@@ -1002,6 +1002,7 @@ const SPEND_CHANNEL_OPTIONS = ["Google Ads", "Meta Ads", "Influencers", "Other P
 
 function SpendManager({ onChange, refreshKey }: { onChange: () => void; refreshKey: string }) {
   const [entries, setEntries] = useState<any[] | null>(null);
+  const [sync, setSync] = useState<{ at: string } | null>(null);
   const [date, setDate] = useState(todayIST());
   const [channel, setChannel] = useState(SPEND_CHANNEL_OPTIONS[0]);
   const [amount, setAmount] = useState("");
@@ -1013,7 +1014,10 @@ function SpendManager({ onChange, refreshKey }: { onChange: () => void; refreshK
     try {
       const res = await fetch("/api/admin/spend", { cache: "no-store" });
       const j = await res.json();
-      if (res.ok) setEntries(j.entries ?? []);
+      if (res.ok) {
+        setEntries(j.entries ?? []);
+        setSync(j.googleAdsSync ?? null);
+      }
     } catch { /* keep last list */ }
   }, []);
 
@@ -1081,6 +1085,18 @@ function SpendManager({ onChange, refreshKey }: { onChange: () => void; refreshK
         </button>
       </form>
       {msg && <p className={`mt-2 text-xs ${msg.ok ? "text-green-700" : "text-rudra"}`}>{msg.text}</p>}
+      <p className="mt-3 text-xs text-ink-faint">
+        {sync?.at ? (
+          <>
+            Google Ads auto-sync: last run <span className="text-ink">{istDateTime(sync.at)}</span>
+            {Date.now() - new Date(sync.at).getTime() > 3 * 3600e3 && (
+              <span className="text-rudra"> · overdue — check Google Ads → Tools → Scripts</span>
+            )}
+          </>
+        ) : (
+          "Google Ads auto-sync hasn't run yet."
+        )}
+      </p>
 
       {entries === null ? (
         <p className="mt-4 text-sm text-ink-faint">Loading…</p>
