@@ -140,6 +140,22 @@ Keep changes light/airy. Do not reintroduce a dark theme.
     is scanned with the shared `scanBannedPhrases` (from `lib/articleGenerator.ts`); a hit
     returns `422`. No key → `503`. Generation only *proposes* copy; nothing saves until the
     admin submits the form.
+- **Founder dashboard (`/admin/dashboard`, the admin landing page):** live KPIs that refresh
+  every 15s — on-site-now, unique visitors, sessions, session length, bounce, traffic sources
+  (channel / campaign / referrer), purchase funnel, landing pages, product views→carts→sales,
+  abandoned checkouts (WhatsApp/email links), email list + CSV export
+  (`api/admin/email-list?list=subscribers|customers`), devices/locations, ops alerts.
+  Data comes from **first-party tracking**: `components/SiteTracker.tsx` + `lib/siteTracker.ts`
+  (visitor UUID in localStorage, 30-min sessions, 15s heartbeat while active) → public
+  `POST /api/collect` (drops bots, admin-cookie holders; classifies channel via
+  `lib/trafficSource.ts`, geo from Vercel headers) → `track_hit` RPC into `analytics_sessions`
+  / `analytics_events` (migration 011). Cart/checkout/lead events piggyback on the existing
+  `lib/analytics.ts` helpers. Orders are attributed to a visit via `amf_sid` cookie →
+  `orders.client_context.analyticsSid`. Reporting is two SQL functions,
+  `analytics_dashboard(from, to, bucket)` and `analytics_overview(today)`, wrapped by
+  `lib/dashboard.ts` (IST ranges + previous-period deltas). Orders under ₹100 are treated as
+  tests (`TEST_ORDER_MAX`). A browser that opens /admin (or any URL with `?notrack=1`) is
+  never tracked again.
 - **Journal (SEO content engine):** `/journal` hub + `/journal/[slug]` article pages.
   Data stored in Supabase `articles` table (`status = draft | published`). Article body
   is typed blocks (paragraph/heading/list/quote) — no raw HTML. Each page emits

@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Analytics from "@/components/Analytics";
+import SiteTracker from "@/components/SiteTracker";
 import LeadCapture from "@/components/LeadCapture";
 import { site } from "@/lib/site";
 
@@ -69,6 +70,7 @@ export default function RootLayout({
           inject attributes onto <body> before React hydrates. */}
       <body suppressHydrationWarning>
         <Analytics />
+        <SiteTracker />
         <CartProvider>
           <Header />
           <main>{children}</main>

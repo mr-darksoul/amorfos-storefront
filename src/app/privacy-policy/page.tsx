@@ -58,7 +58,10 @@ export default function PrivacyPolicyPage() {
               localStorage to keep your shopping cart across sessions. We also use Google
               Analytics, Google Ads and the Meta Pixel, which set cookies and collect information
               such as pages viewed, products added to cart and purchases, so we can understand how
-              the site is used and measure our advertising.
+              the site is used and measure our advertising. Our own site analytics store a random
+              visitor ID in your browser (localStorage and a first-party cookie) and record the
+              pages you view, how you reached us (for example a search engine or an ad), your
+              device type and approximate city — never your name, email, phone or IP address.
             </p>
             <p>
               <strong className="text-ink">When you join our newsletter:</strong> your email

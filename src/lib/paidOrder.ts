@@ -16,6 +16,14 @@ export interface ClientContext {
   fbp?: string;
   fbc?: string;
   sourceUrl?: string;
+  /** First-party analytics ids (lib/siteTracker.ts) — attributes the order to a visit. */
+  analyticsSid?: string;
+  analyticsVid?: string;
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function uuidOrUndefined(v: string | undefined): string | undefined {
+  return v && UUID_RE.test(v) ? v : undefined;
 }
 
 export function clientContextFromRequest(req: Request): ClientContext {
@@ -31,6 +39,8 @@ export function clientContextFromRequest(req: Request): ClientContext {
     fbp: readCookie("_fbp"),
     fbc: readCookie("_fbc"),
     sourceUrl: req.headers.get("referer") || undefined,
+    analyticsSid: uuidOrUndefined(readCookie("amf_sid")),
+    analyticsVid: uuidOrUndefined(readCookie("amf_vid")),
   };
 }
 

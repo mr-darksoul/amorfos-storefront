@@ -8,6 +8,8 @@
  * using a shared `eventID` — for purchases that id is the Razorpay payment id.
  */
 
+import { sendHit } from "@/lib/siteTracker";
+
 declare global {
   interface Window {
     dataLayer?: unknown[];
@@ -64,6 +66,7 @@ const fbContents = (items: TrackedItem[]) =>
 
 /** A single product detail view. */
 export function trackViewContent(item: TrackedItem): void {
+  sendHit("view_item", { productId: item.id, value: item.price });
   gtag("event", "view_item", {
     currency: CURRENCY,
     value: item.price,
@@ -81,6 +84,7 @@ export function trackViewContent(item: TrackedItem): void {
 
 export function trackAddToCart(item: TrackedItem): void {
   const value = item.price * item.qty;
+  sendHit("add_to_cart", { productId: item.id, value });
   gtag("event", "add_to_cart", {
     currency: CURRENCY,
     value,
@@ -97,6 +101,7 @@ export function trackAddToCart(item: TrackedItem): void {
 }
 
 export function trackInitiateCheckout(items: TrackedItem[], value: number): void {
+  sendHit("begin_checkout", { value });
   gtag("event", "begin_checkout", {
     currency: CURRENCY,
     value,
@@ -161,6 +166,7 @@ export function trackPurchase(opts: {
 
 /** Fire when a visitor joins the list (modal or footer). */
 export function trackLead(source: string): void {
+  sendHit("subscribe");
   gtag("event", "generate_lead", { method: source });
   fbq("track", "Lead", { content_name: source });
 }

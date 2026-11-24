@@ -32,6 +32,7 @@ export default async function AdminOrdersPage() {
           <h1 className="font-serif text-3xl text-ink">Orders</h1>
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/admin/dashboard" className="text-sm text-gold-soft hover:underline">Dashboard</Link>
           <Link href="/admin/products" className="text-sm text-gold-soft hover:underline">
             Products
           </Link>

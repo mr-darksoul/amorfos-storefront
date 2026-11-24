@@ -27,6 +27,7 @@ export default async function AdminJournalPage() {
           )}
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/admin/dashboard" className="text-sm text-gold-soft hover:underline">Dashboard</Link>
           <Link href="/admin/products" className="text-sm text-gold-soft hover:underline">
             Products
           </Link>

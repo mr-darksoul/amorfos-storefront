@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
       if (!res.ok) {
         setError(data.error ?? "Login failed.");
       } else {
-        router.push("/admin/products");
+        router.push("/admin/dashboard");
         router.refresh();
       }
     } catch {
