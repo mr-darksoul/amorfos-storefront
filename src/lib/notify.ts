@@ -85,6 +85,16 @@ export async function sendOpsAlertEmail(subject: string, lines: string[]): Promi
   await sendEmail(site.email, `[${site.name} ops] ${subject}`, baseEmailHtml(subject, body));
 }
 
+/** Wraps body HTML in the brand email template (used by the daily report). */
+export function renderBrandEmail(title: string, bodyHtml: string): string {
+  return baseEmailHtml(title, bodyHtml);
+}
+
+/** Internal email (e.g. the daily summary) — body must already be escaped. */
+export async function sendInternalEmail(to: string, subject: string, bodyHtml: string): Promise<void> {
+  await sendEmail(to, subject, baseEmailHtml(subject, bodyHtml));
+}
+
 function orderItemsHtml(order: SupabaseOrder): string {
   return order.items
     .map(

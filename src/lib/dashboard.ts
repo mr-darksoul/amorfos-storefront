@@ -66,9 +66,32 @@ async function rpc<T>(fn: string, args: Record<string, unknown>): Promise<T> {
   return data as T;
 }
 
+/** IST calendar facts for the month-to-date goal strip. */
+function istMonth(now = new Date()) {
+  const ist = new Date(now.getTime() + IST_OFFSET_MS);
+  const y = ist.getUTCFullYear();
+  const m = ist.getUTCMonth();
+  const start = new Date(Date.UTC(y, m, 1) - IST_OFFSET_MS);
+  const daysInMonth = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  // Fraction of the month elapsed, counting today's elapsed hours.
+  const elapsedDays = (now.getTime() - start.getTime()) / DAY_MS;
+  const label = ist.toLocaleString("en-IN", { month: "long", timeZone: "UTC" });
+  return { start, daysInMonth, elapsedDays, label };
+}
+
+/** Channels ad spend can be entered against (match traffic channel names). */
+export const SPEND_CHANNELS = ["Google Ads", "Meta Ads", "Influencers", "Other Paid"] as const;
+
+/** Where the daily summary email goes; unset = the daily email is off. */
+export function dailyReportRecipient(): string | null {
+  const to = process.env.DAILY_REPORT_TO?.trim();
+  return to ? to : null;
+}
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export async function getDashboard(key: RangeKey) {
   const r = resolveRange(key);
+  const month = istMonth();
   const args = (from: Date, to: Date) => ({
     p_from: from.toISOString(),
     p_to: to.toISOString(),
@@ -81,28 +104,47 @@ export async function getDashboard(key: RangeKey) {
     r.prev ? rpc<any>("analytics_dashboard", args(r.prev.from, r.prev.to)) : Promise.resolve(null),
     rpc<any>("analytics_overview", {
       p_today: istMidnight(new Date()).toISOString(),
+      p_month_start: month.start.toISOString(),
       p_test_max: TEST_ORDER_MAX,
     }),
   ]);
 
-  // Product ids → names for the product table.
-  const ids = Array.from(new Set<string>((current?.products ?? []).map((p: any) => p.product_id).filter(Boolean)));
-  let names: Record<string, string> = {};
-  if (ids.length) {
-    const { data } = await supabase().from("products").select("id, name:data->>name").in("id", ids);
-    names = Object.fromEntries((data ?? []).map((p: any) => [p.id, p.name]));
-  }
-
   return {
     range: { key: r.key, from: r.from.toISOString(), to: r.to.toISOString(), bucket: r.bucket },
-    current: {
-      ...current,
-      products: (current?.products ?? []).map((p: any) => ({ ...p, name: names[p.product_id] ?? p.product_id })),
-    },
+    current,
     previous: previous?.kpis ?? null,
     overview,
+    month: {
+      label: month.label,
+      daysInMonth: month.daysInMonth,
+      elapsedDays: month.elapsedDays,
+    },
+    report: { to: dailyReportRecipient() },
     generatedAt: new Date().toISOString(),
   };
 }
 
 export type DashboardData = Awaited<ReturnType<typeof getDashboard>>;
+
+export const VISIT_FILTERS = ["all", "paid_ads", "engaged", "cart", "bounced"] as const;
+export type VisitFilter = (typeof VISIT_FILTERS)[number];
+
+/** Individual visits with their page-by-page journey (newest first). */
+export async function getVisits(opts: {
+  range: RangeKey;
+  filter?: VisitFilter;
+  channel?: string | null;
+  session?: string | null;
+  limit?: number;
+}) {
+  const r = resolveRange(opts.range);
+  return rpc<any[]>("analytics_visits", {
+    p_from: r.from.toISOString(),
+    p_to: r.to.toISOString(),
+    p_channel: opts.channel || null,
+    p_filter: opts.filter ?? "all",
+    p_limit: opts.limit ?? 40,
+    p_session: opts.session || null,
+    p_test_max: TEST_ORDER_MAX,
+  });
+}

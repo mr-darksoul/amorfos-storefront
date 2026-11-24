@@ -156,6 +156,18 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   `lib/dashboard.ts` (IST ranges + previous-period deltas). Orders under ₹100 are treated as
   tests (`TEST_ORDER_MAX`). A browser that opens /admin (or any URL with `?notrack=1`) is
   never tracked again.
+  **v2 (migration 012):** month-to-date vs a revenue goal (`admin_settings`,
+  `api/admin/settings`); hand-entered **ad spend** per day/channel (`marketing_spend`,
+  `api/admin/spend` — channel names match traffic channels) → ROAS, cost per order/visit,
+  revenue-vs-spend chart, spend/ROAS per channel; **visit journeys** (`analytics_visits` RPC,
+  `api/admin/visits` — page-by-page timeline per visit, filterable; live visitors and abandoned
+  checkouts link to theirs); keywords (`utm_term`), exit pages, busiest hours, product flags
+  (no photos / views-no-carts), reminder recovery rate; rule-based **"Worth a look" insights**
+  (`lib/insights.ts`, shared with the email). **Daily summary email** (`lib/dailyReport.ts`):
+  cron `api/cron/daily-report` 03:30 UTC (9 AM IST) sends yesterday's summary to
+  `DAILY_REPORT_TO` — a no-op while that env var is unset; `GET api/admin/daily-report`
+  previews it, `POST` sends now. `analytics_overview` now takes `p_month_start` (the old
+  2-arg overload is kept only for rollout and can be dropped).
 - **Journal (SEO content engine):** `/journal` hub + `/journal/[slug]` article pages.
   Data stored in Supabase `articles` table (`status = draft | published`). Article body
   is typed blocks (paragraph/heading/list/quote) — no raw HTML. Each page emits
