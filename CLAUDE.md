@@ -331,7 +331,14 @@ All env vars are set in Vercel production:
 - Sensitive endpoints (admin login, track, subscribe, reviews) use a
   distributed rate limiter: `rateLimitGlobal` in `lib/ratelimit.ts` backed by
   the `rate_limit_hit` Postgres function (`supabase/migrations/007_rate_limits.sql`).
-  It fails open if the RPC is missing/unreachable.
+  It fails open if the RPC is missing/unreachable. **Migration 007 was not actually
+  applied until 2026-11-24** — before that every limit was per-instance only. It is
+  live now (function `search_path` pinned, execute revoked from anon/authenticated).
+  `api/create-order` is also limited (10 per 10 min per IP) since each call creates a
+  Razorpay order and, later, an abandoned-cart email/WhatsApp to whatever contact was typed.
+- All customer- or vendor-supplied text in email HTML goes through `escapeHtml`
+  (`lib/notify.ts`) — checkout is public, so an unescaped name would let anyone put a
+  link into a real care@ email sent to any address. Keep it that way for new templates.
 - Security headers (nosniff, X-Frame-Options, Referrer-Policy,
   Permissions-Policy) in `next.config.mjs`. Deliberately no CSP (Razorpay +
   GA/Meta inline scripts).

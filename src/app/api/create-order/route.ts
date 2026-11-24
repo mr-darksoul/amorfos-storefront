@@ -5,6 +5,7 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { site } from "@/lib/site";
 import { validateCustomer, digitsOnly } from "@/lib/validateCustomer";
 import { clientContextFromRequest } from "@/lib/paidOrder";
+import { rateLimitGlobal, clientIp } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 
@@ -24,6 +25,7 @@ export interface CustomerInfo {
 }
 
 const SHIPPING_FLAT = 79;
+const MAX_LINES = 50;
 
 export async function POST(req: Request) {
   const keyId = process.env.RAZORPAY_KEY_ID;
@@ -33,6 +35,19 @@ export async function POST(req: Request) {
     return NextResponse.json(
       { error: "Payments are not configured yet." },
       { status: 503 },
+    );
+  }
+
+  // This route is public and each call creates a Razorpay order plus a pending
+  // row — which the abandoned-cart cron later emails/WhatsApps to whatever
+  // contact was typed in. Throttle per IP so it can't be scripted into a spam
+  // or WhatsApp-quality problem. 10 per 10 minutes leaves room for a real
+  // buyer retrying a failed payment several times.
+  const rl = await rateLimitGlobal(`create-order:${clientIp(req)}`, 10, 10 * 60 * 1000);
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: "Too many checkout attempts. Please wait a few minutes and try again." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } },
     );
   }
 
@@ -46,6 +61,9 @@ export async function POST(req: Request) {
   const lines = body.items ?? [];
   if (!Array.isArray(lines) || lines.length === 0) {
     return NextResponse.json({ error: "Your cart is empty." }, { status: 400 });
+  }
+  if (lines.length > MAX_LINES) {
+    return NextResponse.json({ error: "Too many items in one order." }, { status: 400 });
   }
 
   // Validate server-side — the client checks are convenience only and can be

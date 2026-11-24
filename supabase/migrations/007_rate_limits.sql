@@ -23,10 +23,11 @@ ALTER TABLE rate_limit_hits FORCE ROW LEVEL SECURITY;
 CREATE OR REPLACE FUNCTION rate_limit_hit(p_key text, p_limit int, p_window_ms int)
 RETURNS TABLE (allowed boolean, retry_after int)
 LANGUAGE plpgsql
+SET search_path = public, pg_temp
 AS $$
 DECLARE
   v_now timestamptz := now();
-  v_row rate_limit_hits;
+  v_row public.rate_limit_hits;
 BEGIN
   -- Probabilistic garbage collection: ~1 in 100 calls sweeps buckets whose
   -- window lapsed over a day ago, so the table can't grow unbounded.
@@ -49,3 +50,7 @@ BEGIN
   RETURN NEXT;
 END;
 $$;
+
+-- Only the server (service role) calls this; the public API roles never should.
+REVOKE EXECUTE ON FUNCTION rate_limit_hit(text, int, int) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION rate_limit_hit(text, int, int) TO service_role;

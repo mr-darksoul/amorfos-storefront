@@ -4,6 +4,7 @@ import {
   sendOrderConfirmationEmail,
   sendOrderConfirmationWhatsApp,
   sendOpsAlertEmail,
+  escapeHtml,
 } from "@/lib/notify";
 import { sendMetaPurchaseEvent } from "@/lib/metaCapi";
 import { site } from "@/lib/site";
@@ -203,10 +204,10 @@ export async function runPostPaymentWork(
         .update({ fulfillment_status: "failed" })
         .eq("id", order.id);
       await sendOpsAlertEmail("Shiprocket sync failed for a paid order", [
-        `Order <strong>${razorpayOrderId}</strong> (payment ${razorpayPaymentId}) is paid but did not sync to Shiprocket.`,
-        `Customer: ${order.customer?.name ?? "—"} · ${order.customer?.phone ?? "—"}`,
+        `Order <strong>${escapeHtml(razorpayOrderId)}</strong> (payment ${escapeHtml(razorpayPaymentId)}) is paid but did not sync to Shiprocket.`,
+        `Customer: ${escapeHtml(order.customer?.name ?? "—")} · ${escapeHtml(order.customer?.phone ?? "—")}`,
         `Use the <strong>Retry sync</strong> button in /admin/orders, or create the order in Shiprocket manually.`,
-        `Error: ${syncErr instanceof Error ? syncErr.message : String(syncErr)}`,
+        `Error: ${escapeHtml(syncErr instanceof Error ? syncErr.message : String(syncErr))}`,
       ]);
     }
   } catch (err) {

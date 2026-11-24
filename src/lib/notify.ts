@@ -1,5 +1,5 @@
 import path from "node:path";
-import nodemailer from "nodemailer";
+import nodemailer, { type SendMailOptions, type Transporter } from "nodemailer";
 import { site, waLink } from "@/lib/site";
 import type { SupabaseOrder } from "@/lib/shiprocket";
 
@@ -15,11 +15,31 @@ function inrFormat(amount: number): string {
   return `₹${amount.toLocaleString("en-IN")}`;
 }
 
+/**
+ * Escapes text for an HTML email body or attribute. Anything a shopper typed
+ * (name, address) or an outside service sent (Shiprocket status, error text)
+ * must go through this: checkout is public, so without it anyone could put a
+ * link or markup into a real care@amorfos.in email sent to any address.
+ */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/** The shopper's first name, HTML-escaped, for email greetings. */
+function greetingName(order: SupabaseOrder): string {
+  return escapeHtml(order.customer.name?.trim().split(/\s+/)[0] || "there");
+}
+
 // ── SMTP email (GoDaddy / any provider) ──────────────────────────────────────
 
-let transporter: nodemailer.Transporter | null = null;
+let transporter: Transporter | null = null;
 
-function smtpTransport(): nodemailer.Transporter | null {
+function smtpTransport(): Transporter | null {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     return null;
   }
@@ -42,7 +62,7 @@ async function sendEmail(
   to: string,
   subject: string,
   html: string,
-  attachments?: nodemailer.SendMailOptions["attachments"],
+  attachments?: SendMailOptions["attachments"],
 ): Promise<void> {
   const transport = smtpTransport();
   if (!transport) {
@@ -70,7 +90,7 @@ function orderItemsHtml(order: SupabaseOrder): string {
     .map(
       (item) =>
         `<tr>
-          <td style="padding:6px 0;color:#5c4a2a;font-size:13px;">${item.qty}× ${item.name}</td>
+          <td style="padding:6px 0;color:#5c4a2a;font-size:13px;">${escapeHtml(item.qty)}× ${escapeHtml(item.name)}</td>
           <td style="padding:6px 0;color:#5c4a2a;font-size:13px;text-align:right;">${inrFormat(item.price * item.qty)}</td>
         </tr>`,
     )
@@ -114,7 +134,7 @@ export async function sendOrderConfirmationEmail(order: SupabaseOrder, reviewUrl
 
   const body = `
     <p style="margin:0 0 16px;color:#5c4a2a;font-size:14px;line-height:1.7;">
-      Hi ${order.customer.name?.split(" ")[0] || "there"}, your order has been received and payment confirmed.
+      Hi ${greetingName(order)}, your order has been received and payment confirmed.
       We'll update you once it ships.
     </p>
     <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #d4c9b0;border-bottom:1px solid #d4c9b0;margin:16px 0;">
@@ -162,14 +182,14 @@ export async function sendShippingUpdateEmail(
     ? `Your ${site.name} order has been delivered`
     : `Your ${site.name} order is on its way`;
 
-  const trackUrl = `${site.url}/track?awb=${awb}`;
+  const trackUrl = escapeHtml(`${site.url}/track?awb=${encodeURIComponent(awb)}`);
 
   const body = `
     <p style="margin:0 0 16px;color:#5c4a2a;font-size:14px;line-height:1.7;">
-      Hi ${order.customer.name?.split(" ")[0] || "there"} — ${
+      Hi ${greetingName(order)} — ${
         isDelivered
           ? "your order has been delivered. We hope you love your Rudraksha."
-          : `your order is now <strong style="color:#221b12;">${status}</strong>.`
+          : `your order is now <strong style="color:#221b12;">${escapeHtml(status)}</strong>.`
       }
     </p>
     <p style="margin:0 0 20px;">
@@ -177,7 +197,7 @@ export async function sendShippingUpdateEmail(
         Track your order
       </a>
     </p>
-    <p style="margin:0;color:#8a7355;font-size:12px;">AWB: ${awb}</p>`;
+    <p style="margin:0;color:#8a7355;font-size:12px;">AWB: ${escapeHtml(awb)}</p>`;
 
   await sendEmail(
     order.customer.email,
@@ -328,7 +348,7 @@ export async function sendShippingUpdateWhatsApp(
       parameters: [
         { type: "text", text: order.customer.name?.split(" ")[0] || "there" },
         { type: "text", text: status },
-        { type: "text", text: `${site.url}/track?awb=${awb}` },
+        { type: "text", text: `${site.url}/track?awb=${encodeURIComponent(awb)}` },
       ],
     },
   ]);
@@ -347,7 +367,7 @@ function cartSummary(order: SupabaseOrder): string {
 /** Deep-link the customer back to the bead they were buying. */
 function recoveryLink(order: SupabaseOrder): string {
   const firstId = order.items?.[0]?.id;
-  return firstId ? `${site.url}/shop/${firstId}` : `${site.url}/shop`;
+  return firstId ? `${site.url}/shop/${encodeURIComponent(firstId)}` : `${site.url}/shop`;
 }
 
 export async function sendAbandonedCartWhatsApp(order: SupabaseOrder): Promise<void> {
@@ -371,10 +391,10 @@ export async function sendAbandonedCartWhatsApp(order: SupabaseOrder): Promise<v
 export async function sendAbandonedCartEmail(order: SupabaseOrder): Promise<void> {
   if (!order.customer.email) return;
 
-  const link = recoveryLink(order);
+  const link = escapeHtml(recoveryLink(order));
   const body = `
     <p style="margin:0 0 16px;color:#5c4a2a;font-size:14px;line-height:1.7;">
-      Hi ${order.customer.name?.split(" ")[0] || "there"}, you left something with us —
+      Hi ${greetingName(order)}, you left something with us —
       and it&rsquo;s still here, certified and ready.
     </p>
     <table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #d4c9b0;border-bottom:1px solid #d4c9b0;margin:16px 0;">
