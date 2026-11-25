@@ -110,6 +110,23 @@ group took ~30% of Search spend (₹262 of ₹872 by 24 Nov). Its 13 tracked vis
 (median ~18 s), probably because searchers expect a ₹2–5k bead. Next option if it still doesn't engage:
 point the ad group at the ₹4,499 wooden Gauri Shankar instead of the ₹9,999 one.
 
+### Changes 25 Nov 2026 (premium-proof pass, see `sales-marketing-plan.md` §3F)
+
+Results 22–24 Nov: 90 clicks, ₹1,082, **0 conversions**. Shopping: 40 clicks at ₹5.26; Search avg ₹14–25.
+Gauri Shankar was the biggest Search spender (₹262, 11 clicks).
+
+- **Paused all 10 "…price" keywords** (5, 2, 3, 9, 10, 11, 12, 13, 14 Mukhi + "rudraksha price"):
+  they pull bargain hunters and the store is deliberately premium.
+- **Paused the 14 Mukhi ad group** (₹16,499, no reviews, bead size "varies" on the page) until the
+  product page carries the proof block (exact size, certificate). Re-enable after.
+- **Headline swap in 17 RSAs:** "Thousands of Beads Sold" → "5,000+ Beads Delivered" (matches the
+  site's new track-record line). Size/grade headlines wait for the Amorfos Grade rules — don't put
+  bead sizes in ads until Manav confirms them (product data still has "varies" / mismatched sizes).
+- **Bids left as they are:** live ad-group bids are ₹10–25 (the ₹5 tier above was never applied);
+  many keywords show "Below first page bid" (₹38–151). Not raising bids while the site converts at 0.
+- Note: at ~₹360/day actual spend, the ₹20k credit (by 21 Jan) is borderline — revisit once proof + COD are live.
+- Account flags seen: "Complete advertiser verification" (Manav to do) and "Set up conversion tracking".
+
 ### Negative keywords (campaign level)
 `free, meaning, benefits, wikipedia, pdf, video, youtube, image, images, photo, wallpaper,
 drawing, how to wear, how to identify, identify, test, real or fake, fake, side effects, rules,

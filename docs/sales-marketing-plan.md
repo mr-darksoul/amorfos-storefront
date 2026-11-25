@@ -115,13 +115,13 @@
 | 2 | Unit cost, top 20 SKUs | Manav | |
 | 3 | Proof photos for 5, 6, 7, 9 Mukhi | Manav | |
 | 4 | Proof block on product pages | Code | needs 1 + 3 |
-| 5 | Remove "% OFF" badges; clean product titles | Code | |
-| 6 | Amazon reviews off product pages; "5,000+ beads delivered since 2018" | Code | |
-| 7 | 5 and 7 Mukhi in the homepage hero | Code | |
-| 8 | Sticky mobile Add to cart; popup off product pages | Code | |
+| 5 | Remove "% OFF" badges; clean product titles | Code | done 25 Nov |
+| 6 | Amazon reviews off product pages; "5,000+ beads delivered since 2018" | Code | done 25 Nov |
+| 7 | 5 and 7 Mukhi in the homepage hero | Code | done 25 Nov |
+| 8 | Sticky mobile Add to cart; popup off product pages | Code | already live |
 | 9 | Rename/remove health-named products | Manav OK → code | |
-| 10 | Shipping-message + PDF bugs; WhatsApp on | Code + Manav (env) | |
-| 11 | Ads: lower "price" keywords, grade headlines, 14 Mukhi → WhatsApp, fix bids | Manav OK | |
+| 10 | Shipping-message + PDF bugs; WhatsApp on | Code + Manav (env) | bugs fixed 25 Nov; WhatsApp env pending |
+| 11 | Ads: lower "price" keywords, grade headlines, 14 Mukhi → WhatsApp, fix bids | Manav OK | done 25 Nov: price kws + 14 Mukhi paused, proof headline; grade headlines wait for #1 |
 | 12 | Daily summary email (`DAILY_REPORT_TO`) | Manav (env) | |
 
 ### December: a reason to buy now
