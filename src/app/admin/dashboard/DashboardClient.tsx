@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { DashboardData, RangeKey } from "@/lib/dashboard";
 import { inr } from "@/lib/format";
+import { site } from "@/lib/site";
 import { computeInsights, type Insight } from "@/lib/insights";
 
 const REFRESH_MS = 15_000;
@@ -72,11 +73,46 @@ function bucketLabel(bucket: string, kind: string): string {
   return kind === "week" ? `wk of ${da} ${month}` : `${da} ${month}`;
 }
 
-function waLink(phone?: string): string | null {
+function waLink(phone?: string, text?: string): string | null {
   const digits = (phone ?? "").replace(/\D/g, "");
   if (digits.length < 10) return null;
   const full = digits.length === 10 ? `91${digits}` : digits;
-  return `https://wa.me/${full}`;
+  return `https://wa.me/${full}${text ? `?text=${encodeURIComponent(text)}` : ""}`;
+}
+
+/** "Amorfos® Certified 5 Mukhi Nepali Rudraksha Pendant, Nepal (Brown)" → "5 Mukhi Nepali Rudraksha Pendant" */
+function shortItemName(name: string): string {
+  return name
+    .replace(/^\s*Amorfos®?\s*/i, "")
+    .replace(/^(Lab\s+)?Certified\s+/i, "")
+    .replace(/,.*$/, "")
+    .trim();
+}
+
+/** "earlier today" / "yesterday" / "a few days ago", by IST calendar day. */
+function whenPhrase(iso: string): string {
+  const day = (d: Date) => d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const diff = Math.round((Date.parse(day(new Date())) - Date.parse(day(new Date(iso)))) / 86_400_000);
+  return diff <= 0 ? "earlier today" : diff === 1 ? "yesterday" : "a few days ago";
+}
+
+/** Pre-filled WhatsApp text for an abandoned checkout, in the brand's support voice. */
+function recoveryMessage(o: any): string {
+  const first = String(o.name ?? "").trim().split(/\s+/)[0] ?? "";
+  const greeting = first ? `Namaste ${first[0].toUpperCase()}${first.slice(1).toLowerCase()},` : "Namaste,";
+  const items: any[] = o.items ?? [];
+  const lead = items[0];
+  const extra = items.length - 1;
+  const what = lead
+    ? `the ${shortItemName(String(lead.name ?? "piece"))}${extra > 0 ? ` and ${extra} more piece${extra > 1 ? "s" : ""}` : ""}`
+    : "your order";
+  const link = lead?.id ? `${site.url}/shop/${lead.id}` : `${site.url}/shop`;
+  return [
+    `${greeting} this is Manav from Amorfos.`,
+    `I saw you were ordering ${what} (${inr(o.amount)}) ${whenPhrase(o.created_at)}, but the payment didn't go through.`,
+    "Did something go wrong with the payment, or is there anything about the bead I can help with?",
+    `You can complete the order here whenever you're ready: ${link}`,
+  ].join("\n\n");
 }
 
 // ── data fetching ───────────────────────────────────────────────────────────
@@ -781,7 +817,7 @@ function Abandoned({ rows, onVisit }: { rows: any[]; onVisit: (id: string) => vo
   return (
     <ul id="abandoned" className="divide-y divide-line">
       {rows.map((o) => {
-        const wa = waLink(o.phone);
+        const wa = waLink(o.phone, recoveryMessage(o));
         const items = (o.items ?? []).map((i: any) => `${i.qty}× ${i.name}`).join(", ");
         return (
           <li key={o.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
