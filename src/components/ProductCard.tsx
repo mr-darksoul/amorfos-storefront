@@ -83,17 +83,32 @@ export default function ProductCard({
           )
         )}
 
-        {/* Quick add */}
+        {/* Quick add — a hover bar with a mouse; on touch screens (no hover) a
+            small always-visible + button instead, so phones can add from the grid. */}
         {!soldOut && (
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              add(product.id);
-            }}
-            className="absolute inset-x-3 bottom-3 translate-y-3 rounded-sm bg-dark/95 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-cream opacity-0 transition-all duration-300 hover:bg-gold group-hover:translate-y-0 group-hover:opacity-100"
-          >
-            Quick add
-          </button>
+          <>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                add(product.id);
+              }}
+              className="absolute inset-x-3 bottom-3 translate-y-3 rounded-sm bg-dark/95 py-2.5 text-[0.7rem] font-medium uppercase tracking-[0.18em] text-cream opacity-0 transition-all duration-300 hover:bg-gold group-hover:translate-y-0 group-hover:opacity-100 [@media(hover:none)]:hidden"
+            >
+              Quick add
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                add(product.id);
+              }}
+              aria-label={`Add ${product.name} to cart`}
+              className="absolute bottom-2 right-2 hidden size-9 place-items-center rounded-full border border-line-strong bg-paper/95 text-ink shadow-sm active:border-gold active:bg-gold active:text-cream [@media(hover:none)]:grid"
+            >
+              <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+              </svg>
+            </button>
+          </>
         )}
       </Link>
 

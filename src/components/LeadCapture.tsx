@@ -8,8 +8,10 @@ const STORAGE_KEY = "amorfos.lead.v1";
 const SNOOZE_MS = 14 * 24 * 60 * 60 * 1000; // re-ask after 14 days
 const SHOW_DELAY_MS = 14_000; // quiet: only after a real visit
 
-// Never interrupt a purchase or the admin/journal flows.
-const SUPPRESSED = ["/checkout", "/thank-you", "/admin", "/reviews"];
+// Never interrupt a purchase or the admin/journal flows — and not on product or
+// collection pages either: that's where paid clicks land, and a popup there
+// stands between a shopper and the Add to cart button.
+const SUPPRESSED = ["/checkout", "/thank-you", "/admin", "/reviews", "/shop", "/collections"];
 
 function recentlyHandled(): boolean {
   try {

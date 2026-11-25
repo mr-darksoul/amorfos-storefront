@@ -143,6 +143,18 @@ body {
   border-color: var(--color-gold);
   color: var(--color-gold);
 }
+/* Tighter button for narrow bars (e.g. the sticky mobile purchase bar). */
+.btn-compact {
+  padding: 0.85rem 0.95rem;
+  letter-spacing: 0.1em;
+}
+
+/* While the sticky purchase bar is up (phones, product pages): keep the page's
+   last content and the WhatsApp button clear of it. */
+@media (max-width: 767px) {
+  html[data-sticky-buy] body { padding-bottom: 5rem; }
+  html[data-sticky-buy] .wa-float { bottom: 5.75rem; }
+}
 
 /* Subtle film-grain layer for depth on flat color fields */
 .grain::before {
