@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/lib/types";
 import type { RatingMap } from "@/lib/reviews";
-import { inr, discountPct } from "@/lib/format";
+import { inr, displayName } from "@/lib/format";
 import { useCart } from "@/context/CartContext";
 
 export default function ProductCard({
@@ -15,7 +15,7 @@ export default function ProductCard({
   ratings?: RatingMap;
 }) {
   const { add } = useCart();
-  const off = discountPct(product.price, product.mrp);
+  const title = displayName(product);
   const rating = product.mukhi && ratings ? ratings[product.mukhi] : null;
   const hasFirst = product.images.length > 0;
   const hasSecond = product.images.length > 1;
@@ -71,16 +71,10 @@ export default function ProductCard({
             </span>
           )}
         </div>
-        {soldOut ? (
+        {soldOut && (
           <span className="absolute right-3 top-3 rounded-full bg-dark/85 px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.14em] text-cream backdrop-blur-sm">
             Sold out
           </span>
-        ) : (
-          off > 0 && (
-            <span className="absolute right-3 top-3 rounded-full bg-gold px-2.5 py-1 text-[0.6rem] font-medium uppercase tracking-[0.14em] text-cream">
-              {off}% off
-            </span>
-          )
         )}
 
         {/* Quick add — a hover bar with a mouse; on touch screens (no hover) a
@@ -101,7 +95,7 @@ export default function ProductCard({
                 e.preventDefault();
                 add(product.id);
               }}
-              aria-label={`Add ${product.name} to cart`}
+              aria-label={`Add ${title} to cart`}
               className="absolute bottom-2 right-2 hidden size-9 place-items-center rounded-full border border-line-strong bg-paper/95 text-ink shadow-sm active:border-gold active:bg-gold active:text-cream [@media(hover:none)]:grid"
             >
               <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
@@ -118,16 +112,11 @@ export default function ProductCard({
         </p>
         <Link href={`/shop/${product.id}`}>
           <h3 className="font-serif text-xl leading-snug transition-colors hover:text-gold-soft">
-            {product.name}
+            {title}
           </h3>
         </Link>
         <div className="mt-1 flex items-baseline gap-2">
           <span className="text-base tabular-nums text-ink">{inr(product.price)}</span>
-          {product.mrp > product.price && (
-            <span className="text-sm tabular-nums text-ink-faint line-through">
-              {inr(product.mrp)}
-            </span>
-          )}
         </div>
         {rating && (
           <div className="mt-1 flex items-center gap-1">

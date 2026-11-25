@@ -18,8 +18,14 @@ const trust = [
   { Icon: ShieldIcon, title: "Lab Certified", text: "Every bead, individually certified." },
   { Icon: TruckIcon, title: "Free shipping", text: "On all orders above ₹999." },
   { Icon: ReturnIcon, title: "7-day returns", text: "On unused, sealed products." },
-  { Icon: LeafIcon, title: "Hand-selected", text: "Sourced from Nepal & Indonesia." },
+  { Icon: LeafIcon, title: "5,000+ beads delivered", text: "To homes across India since 2018." },
 ];
+
+// Homepage lead products. 5 and 7 Mukhi are what most people start with
+// (by far the most-bought beads historically), so they front the store.
+// Falls back to whatever is live if an id is ever deactivated.
+const HERO_ID = "5-mukhi-nepal";
+const FEATURED_IDS = ["5-mukhi-nepal", "7-mukhi-nepal", "6-mukhi-nepal", "9-mukhi-indonesia"];
 
 const cats: Category[] = ["pendant", "mala", "combination", "loose"];
 const catImage: Record<Category, string> = {
@@ -31,16 +37,17 @@ const catImage: Record<Category, string> = {
 
 export default async function Home() {
   const [products, ratings] = await Promise.all([getAdminProducts(), getAllRatingSummaries()]);
-  const heroProduct =
-    products.find((p) => p.id === "5-mukhi-nepal-2") ?? products[0];
+  const heroProduct = products.find((p) => p.id === HERO_ID) ?? products[0];
   // Caption is derived from the hero product so it can never drift from the image.
   const heroSpec = heroProduct.mukhiLabel;
   const heroName =
     heroProduct.mukhi != null
       ? `${heroProduct.mukhi} Mukhi Rudraksha ${heroProduct.categoryLabel}`
       : `Rudraksha ${heroProduct.categoryLabel}`;
-  const flagged = products.filter((p) => p.bestseller);
-  const bestsellers = (flagged.length ? flagged : products).slice(0, 4);
+  const featured = FEATURED_IDS.map((id) => products.find((p) => p.id === id)).filter(
+    (p): p is (typeof products)[number] => !!p,
+  );
+  const bestsellers = (featured.length >= 2 ? featured : products).slice(0, 4);
   const recentArticles = (await getPublishedArticles()).slice(0, 3);
 
   return (
@@ -123,8 +130,8 @@ export default async function Home() {
       <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 md:py-28">
         <Reveal className="mb-12 flex items-end justify-between gap-6">
           <div>
-            <p className="eyebrow mb-3">Most worn</p>
-            <h2 className="display text-4xl sm:text-5xl">The bestsellers</h2>
+            <p className="eyebrow mb-3">Most chosen</p>
+            <h2 className="display text-4xl sm:text-5xl">Where most begin</h2>
           </div>
           <Link
             href="/shop"
@@ -250,8 +257,8 @@ export default async function Home() {
             <p className="mx-auto mt-6 max-w-xl leading-relaxed text-ink-dim">
               Every Amorfos piece arrives with its Lab Certificate, sealed for
               authenticity. Should it not be right for you, return any unused,
-              sealed product within 7 days. We previously sold thousands of beads
-              on Amazon and Flipkart — the same care now comes to you directly.
+              sealed product within 7 days. Over 5,000 beads delivered since 2018,
+              first through Amazon and Flipkart — the same care now comes to you directly.
             </p>
             <Link href="/policies#authenticity" className="btn btn-outline mt-8">
               How we certify

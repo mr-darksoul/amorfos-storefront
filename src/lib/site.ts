@@ -10,6 +10,8 @@ export const site = {
   address: "Rohini, Sector-1, Delhi, India",
   founder: "Manav Bansal",
   freeShippingThreshold: 999,
+  /** Brand-level proof from the earlier marketplace years (first review Jun 2018, ~5,100 units). */
+  trackRecord: "5,000+ beads delivered since 2018",
 };
 
 export const waLink = (text?: string) =>

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAdminProducts, getAdminProduct, getAdminRelated } from "@/lib/adminProducts";
 import { collectionHref } from "@/lib/collections";
-import { inr, discountPct } from "@/lib/format";
+import { inr, displayName } from "@/lib/format";
 import { site, waLink } from "@/lib/site";
 import ProductGallery from "@/components/ProductGallery";
 import ProductPurchase from "@/components/ProductPurchase";
@@ -86,7 +86,7 @@ export default async function ProductPage({
   const product = await getAdminProduct(id);
   if (!product) notFound();
 
-  const off = discountPct(product.price, product.mrp);
+  const title = displayName(product);
   const soldOut = typeof product.stock === "number" && product.stock <= 0;
   const [related, reviews, ratings] = await Promise.all([
     getAdminRelated(product),
@@ -226,7 +226,7 @@ export default async function ProductPage({
           {/* Info */}
           <div className="md:py-4">
             <p className="eyebrow mb-3">{product.categoryLabel} · {product.origin}</p>
-            <h1 className="display text-4xl sm:text-5xl">{product.name}</h1>
+            <h1 className="display text-4xl sm:text-5xl">{title}</h1>
 
             {/* Inline rating */}
             {reviewSummary.total > 0 && (
@@ -261,14 +261,6 @@ export default async function ProductPage({
             {/* Price */}
             <div className="mt-6 flex items-center gap-3">
               <span className="font-serif text-3xl text-ink">{inr(product.price)}</span>
-              {product.mrp > product.price && (
-                <>
-                  <span className="text-lg text-ink-faint line-through">{inr(product.mrp)}</span>
-                  <span className="rounded-full bg-gold px-2.5 py-1 text-[0.65rem] font-medium uppercase tracking-wide text-paper">
-                    {off}% off
-                  </span>
-                </>
-              )}
             </div>
             <p className="mt-1 text-xs text-ink-faint">
               Inclusive of all taxes · Ships within 1–2 days, arrives in 3–7
@@ -282,6 +274,9 @@ export default async function ProductPage({
               <Assurance Icon={TruckIcon} label="Free over ₹999" />
               <Assurance Icon={ReturnIcon} label="7-day returns" />
             </div>
+            <p className="mt-3 text-center text-[0.7rem] uppercase tracking-[0.18em] text-ink-faint">
+              {site.trackRecord}
+            </p>
 
             {/* Description */}
             <div className="mt-8">
@@ -342,7 +337,7 @@ export default async function ProductPage({
 
             {/* WhatsApp help */}
             <a
-              href={waLink(`Hi Amorfos, I'd like to know more about the ${product.name}.`)}
+              href={waLink(`Hi Amorfos, I'd like to know more about the ${title}.`)}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-block text-sm text-gold-soft underline-offset-4 hover:underline"

@@ -58,8 +58,18 @@ export async function getAdminProduct(
 
 export async function getAdminRelated(product: Product, limit = 3): Promise<Product[]> {
   const list = await getAdminProducts();
-  const sameCat = list.filter((p) => p.id !== product.id && p.category === product.category);
-  const others = list.filter((p) => p.id !== product.id && p.category !== product.category);
+  // Suggest pieces in a similar price band (closest price ratio first) that
+  // have photos — a ₹19,499 bead next to a ₹599 one isn't a real alternative.
+  const closeness = (p: Product) =>
+    Math.abs(Math.log(Math.max(p.price, 1) / Math.max(product.price, 1))) +
+    (p.images.length ? 0 : 10);
+  const byPrice = (a: Product, b: Product) => closeness(a) - closeness(b);
+  const sameCat = list
+    .filter((p) => p.id !== product.id && p.category === product.category)
+    .sort(byPrice);
+  const others = list
+    .filter((p) => p.id !== product.id && p.category !== product.category)
+    .sort(byPrice);
   return [...sameCat, ...others].slice(0, limit);
 }
 

@@ -34,7 +34,7 @@ export default function Header() {
     <>
       {/* Announcement bar */}
       <div className="bg-paper-raised text-center text-[0.68rem] tracking-[0.25em] uppercase text-gold-soft/90 py-2 px-4 border-b border-line">
-        Lab Certified · Free shipping above ₹999 · 7-day returns
+        Lab Certified · 5,000+ beads delivered · Free shipping above ₹999
       </div>
 
       <header

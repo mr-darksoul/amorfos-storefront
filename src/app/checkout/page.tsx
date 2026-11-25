@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useCheckout } from "@/lib/useCheckout";
-import { inr } from "@/lib/format";
+import { inr, displayName } from "@/lib/format";
 import { site, waLink } from "@/lib/site";
 import { validateCustomer, digitsOnly } from "@/lib/validateCustomer";
 import { ArrowIcon } from "@/components/icons";
@@ -234,7 +234,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex flex-1 items-start justify-between">
                   <div>
-                    <p className="font-serif text-base leading-snug text-ink">{item.product.name}</p>
+                    <p className="font-serif text-base leading-snug text-ink">{displayName(item.product)}</p>
                     <p className="text-xs text-ink-faint">Qty {item.qty}</p>
                   </div>
                   <span className="text-sm tabular-nums text-ink">{inr(item.lineTotal)}</span>

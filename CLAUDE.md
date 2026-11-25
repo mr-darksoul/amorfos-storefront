@@ -89,7 +89,10 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   + WhatsApp Cloud API. Confirmation email includes a "Leave a Review" button when a
   review token was generated. Shipping-status updates via webhook at
   `/api/webhooks/delivery-status` (not `/shiprocket` — Shiprocket blocks URLs containing
-  "shiprocket"/"sr"/"kr").
+  "shiprocket"/"sr"/"kr"). It maps RTO/return → `returned`, cancel → `cancelled`,
+  undelivered/lost → `delivery_issue` (checked before "delivered", which those strings
+  contain); delivered/returned/cancelled are terminal. Customer messages go out via
+  `after()` and only for processing/shipped/out_for_delivery/delivered.
 - **Newsletter lead-magnet (double opt-in):** `NewsletterForm` (footer + lead modal) →
   `POST /api/subscribe` (rate-limited 5/hr/IP). A new signup is stored **unconfirmed**
   with a single-use `confirm_token` and emailed only a lightweight confirmation link
@@ -122,7 +125,14 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   - **Admin moderation** (`/admin/reviews`): lists all pending reviews with Approve / Reject.
     Approve sets `status=approved` (goes live). Reject deletes the row.
   - **Seeded data:** 38 Amazon reviews imported (scrapped 2026-06-28) for mukhi 4, 6, 7, 9, 11, 12, 13
-    — all `status=approved, source=amazon`.
+    — all `status=approved, source=amazon`. **Hidden since 2026-11-25:** they describe older,
+    lower-grade marketplace stock, so `lib/reviews.ts` excludes `source = 'amazon'` everywhere
+    (PDP, cards, JSON-LD, OG). Brand-level proof is `site.trackRecord` ("5,000+ beads delivered
+    since 2018") instead. Amorfos no longer sells on any marketplace.
+  - **Shopper-facing titles:** `displayName()` in `lib/format.ts` renders clean titles
+    ("6 Mukhi Nepali Rudraksha Pendant") on cards, PDP h1, cart and checkout; the stored
+    keyword-heavy `name` still feeds meta titles, the Merchant feed, orders and invoices.
+    No MRP strike-through or "% off" badge is shown anywhere (premium, one honest price).
   - **Admin auth note:** `/admin/*` is protected entirely by `middleware.ts`. Admin sub-pages must NOT
     re-implement their own auth check — the middleware already handles it.
 - **Admin:** `/admin` (cookie/HMAC gate via `ADMIN_PASSWORD` + `middleware.ts`, fails

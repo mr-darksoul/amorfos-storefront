@@ -145,11 +145,6 @@ export default function ProductPurchase({ product }: { product: Product }) {
         <div className="flex items-center gap-3">
           <div className="min-w-0 shrink">
             <p className="font-serif text-xl leading-none tabular-nums text-ink">{inr(product.price)}</p>
-            {product.mrp > product.price && (
-              <p className="mt-1 text-[0.7rem] tabular-nums text-ink-faint line-through">
-                {inr(product.mrp)}
-              </p>
-            )}
           </div>
           <button
             onClick={handleAdd}

@@ -17,6 +17,8 @@ const STATUS_STAGES = [
 
 function inferStageIndex(status: string): number {
   const s = status.toLowerCase();
+  // "UNDELIVERED" / "RTO DELIVERED" contain "delivered" but are not deliveries.
+  if (s.includes("rto") || s.includes("return") || s.includes("undelivered")) return 3;
   if (s.includes("delivered")) return 5;
   if (s.includes("out for delivery")) return 4;
   if (s.includes("transit")) return 3;

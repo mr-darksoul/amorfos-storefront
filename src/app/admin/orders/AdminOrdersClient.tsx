@@ -60,6 +60,9 @@ const FULFILLMENT_LABEL: Record<string, string> = {
   shipped: "Shipped",
   out_for_delivery: "Out for delivery",
   delivered: "Delivered",
+  delivery_issue: "Delivery issue",
+  returned: "Returned (RTO)",
+  cancelled: "Cancelled",
   failed: "Sync failed",
 };
 
@@ -70,6 +73,9 @@ const FULFILLMENT_CLASS: Record<string, string> = {
   shipped: "bg-blue-700/20 text-blue-500",
   out_for_delivery: "bg-green-700/15 text-green-500",
   delivered: "bg-green-700/20 text-green-600",
+  delivery_issue: "bg-rudra/15 text-rudra",
+  returned: "bg-rudra/15 text-rudra",
+  cancelled: "bg-paper-soft text-ink-faint",
   failed: "bg-rudra/15 text-rudra",
 };
 

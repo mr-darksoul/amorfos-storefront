@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { inr } from "@/lib/format";
+import { inr, displayName } from "@/lib/format";
 import { site } from "@/lib/site";
 import { CloseIcon, MinusIcon, PlusIcon, ArrowIcon } from "./icons";
 
@@ -104,7 +104,7 @@ export default function CartDrawer() {
                         onClick={close}
                         className="font-serif text-lg leading-tight hover:text-gold-soft"
                       >
-                        {item.product.name}
+                        {displayName(item.product)}
                       </Link>
                       <button
                         onClick={() => remove(item.id)}

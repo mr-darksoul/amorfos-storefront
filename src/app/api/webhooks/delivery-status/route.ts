@@ -1,19 +1,29 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { sendShippingUpdateEmail, sendShippingUpdateWhatsApp } from "@/lib/notify";
 
 export const runtime = "nodejs";
 
-// Map Shiprocket status strings to our fulfillment_status values
+// Terminal states: once reached, later webhook events never move the order.
+const TERMINAL = new Set(["delivered", "returned", "cancelled"]);
+
+// Map Shiprocket status strings to our fulfillment_status values.
+// Order matters: "UNDELIVERED" and "RTO DELIVERED" both contain "delivered",
+// so the failure/return checks must run before the plain "delivered" match.
 function mapStatus(srStatus: string): string {
   const s = srStatus.toLowerCase();
-  if (s.includes("picked up") || s.includes("pickup")) return "processing";
+  if (s.includes("rto") || s.includes("return")) return "returned";
+  if (s.includes("cancel")) return "cancelled";
+  if (s.includes("undelivered") || s.includes("lost") || s.includes("damaged")) return "delivery_issue";
   if (s.includes("out for delivery")) return "out_for_delivery";
   if (s.includes("delivered")) return "delivered";
-  if (s.includes("in transit") || s.includes("transit")) return "shipped";
-  if (s.includes("shipped")) return "shipped";
+  if (s.includes("picked up") || s.includes("pickup")) return "processing";
   return "shipped";
 }
+
+// Statuses the customer should hear about. Internal states (returned,
+// cancelled, delivery_issue) are for the admin, not an automatic message.
+const NOTIFY = new Set(["processing", "shipped", "out_for_delivery", "delivered"]);
 
 export async function POST(req: Request) {
   // Auth is mandatory. If the token is unset, every caller is rejected — this
@@ -69,10 +79,10 @@ export async function POST(req: Request) {
 
   // No-regression / idempotency guard. Shiprocket can deliver events out of
   // order or repeat them, so:
-  //  - never move a delivered order backwards, and
+  //  - never move an order out of a terminal state (delivered/returned/cancelled), and
   //  - skip when the status is unchanged (avoids duplicate notifications).
   if (
-    order.fulfillment_status === "delivered" ||
+    TERMINAL.has(order.fulfillment_status) ||
     order.fulfillment_status === fulfillmentStatus
   ) {
     return NextResponse.json({ ok: true });
@@ -83,17 +93,25 @@ export async function POST(req: Request) {
     .update({ fulfillment_status: fulfillmentStatus })
     .eq("id", order.id);
 
-  // Notify customer — fire-and-forget, errors logged only
-  void Promise.allSettled([
-    sendShippingUpdateEmail(order, currentStatus, awb),
-    sendShippingUpdateWhatsApp(order, currentStatus, awb),
-  ]).then((results) => {
-    for (const r of results) {
-      if (r.status === "rejected") {
-        console.error("[webhook] notification error:", r.reason);
+  if (!NOTIFY.has(fulfillmentStatus)) {
+    console.warn(`[delivery-status] order ${order.id} → ${fulfillmentStatus} (${currentStatus})`);
+  }
+
+  // Notify the customer after the response. Must use after(): a bare
+  // fire-and-forget promise is killed by Vercel once the response flushes.
+  if (NOTIFY.has(fulfillmentStatus)) {
+    after(async () => {
+      const results = await Promise.allSettled([
+        sendShippingUpdateEmail(order, currentStatus, awb),
+        sendShippingUpdateWhatsApp(order, currentStatus, awb),
+      ]);
+      for (const r of results) {
+        if (r.status === "rejected") {
+          console.error("[delivery-status] notification error:", r.reason);
+        }
       }
-    }
-  });
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }

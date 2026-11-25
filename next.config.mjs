@@ -5,6 +5,8 @@ const nextConfig = {
   // be read from disk at runtime on Vercel (it lives outside /public on purpose).
   outputFileTracingIncludes: {
     "/api/subscribe": ["./assets/lead-magnet/**"],
+    // The PDF is actually sent from the confirm step (double opt-in).
+    "/api/subscribe/confirm": ["./assets/lead-magnet/**"],
   },
   images: {
     formats: ["image/avif", "image/webp"],
