@@ -52,7 +52,7 @@ Planner shows ranges until the account has spent; we'll get exact numbers after 
 
 **Name:** `AMF | Search | India` · **Budget:** ₹600/day · **Networks:** Google Search only
 (untick Search Partners and Display) · **Locations:** India, *"Presence: people in or regularly in"*
-· **Languages:** English, Hindi · **Bidding:** *Maximize clicks* with max CPC **₹15** for the first
+· **Languages:** English, Hindi · **Bidding:** *Maximize clicks* with max CPC **₹15** (lowered to **₹10** on 24 Nov — clicks were all landing at ₹14–15) for the first
 2 weeks → switch to *Maximize conversions* once there are ~15 purchases in 30 days.
 
 ### Ad groups (keywords in "phrase" and [exact] match)
@@ -73,8 +73,42 @@ Planner shows ranges until the account has spent; we'll get exact numbers after 
 | 9 Mukhi | "9 mukhi rudraksha", [9 mukhi rudraksha original], "9 mukhi rudraksha pendant", "9 mukhi rudraksha price", "buy 9 mukhi rudraksha", "nau mukhi rudraksha", "9 face rudraksha", "nine mukhi rudraksha" | `/shop/9-mukhi-indonesia` (₹999) |
 
 **Built in Google Ads** as `AMF | Search | India` (ID 24528597072). **Went live 22 Nov 2026** (start
-date moved up from 30 Nov, budget ₹600/day). 12 ad groups, 91 keywords and 64 negatives are in (reviewed and extended 22 Nov; 2, 3 and 9 Mukhi added the same day). Mala ads show the price up front so
+date moved up from 30 Nov, budget ₹600/day). 12 ad groups, 91 keywords and 88 negatives are in (reviewed and extended 22 Nov; 2, 3 and 9 Mukhi added the same day). Mala ads show the price up front so
 shoppers looking for cheap japa malas skip them.
+
+### Price-tier bidding (24 Nov 2026, assumes 50% margin until real costs are known)
+
+Switched from *Maximize clicks* (₹15 → ₹10 cap) to **Manual CPC with a bid per ad group**.
+Break-even CPC = price × 50% margin × 1.5% conversion rate; bids sit just under it.
+
+| Price tier | Ad groups | Max CPC |
+|---|---|---|
+| ₹599 | 2, 3, 4, 5, 6 Mukhi, Certified (generic) | ~~₹5~~ **₹10** (25 Nov) |
+| ₹999 | 7 Mukhi, 9 Mukhi | ~~₹7~~ **₹12** (25 Nov) |
+| ₹1,499 | 10 Mukhi | ₹10 |
+| ₹2,499 | 1 Mukhi, 11 Mukhi | ₹15 |
+| ₹2,999 | 12 Mukhi, 13 Mukhi | ₹18 |
+| ₹4,499 | 7 Mukhi Mala | ₹15 |
+| ₹9,999 | 9 Mukhi Mala | ₹20 |
+| ₹9,999 / ₹16,499 | Gauri Shankar, 14 Mukhi | ₹25 (Gauri Shankar ~~₹25~~ **₹15**, 25 Nov) |
+
+New ad groups (24 Nov): 10–14 Mukhi → `/shop/{10..14}-mukhi-indonesia` (₹1,499 / ₹2,499 / ₹2,999 /
+₹2,999 / ₹16,499); Certified now excludes 10–14 Mukhi names; each new group excludes "mala".
+Google showed "Below first page bid" estimates of ₹39–121 right after the switch — watch impressions
+for 24–48 h; if they collapse, raise the ₹599-tier bids or revert to Maximize clicks with a cap.
+Recalculate all bids when Manav shares real unit costs (after the ₹2,400 test).
+
+**25 Nov 2026 — ₹599 and ₹999 tiers raised (₹5 → ₹10, ₹7 → ₹12).** Over the first ~15 h of
+first-party tracking (24 Nov 6 pm onward), the ₹5/₹7 groups got zero Search visits. The
+Search budget all went to Gauri Shankar (₹25 bid, about half of Search visits), 14 Mukhi, 1 Mukhi,
+12 Mukhi and the malas, with no add-to-carts out of 57 Google Ads visits. These bids sit **above**
+the 50%-margin break-even (₹4.5 / ₹7.5): they buy learning data on the highest-demand searches, not
+profit. Review on ~2 Dec: if a group has 30+ clicks and no add-to-cart, lower it or pause it.
+
+**25 Nov 2026 — Gauri Shankar lowered ₹25 → ₹15.** The bid is under break-even (₹75 at ₹9,999), but this
+group took ~30% of Search spend (₹262 of ₹872 by 24 Nov). Its 13 tracked visits all left after one page
+(median ~18 s), probably because searchers expect a ₹2–5k bead. Next option if it still doesn't engage:
+point the ad group at the ₹4,499 wooden Gauri Shankar instead of the ₹9,999 one.
 
 ### Negative keywords (campaign level)
 `free, meaning, benefits, wikipedia, pdf, video, youtube, image, images, photo, wallpaper,
@@ -126,7 +160,7 @@ guaranteed", no religion-targeted phrasing ("Are you a Shiva devotee?"), never n
 long ids are now shortened with a hash in `feeds/google.xml`), all 37 products in Merchant Center
 and under review. Campaign drafted in Google Ads but **not published**: Standard Shopping,
 ₹200/day, Manual CPC with ₹10 bid on "All Products", India (presence), Google Search only, AI Max
-off. Publishing makes it live, so it waits for Manav's go-ahead (ideally once products are approved).
+off. **Published 24 Nov 2026** on Manav's go-ahead after all 37 products were approved for Shopping ads (campaign ID 24535086396).
 Merchant Center also says the account "isn't set up to show products in ads yet" — enable the
 Shopping ads programme there before launch.
 
