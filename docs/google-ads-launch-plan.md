@@ -127,6 +127,21 @@ Gauri Shankar was the biggest Search spender (₹262, 11 clicks).
 - Note: at ~₹360/day actual spend, the ₹20k credit (by 21 Jan) is borderline — revisit once proof + COD are live.
 - Account flags seen: "Complete advertiser verification" (Manav to do) and "Set up conversion tracking".
 
+### Rebalance 28 Nov 2026 (ads paused since 26 Nov: prepaid balance exhausted)
+
+Results 23–26 Nov: **₹2,034 spend (+ GST = the ₹2,400 top-up), 169 clicks, 0 purchases.**
+Search ₹1,611 / 92 clicks / ₹17.51 CPC; Shopping ₹423 / 77 clicks / ₹5.50 CPC. On-site: 121 tracked
+ad visits → 9 opened a 2nd page → 1 add-to-cart → 1 checkout (Shopping, 6 Mukhi, desktop, 25 Nov,
+unpaid) → 0 paid. Median visit 9–20 s. Raising the ₹599/₹999 Search bids to ₹10/₹12 on 25 Nov did
+not buy 5/6 Mukhi traffic (1 visit); Search money still went to 1/12/14 Mukhi, malas, Gauri Shankar.
+
+- **Budgets:** Shopping ₹200 → **₹400/day**; Search ₹600 → **₹200/day**.
+- **Search ad groups left on:** 1 Mukhi, 7 Mukhi, Certified. **Paused:** Gauri Shankar, 2, 3, 4, 5, 6,
+  9, 10, 11, 12, 13 Mukhi, 7 Mukhi Mala, 9 Mukhi Mala (14 Mukhi already paused 25 Nov). The ₹599–999
+  pendants are now reached through Shopping, which shows photo + price at ~a third of the click cost.
+- Takes effect once funds are added. Review after ~150 Shopping clicks: add-to-cart rate, checkouts,
+  cost per checkout. Re-enable paused groups one at a time only once the site converts.
+
 ### Negative keywords (campaign level)
 `free, meaning, benefits, wikipedia, pdf, video, youtube, image, images, photo, wallpaper,
 drawing, how to wear, how to identify, identify, test, real or fake, fake, side effects, rules,
