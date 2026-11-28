@@ -21,21 +21,26 @@ export interface ReviewSummary {
 export type RatingMap = Record<number, { average: number; total: number }>;
 
 /**
- * Reviews imported from the old Amazon store (2018–2024) describe older,
- * lower-grade stock, so they are no longer shown on product pages, cards or in
- * structured data. They stay in the DB (source = 'amazon') as history; the
- * brand-level "5,000+ beads delivered" line (site.trackRecord) carries that
- * proof instead. Only reviews from Amorfos's own D2C buyers are shown.
+ * Reviews imported from the earlier Amazon store (2018–2024) are shown on
+ * product pages and cards, but always labelled as such (ReviewSection badge +
+ * note). They are NOT used in Product JSON-LD aggregateRating: Google's review
+ * snippet rules require ratings collected directly on this site, so structured
+ * data counts only Amorfos's own reviews (see `ownReviews`).
  */
-const HIDDEN_SOURCE = "amazon";
+export const MARKETPLACE_SOURCE = "amazon";
+
+export const isMarketplaceReview = (r: Pick<Review, "source">) =>
+  r.source === MARKETPLACE_SOURCE;
+
+/** Reviews collected on amorfos.in itself — the only ones used in structured data. */
+export const ownReviews = (reviews: Review[]) => reviews.filter((r) => !isMarketplaceReview(r));
 
 export async function getAllRatingSummaries(): Promise<RatingMap> {
   if (!isSupabaseConfigured()) return {};
   const { data, error } = await supabase()
     .from("reviews")
     .select("mukhi, rating")
-    .eq("status", "approved")
-    .neq("source", HIDDEN_SOURCE);
+    .eq("status", "approved");
 
   if (error || !data) return {};
 
@@ -63,7 +68,6 @@ export async function getReviewsByMukhi(mukhi: number): Promise<Review[]> {
     .select("*")
     .eq("mukhi", mukhi)
     .eq("status", "approved")
-    .neq("source", HIDDEN_SOURCE)
     .order("review_date", { ascending: false });
 
   if (error) {

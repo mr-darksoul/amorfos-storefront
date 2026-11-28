@@ -125,10 +125,11 @@ Keep changes light/airy. Do not reintroduce a dark theme.
   - **Admin moderation** (`/admin/reviews`): lists all pending reviews with Approve / Reject.
     Approve sets `status=approved` (goes live). Reject deletes the row.
   - **Seeded data:** 38 Amazon reviews imported (scrapped 2026-06-28) for mukhi 4, 6, 7, 9, 11, 12, 13
-    — all `status=approved, source=amazon`. **Hidden since 2026-11-25:** they describe older,
-    lower-grade marketplace stock, so `lib/reviews.ts` excludes `source = 'amazon'` everywhere
-    (PDP, cards, JSON-LD, OG). Brand-level proof is `site.trackRecord` ("5,000+ beads delivered
-    since 2018") instead. Amorfos no longer sells on any marketplace.
+    — all `status=approved, source=amazon`. Hidden 25 Nov, **shown again from 2026-11-28**
+    at Manav's call, always labelled: badge "Verified Amazon purchase" + a note that they come from
+    the earlier Amazon store. They are excluded from Product JSON-LD `aggregateRating` (`ownReviews`
+    in `lib/reviews.ts`) because Google requires ratings collected on the site itself. Amorfos no
+    longer sells on any marketplace; `site.trackRecord` ("5,000+ beads delivered since 2018") stays.
   - **Shopper-facing titles:** `displayName()` in `lib/format.ts` renders clean titles
     ("6 Mukhi Nepali Rudraksha Pendant") on cards, PDP h1, cart and checkout; the stored
     keyword-heavy `name` still feeds meta titles, the Merchant feed, orders and invoices.

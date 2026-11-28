@@ -13,7 +13,7 @@ import Reveal from "@/components/Reveal";
 import { ShieldIcon, TruckIcon, ReturnIcon, CheckIcon } from "@/components/icons";
 import ReviewSection from "@/components/ReviewSection";
 import ReviewForm from "@/components/ReviewForm";
-import { getReviewsByMukhi, summariseReviews, getAllRatingSummaries } from "@/lib/reviews";
+import { getReviewsByMukhi, summariseReviews, getAllRatingSummaries, ownReviews } from "@/lib/reviews";
 import type { Product } from "@/lib/types";
 
 export const revalidate = 60;
@@ -162,6 +162,8 @@ export default async function ProductPage({
     getAllRatingSummaries(),
   ]);
   const reviewSummary = summariseReviews(reviews);
+  // Structured data counts only reviews collected on this site (Google policy).
+  const ownSummary = summariseReviews(ownReviews(reviews));
 
   const specs: [string, React.ReactNode][] = [
     [
@@ -288,11 +290,11 @@ export default async function ProductPage({
         },
       },
     },
-    ...(reviewSummary.total > 0 && {
+    ...(ownSummary.total > 0 && {
       aggregateRating: {
         "@type": "AggregateRating",
-        ratingValue: reviewSummary.average,
-        reviewCount: reviewSummary.total,
+        ratingValue: ownSummary.average,
+        reviewCount: ownSummary.total,
         bestRating: 5,
         worstRating: 1,
       },

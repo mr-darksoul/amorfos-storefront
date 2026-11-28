@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Review, ReviewSummary } from "@/lib/reviews";
+import { isMarketplaceReview, type Review, type ReviewSummary } from "@/lib/reviews";
 
 function StarFill({ filled, half }: { filled: boolean; half?: boolean }) {
   return (
@@ -73,10 +73,17 @@ export default function ReviewSection({
   if (summary.total === 0) return null;
 
   const visible = reviews.slice(0, shown);
+  const hasMarketplace = reviews.some(isMarketplaceReview);
 
   return (
     <section id="reviews" className="mt-16 border-t border-line pt-12">
       <p className="eyebrow mb-4">What customers say</p>
+      {hasMarketplace && (
+        <p className="-mt-2 mb-6 text-xs text-ink-faint">
+          Includes reviews from our earlier Amazon store (2018–2024), shared across every piece of the
+          same mukhi.
+        </p>
+      )}
 
       {/* Summary row */}
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-12 mb-10">
@@ -111,9 +118,13 @@ export default function ReviewSection({
                   <p className="mt-1.5 font-medium text-ink text-sm leading-snug">{r.title}</p>
                 )}
               </div>
-              {r.verified && (
+              {(r.verified || isMarketplaceReview(r)) && (
                 <span className="shrink-0 rounded-full border border-line px-2.5 py-0.5 text-[0.62rem] uppercase tracking-wide text-gold">
-                  Verified
+                  {isMarketplaceReview(r)
+                    ? r.verified
+                      ? "Verified Amazon purchase"
+                      : "Amazon review"
+                    : "Verified purchase"}
                 </span>
               )}
             </div>
