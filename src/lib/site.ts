@@ -12,6 +12,9 @@ export const site = {
   freeShippingThreshold: 999,
   /** Brand-level proof from the earlier marketplace years (first review Jun 2018, ~5,100 units). */
   trackRecord: "5,000+ beads delivered since 2018",
+  /** Official profiles — feed Organization `sameAs` so search/answer engines tie them to the brand. */
+  sameAs: ["https://www.instagram.com/amorfos.in/"],
+  foundingYear: "2018",
 };
 
 export const waLink = (text?: string) =>

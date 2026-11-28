@@ -48,10 +48,13 @@ export async function getAdminProduct(
     .from("products")
     .select("data, active")
     .eq("id", id)
-    .single();
-  // Mirror getAdminProducts: fall back to the hardcoded catalog when the
-  // Supabase row is missing, so the listing and detail page stay in sync.
-  if (error || !data) return hardcoded.find((p) => p.id === id);
+    .maybeSingle();
+  // Mirror getAdminProducts: fall back to the hardcoded catalog only when
+  // Supabase itself fails. A missing row means the product was deleted — it
+  // must not keep rendering from the stale static file (those pages were
+  // live, unlinked and out of date). The public page redirects legacy ids.
+  if (error) return hardcoded.find((p) => p.id === id);
+  if (!data) return undefined;
   if (!includeInactive && data.active === false) return undefined;
   return data.data as Product;
 }
@@ -113,4 +116,9 @@ export async function deleteAdminProduct(id: string): Promise<void> {
   }
   const { error } = await supabase().from("products").delete().eq("id", id);
   if (error) throw new Error(error.message);
+}
+
+/** A product that exists only in the static file — i.e. a retired listing's last known data. */
+export function getLegacyProduct(id: string): Product | undefined {
+  return hardcoded.find((p) => p.id === id);
 }

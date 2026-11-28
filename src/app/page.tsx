@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
@@ -5,6 +6,8 @@ import ProductCard from "@/components/ProductCard";
 import ArticleCard from "@/components/ArticleCard";
 import { categoryMeta } from "@/lib/products";
 import { collectionHref } from "@/lib/collections";
+import { mukhiCollections } from "@/lib/mukhiCollections";
+import { buildHomeFaqs } from "@/lib/homeFaqs";
 import { getPublishedArticles } from "@/lib/articles";
 import { getAdminProducts } from "@/lib/adminProducts";
 import { getAllRatingSummaries } from "@/lib/reviews";
@@ -13,6 +16,18 @@ import { ShieldIcon, TruckIcon, ReturnIcon, LeafIcon, ArrowIcon } from "@/compon
 import type { Category } from "@/lib/types";
 
 export const revalidate = 60;
+
+const HOME_TITLE = "Buy Original Rudraksha Online — Lab Certified | Amorfos";
+const HOME_DESCRIPTION =
+  "Shop original, Lab Certified Rudraksha online — 1 to 14 Mukhi pendants, Gauri Shankar and malas from Nepal & Indonesia, set in silver. Free shipping over ₹999.";
+
+export const metadata: Metadata = {
+  title: { absolute: HOME_TITLE },
+  description: HOME_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: { title: HOME_TITLE, description: HOME_DESCRIPTION, url: "/" },
+  twitter: { title: HOME_TITLE, description: HOME_DESCRIPTION },
+};
 
 const trust = [
   { Icon: ShieldIcon, title: "Lab Certified", text: "Every bead, individually certified." },
@@ -50,6 +65,18 @@ export default async function Home() {
   const bestsellers = (featured.length >= 2 ? featured : products).slice(0, 4);
   const recentArticles = (await getPublishedArticles()).slice(0, 3);
 
+  // Answer-first Q&A (shared with /llms-full.txt), rendered visibly and as FAQPage JSON-LD.
+  const homeFaqs = buildHomeFaqs(products);
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: homeFaqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <>
       {/* ───────────────────────── Hero ───────────────────────── */}
@@ -58,13 +85,14 @@ export default async function Home() {
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-5 pb-16 pt-12 sm:px-8 md:grid-cols-2 md:gap-6 md:pb-24 md:pt-16">
           <div className="order-2 md:order-1">
             <Reveal>
-              <p className="eyebrow mb-6">Delhi · Est. for the devout</p>
+              {/* The h1 carries the search phrase; the display line is the brand voice. */}
+              <h1 className="eyebrow mb-6">Original, Lab Certified Rudraksha · Delhi</h1>
             </Reveal>
             <Reveal delay={80}>
-              <h1 className="display text-5xl sm:text-6xl lg:text-7xl">
+              <p className="display text-5xl sm:text-6xl lg:text-7xl">
                 The bead that<br />
                 <span className="text-gold-soft italic">steadies</span> you.
-              </h1>
+              </p>
             </Reveal>
             <Reveal delay={160}>
               <p className="mt-7 max-w-md text-base leading-relaxed text-ink-dim">
@@ -220,6 +248,25 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* ─────────────────── Shop by Mukhi ──────────────────────── */}
+      <section className="mx-auto max-w-7xl px-5 pb-4 sm:px-8">
+        <Reveal className="mb-8 text-center">
+          <p className="eyebrow mb-3">Know your bead?</p>
+          <h2 className="display text-3xl sm:text-4xl">Shop by Mukhi</h2>
+        </Reveal>
+        <div className="mx-auto flex max-w-4xl flex-wrap justify-center gap-2">
+          {mukhiCollections.map((c) => (
+            <Link
+              key={c.slug}
+              href={`/collections/${c.slug}`}
+              className="rounded-full border border-line px-4 py-2 text-sm text-ink-dim transition-colors hover:border-line-strong hover:text-ink"
+            >
+              {c.label}
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* ──────────────────────── From the Journal ─────────────── */}
       {recentArticles.length > 0 && (
         <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 md:py-28">
@@ -245,6 +292,34 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* ─────────────────── Questions ─────────────────────────── */}
+      <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 md:py-24">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+        <div className="grid gap-10 md:grid-cols-[1fr_2fr]">
+          <Reveal>
+            <p className="eyebrow mb-3">Before you choose</p>
+            <h2 className="display text-4xl sm:text-5xl">Questions, answered</h2>
+            <Link
+              href="/journal/how-to-identify-original-rudraksha"
+              className="mt-6 inline-block text-sm text-gold-soft underline-offset-4 hover:underline"
+            >
+              How to identify an original Rudraksha →
+            </Link>
+          </Reveal>
+          <dl className="divide-y divide-line">
+            {homeFaqs.map((f) => (
+              <div key={f.q} className="py-5 first:pt-0">
+                <dt className="font-serif text-xl text-ink">{f.q}</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-ink-dim">{f.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
 
       {/* ─────────────────── Assurance band ────────────────────── */}
       <section className="grain relative overflow-hidden bg-paper">

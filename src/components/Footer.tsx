@@ -32,6 +32,10 @@ export default function Footer() {
           <FooterLink href="/collections/rudraksha-mala">Malas</FooterLink>
           <FooterLink href="/collections/rudraksha-combination">Combination</FooterLink>
           <FooterLink href="/collections/loose-rudraksha-beads">Loose beads</FooterLink>
+          <FooterLink href="/collections/5-mukhi-rudraksha">5 Mukhi Rudraksha</FooterLink>
+          <FooterLink href="/collections/7-mukhi-rudraksha">7 Mukhi Rudraksha</FooterLink>
+          <FooterLink href="/collections/gauri-shankar-rudraksha">Gauri Shankar</FooterLink>
+          <FooterLink href="/collections">All Mukhi →</FooterLink>
         </FooterCol>
 
         <FooterCol title="House">

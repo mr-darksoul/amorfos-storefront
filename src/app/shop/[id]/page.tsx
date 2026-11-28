@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getAdminProducts, getAdminProduct, getAdminRelated } from "@/lib/adminProducts";
+import { notFound, permanentRedirect } from "next/navigation";
+import { getAdminProducts, getAdminProduct, getAdminRelated, getLegacyProduct } from "@/lib/adminProducts";
 import { collectionHref } from "@/lib/collections";
+import { mukhiCollectionFor } from "@/lib/mukhiCollections";
 import { inr, displayName } from "@/lib/format";
 import { site, waLink } from "@/lib/site";
 import ProductGallery from "@/components/ProductGallery";
@@ -13,6 +14,7 @@ import { ShieldIcon, TruckIcon, ReturnIcon, CheckIcon } from "@/components/icons
 import ReviewSection from "@/components/ReviewSection";
 import ReviewForm from "@/components/ReviewForm";
 import { getReviewsByMukhi, summariseReviews, getAllRatingSummaries } from "@/lib/reviews";
+import type { Product } from "@/lib/types";
 
 export const revalidate = 60;
 
@@ -50,8 +52,8 @@ export async function generateMetadata({
   const ogImage = { url: ogImageUrl, width: 1200, height: 630, alt: product.name };
 
   return {
-    title: `${product.name} · ${product.mukhiLabel}`,
-    description: `${product.tagline} ${product.origin} origin, ${product.beadSize}. Lab Certified. ${inr(product.price)}.`,
+    title: metaTitle(product),
+    description: metaDescription(product),
     alternates: { canonical: `/shop/${product.id}` },
     openGraph: {
       title: `${product.name} — ${site.name}`,
@@ -65,6 +67,60 @@ export async function generateMetadata({
       images: [ogImageUrl],
     },
   };
+}
+
+/** Shopper-style title ("5 Mukhi Nepali Rudraksha Pendant — Lab Certified"); layout appends the brand. */
+function metaTitle(p: Product): string {
+  // Compress long combination names: "8 Mukhi, 9 Mukhi and 10 Mukhi" → "8, 9 & 10 Mukhi".
+  let t = displayName(p)
+    .replace(/(\d+) Mukhi(?=,| and )/g, "$1")
+    .replace(/ and (?=\d)/g, " & ");
+  if ((t.match(/Rudraksha/g) ?? []).length > 1) t = t.replace(/\s+Rudraksha(?!.*Rudraksha)/, "");
+  return t.length <= 40 ? `${t} — Lab Certified` : t;
+}
+
+/** "varies" and blanks are placeholders, not a spec worth stating. */
+const realSize = (s?: string) => (s && !/^\s*varies\s*$/i.test(s) ? s : undefined);
+
+/** ≤ ~160 chars: what it is, origin/size, proof, price, the two policies people check. */
+function metaDescription(p: Product): string {
+  const spec = [`${p.origin} origin`, realSize(p.beadSize)].filter(Boolean).join(", ");
+  const tail = `Lab Certified · ${inr(p.price)} · Free shipping over ₹999 · 7-day returns.`;
+  const full = `${p.tagline} ${spec}. ${tail}`;
+  return full.length <= 165 ? full : `${displayName(p)} — ${spec}. ${tail}`;
+}
+
+/** Product-level Q&A, rendered on the page and as FAQPage JSON-LD. */
+function productFaqs(p: Product, mukhiLabel?: string): { q: string; a: string }[] {
+  const name = displayName(p);
+  const faqs: { q: string; a: string }[] = [
+    {
+      q: `Is this ${name} original?`,
+      a: `Yes. Every Amorfos bead is Lab Certified for authenticity and origin (${p.origin}) before it ships, and the certificate comes in the box with your piece.`,
+    },
+  ];
+  if (p.beads?.length) {
+    faqs.push({
+      q: "Which beads are in this combination?",
+      a: `${p.beads.map((b) => `${b.mukhi} Mukhi (${b.origin})`).join(", ")} — each bead individually Lab Certified and linked in silver.`,
+    });
+  } else if (p.deity || p.planet) {
+    faqs.push({
+      q: `What is ${mukhiLabel ?? p.mukhiLabel} associated with?`,
+      a: `Traditionally, its ruling deity is ${p.deity}${p.planet ? ` and its ruling planet is ${p.planet}` : ""}. It is worn on the recommendation of astrologers and pandits; we make no medical or miraculous claims.`,
+    });
+  }
+  faqs.push(
+    {
+      q: "How long does delivery take?",
+      a: `Orders ship within 1–2 days and arrive in 3–7 days across India. Shipping is free above ₹${site.freeShippingThreshold}, otherwise a flat ₹79. Payment is prepaid by UPI, card or netbanking.`,
+    },
+    {
+      q: "Can I return it?",
+      a: "Yes — within 7 days of delivery, if the product is unused and in its original sealed packaging. Message us on WhatsApp to start a return.",
+    },
+  );
+  return faqs;
 }
 
 // Compact, stable hash (djb2) of the image's data inputs — used as the OG
@@ -84,7 +140,19 @@ export default async function ProductPage({
 }) {
   const { id } = await params;
   const product = await getAdminProduct(id);
-  if (!product) notFound();
+  if (!product) {
+    // Retired listings (deleted from the live catalogue but once in the
+    // sitemap / indexed / linked) 308 to the closest live page so their
+    // search equity lands somewhere useful instead of a 404.
+    const legacy = getLegacyProduct(id);
+    if (legacy) {
+      const mukhiPage = mukhiCollectionFor(legacy);
+      permanentRedirect(mukhiPage ? `/collections/${mukhiPage.slug}` : collectionHref(legacy.category));
+    }
+    notFound();
+  }
+  const mukhiPage = mukhiCollectionFor(product);
+  const faqs = productFaqs(product, mukhiPage?.label);
 
   const title = displayName(product);
   const soldOut = typeof product.stock === "number" && product.stock <= 0;
@@ -96,7 +164,20 @@ export default async function ProductPage({
   const reviewSummary = summariseReviews(reviews);
 
   const specs: [string, React.ReactNode][] = [
-    ["Mukhi", product.mukhiLabel],
+    [
+      "Mukhi",
+      mukhiPage ? (
+        <Link
+          key="mukhi"
+          href={`/collections/${mukhiPage.slug}`}
+          className="text-gold-soft underline-offset-4 hover:underline"
+        >
+          {product.mukhiLabel}
+        </Link>
+      ) : (
+        product.mukhiLabel
+      ),
+    ],
     ["Origin", product.origin],
     ["Bead size", product.beadSize],
     ["Ruling deity", product.deity],
@@ -119,27 +200,49 @@ export default async function ProductPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Shop", item: `${site.url}/shop` },
+      { "@type": "ListItem", position: 1, name: "Home", item: site.url },
       {
         "@type": "ListItem",
         position: 2,
         name: product.categoryLabel,
         item: `${site.url}${collectionHref(product.category)}`,
       },
-      { "@type": "ListItem", position: 3, name: product.name },
+      ...(mukhiPage
+        ? [
+            {
+              "@type": "ListItem",
+              position: 3,
+              name: mukhiPage.label,
+              item: `${site.url}/collections/${mukhiPage.slug}`,
+            },
+          ]
+        : []),
+      { "@type": "ListItem", position: mukhiPage ? 4 : 3, name: title },
     ],
   };
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: product.name,
-    image: product.images.map((i) =>
-      /^https?:\/\//.test(i) ? i : `${site.url}${i}`,
-    ),
-    description: product.tagline,
+    "@id": `${site.url}/shop/${product.id}#product`,
+    name: title,
+    alternateName: product.name,
+    sku: product.id,
+    image: product.images.length
+      ? product.images.map((i) => (/^https?:\/\//.test(i) ? i : `${site.url}${i}`))
+      : [`${site.url}/shop/${product.id}/og`],
+    description: `${product.tagline} ${product.description}`.trim(),
     brand: { "@type": "Brand", name: site.name },
-    category: product.categoryLabel,
+    category: `Rudraksha ${product.categoryLabel}`,
+    itemCondition: "https://schema.org/NewCondition",
+    additionalProperty: [
+      ...(product.mukhi ? [{ "@type": "PropertyValue", name: "Mukhi", value: product.mukhiLabel }] : []),
+      { "@type": "PropertyValue", name: "Origin", value: product.origin },
+      ...(realSize(product.beadSize) ? [{ "@type": "PropertyValue", name: "Bead size", value: product.beadSize }] : []),
+      ...(product.deity ? [{ "@type": "PropertyValue", name: "Ruling deity", value: product.deity }] : []),
+      ...(product.planet ? [{ "@type": "PropertyValue", name: "Ruling planet", value: product.planet }] : []),
+      { "@type": "PropertyValue", name: "Certification", value: "Lab Certified" },
+    ],
     offers: {
       "@type": "Offer",
       url: `${site.url}/shop/${product.id}`,
@@ -148,14 +251,14 @@ export default async function ProductPage({
       availability: soldOut
         ? "https://schema.org/OutOfStock"
         : "https://schema.org/InStock",
-      seller: { "@type": "Organization", name: site.name },
+      seller: { "@id": `${site.url}/#organization` },
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
         applicableCountry: "IN",
         returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
         merchantReturnDays: 7,
         returnMethod: "https://schema.org/ReturnByMail",
-        returnFees: "https://schema.org/FreeReturn",
+        returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
       },
       shippingDetails: {
         "@type": "OfferShippingDetails",
@@ -206,6 +309,20 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((f) => ({
+              "@type": "Question",
+              name: f.q,
+              acceptedAnswer: { "@type": "Answer", text: f.a },
+            })),
+          }),
+        }}
+      />
 
       <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 md:py-12">
         {/* Breadcrumb */}
@@ -215,6 +332,14 @@ export default async function ProductPage({
           <Link href={collectionHref(product.category)} className="hover:text-gold-soft">
             {product.categoryLabel}
           </Link>
+          {mukhiPage && (
+            <>
+              <span>/</span>
+              <Link href={`/collections/${mukhiPage.slug}`} className="hover:text-gold-soft">
+                {mukhiPage.label.replace(" Rudraksha", "")}
+              </Link>
+            </>
+          )}
         </nav>
 
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-14 md:items-start">
@@ -346,6 +471,28 @@ export default async function ProductPage({
             </a>
           </div>
         </div>
+
+        {/* Q&A — also emitted as FAQPage JSON-LD above */}
+        <section className="mt-20 border-t border-line pt-12">
+          <p className="eyebrow mb-3">Good to know</p>
+          <h2 className="display mb-6 text-3xl sm:text-4xl">Questions, answered</h2>
+          <dl className="max-w-3xl divide-y divide-line">
+            {faqs.map((f) => (
+              <div key={f.q} className="py-5">
+                <dt className="font-serif text-xl text-ink">{f.q}</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-ink-dim">{f.a}</dd>
+              </div>
+            ))}
+          </dl>
+          {mukhiPage && (
+            <Link
+              href={`/collections/${mukhiPage.slug}`}
+              className="mt-6 inline-block text-sm text-gold-soft underline-offset-4 hover:underline"
+            >
+              See every {mukhiPage.label} we offer →
+            </Link>
+          )}
+        </section>
 
         {/* Reviews */}
         <ReviewSection reviews={reviews} summary={reviewSummary} />

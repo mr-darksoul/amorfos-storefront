@@ -33,11 +33,11 @@ export async function getPublishedArticles(): Promise<Article[]> {
   if (!isSupabaseConfigured()) return [];
   const { data, error } = await supabase()
     .from("articles")
-    .select("data")
+    .select("data, published_at, updated_at")
     .eq("status", "published")
     .order("published_at", { ascending: false });
   if (error || !data) return [];
-  return data.map((row) => row.data as Article);
+  return data.map(withDates);
 }
 
 /** A single published article by slug (used by the public page). */
@@ -45,12 +45,21 @@ export async function getArticle(slug: string): Promise<Article | undefined> {
   if (!isSupabaseConfigured()) return undefined;
   const { data, error } = await supabase()
     .from("articles")
-    .select("data")
+    .select("data, published_at, updated_at")
     .eq("slug", slug)
     .eq("status", "published")
     .single();
   if (error || !data) return undefined;
-  return data.data as Article;
+  return withDates(data);
+}
+
+/** Attach row timestamps (for sitemap lastmod and Article datePublished). */
+function withDates(row: { data: unknown; published_at?: string | null; updated_at?: string | null }): Article {
+  return {
+    ...(row.data as Article),
+    publishedAt: row.published_at ?? null,
+    updatedAt: row.updated_at ?? null,
+  };
 }
 
 // ── Admin reads (all statuses) ─────────────────────────────────────

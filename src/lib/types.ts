@@ -82,4 +82,7 @@ export interface Article {
   relatedCollectionSlugs?: string[]; // slugs from collections.ts
   author?: string; // defaults to "Amorfos"
   readingMinutes?: number;
+  /** Row timestamps, attached on public reads — not stored in the JSON blob. */
+  publishedAt?: string | null;
+  updatedAt?: string | null;
 }

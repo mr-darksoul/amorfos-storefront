@@ -1,4 +1,5 @@
 import type { Category } from "./types";
+import { mukhiCollections } from "./mukhiCollections";
 
 /**
  * Category landing pages — the crawlable, indexable destinations that target
@@ -154,4 +155,16 @@ export function collectionForCategory(category: Category): Collection | undefine
 export function collectionHref(category: Category): string {
   const c = collectionForCategory(category);
   return c ? `/collections/${c.slug}` : `/shop?category=${category}`;
+}
+
+/**
+ * Slug → { slug, h1 } for any landing page under /collections — form
+ * collections and the per-Mukhi pages alike. Used for internal links
+ * (e.g. a Journal article's "Shop what you read about" pills).
+ */
+export function getCollectionLink(slug: string): { slug: string; h1: string } | undefined {
+  const form = getCollection(slug);
+  if (form) return { slug: form.slug, h1: form.h1 };
+  const m = mukhiCollections.find((c) => c.slug === slug);
+  return m ? { slug: m.slug, h1: m.label } : undefined;
 }

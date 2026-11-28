@@ -259,7 +259,7 @@ web/src/
 │  ├─ api/cron/content-draft/                          Vercel Cron endpoint (CRON_SECRET)
 │  ├─ api/webhooks/delivery-status/                    Shiprocket status webhook
 │  ├─ api/webhooks/razorpay/                           Razorpay payment webhook (order.paid)
-│  ├─ sitemap.ts · robots.ts                           SEO (includes /journal + articles)
+│  ├─ sitemap.ts · robots.ts · llms.txt/ · llms-full.txt/   SEO + AEO (live data)
 │  └─ globals.css           ← brand design tokens (source of truth)
 ├─ components/              Header, Footer, CartDrawer, ProductCard,
 │                          ProductGallery, ProductPurchase, ShopClient, ArticleCard,
@@ -276,12 +276,23 @@ web/src/
                            shiprocket, notify, invoice, reviews, ratelimit
 ```
 
-**AI / LLM discovery:** `public/llms.txt` (concise brand brief + key links) and
-`public/llms-full.txt` (inlined brand story, catalogue overview, mukhi reference,
-policies, FAQs) follow the llms.txt convention so AI crawlers get an accurate,
-on-brand summary. Keep them in sync with the brand copy rules above (say "Lab
-Certified" only, no medical/miraculous claims). They are static files — edit by
-hand; nothing generates them.
+**AI / LLM discovery:** `/llms.txt` and `/llms-full.txt` are **route handlers generated from
+live data** (`lib/llmsText.ts`, revalidate 1h) — brand brief, per-Mukhi prices, every live
+product, homepage FAQs, Journal index. Don't re-add static copies in `public/` (they'd conflict
+with the routes and go stale — the old ones quoted prices a year out of date).
+
+**SEO / AEO (see `docs/seo-aeo-plan.md`):**
+- **Per-Mukhi landing pages** `/collections/<n>-mukhi-rudraksha` (1–14, `gauri-shankar-rudraksha`,
+  `ganesh-rudraksha`) are defined in `lib/mukhiCollections.ts` and served by the same
+  `collections/[slug]` route as the form collections. FAQs include live price ranges.
+- **Retired product ids** (in `products.ts` but not live in Supabase) **308** to their Mukhi page
+  (else their form collection) — `getAdminProduct` no longer falls back to the static file when
+  the row is missing, only when Supabase errors.
+- Sitewide Organization/OnlineStore + WebSite JSON-LD in `layout.tsx` (`@id` `#organization` /
+  `#website`) — reference it, don't duplicate it. **No canonical in the root layout** (it was
+  inherited by pages that forgot theirs); every indexable page sets its own.
+- Sitemap reads the **live** catalogue; empty collections are excluded and noindexed.
+- Homepage FAQs live in `lib/homeFaqs.ts` (shared with llms-full).
 
 ## Editing the catalogue
 

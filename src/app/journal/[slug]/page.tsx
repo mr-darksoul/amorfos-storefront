@@ -7,7 +7,8 @@ import {
   CLUSTER_LABELS,
 } from "@/lib/articles";
 import { getAdminProducts } from "@/lib/adminProducts";
-import { getCollection } from "@/lib/collections";
+import { getCollectionLink } from "@/lib/collections";
+import { mukhiCollections } from "@/lib/mukhiCollections";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
 import { site } from "@/lib/site";
@@ -86,8 +87,12 @@ export default async function ArticlePage({
         article.relatedProductIds!.includes(p.id),
       )
     : [];
-  const relatedCollections = (article.relatedCollectionSlugs ?? [])
-    .map((s) => getCollection(s))
+  // Mukhi guides always link to their shoppable Mukhi page first.
+  const mukhiPage = mukhiCollections.find((c) => c.journalSlug === article.slug);
+  const relatedCollections = [
+    ...new Set([...(mukhiPage ? [mukhiPage.slug] : []), ...(article.relatedCollectionSlugs ?? [])]),
+  ]
+    .map((s) => getCollectionLink(s))
     .filter((c): c is NonNullable<typeof c> => !!c);
 
   const jsonLd: Record<string, unknown>[] = [
@@ -107,14 +112,21 @@ export default async function ArticlePage({
       description: article.metaDescription,
       url,
       mainEntityOfPage: url,
-      ...(article.heroImage ? { image: article.heroImage } : {}),
-      author: { "@type": "Organization", name: article.author || site.name },
-      publisher: {
-        "@type": "Organization",
-        name: site.name,
-        url: site.url,
-        logo: { "@type": "ImageObject", url: `${site.url}/brand/logo-dark.png` },
-      },
+      image: article.heroImage
+        ? /^https?:\/\//.test(article.heroImage)
+          ? article.heroImage
+          : `${site.url}${article.heroImage}`
+        : `${site.url}/opengraph-image`,
+      ...(article.publishedAt ? { datePublished: article.publishedAt } : {}),
+      ...(article.updatedAt || article.publishedAt
+        ? { dateModified: article.updatedAt || article.publishedAt }
+        : {}),
+      inLanguage: "en-IN",
+      author:
+        !article.author || article.author === site.name
+          ? { "@id": `${site.url}/#organization` }
+          : { "@type": "Person", name: article.author },
+      publisher: { "@id": `${site.url}/#organization` },
       isPartOf: { "@type": "Blog", name: `The Journal — ${site.name}`, url: `${site.url}/journal` },
       articleSection: CLUSTER_LABELS[article.cluster],
     },
@@ -155,6 +167,18 @@ export default async function ArticlePage({
           <p className="mt-5 text-xs uppercase tracking-[0.18em] text-ink-faint">
             {article.author || site.name}
             {article.readingMinutes ? ` · ${article.readingMinutes} min read` : ""}
+            {(article.updatedAt || article.publishedAt) && (
+              <>
+                {" · Updated "}
+                <time dateTime={(article.updatedAt || article.publishedAt)!}>
+                  {new Date((article.updatedAt || article.publishedAt)!).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </time>
+              </>
+            )}
           </p>
         </header>
 

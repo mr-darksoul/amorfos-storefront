@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { collections } from "@/lib/collections";
+import { mukhiCollections } from "@/lib/mukhiCollections";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
-  title: "Rudraksha Collections — Pendants, Malas & More",
+  title: "Rudraksha Collections — by Mukhi and by Form",
   description:
-    "Browse Amorfos Rudraksha by form — Lab Certified pendants, malas, combination pieces and loose beads, in hand-finished silver.",
+    "Browse Lab Certified Rudraksha by Mukhi (1 to 14, Gauri Shankar, Ganesh) or by form — pendants, malas, combinations and loose beads in hand-finished silver.",
   alternates: { canonical: "/collections" },
 };
 
@@ -16,9 +17,9 @@ export default function CollectionsIndex() {
     <div className="mx-auto max-w-7xl px-5 py-12 sm:px-8 md:py-16">
       <div className="mb-10 border-b border-line pb-8">
         <p className="eyebrow mb-3">Find your bead</p>
-        <h1 className="display text-4xl sm:text-5xl">Shop by form</h1>
+        <h1 className="display text-4xl sm:text-5xl">Rudraksha Collections</h1>
         <p className="mt-3 max-w-xl text-sm text-ink-dim">
-          Pendants, malas, combination pieces and loose beads — each one Lab Certified.
+          Shop by form — pendants, malas, combination pieces and loose beads — or by Mukhi below. Each one Lab Certified.
         </p>
       </div>
 
@@ -44,6 +45,29 @@ export default function CollectionsIndex() {
           </Reveal>
         ))}
       </div>
+
+      <section className="mt-20">
+        <div className="mb-8 border-b border-line pb-6">
+          <p className="eyebrow mb-3">Know your bead?</p>
+          <h2 className="display text-3xl sm:text-4xl">Shop by Mukhi</h2>
+        </div>
+        <ul className="grid grid-cols-1 gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+          {mukhiCollections.map((c) => (
+            <li key={c.slug} className="bg-paper">
+              <Link
+                href={`/collections/${c.slug}`}
+                className="block h-full px-5 py-4 transition-colors hover:bg-paper-raised"
+              >
+                <span className="font-serif text-xl text-ink">{c.label}</span>
+                <span className="mt-1 block text-xs text-ink-faint">
+                  {c.deity}
+                  {c.planet ? ` · ${c.planet}` : ""}
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
