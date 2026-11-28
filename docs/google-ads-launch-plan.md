@@ -141,6 +141,13 @@ not buy 5/6 Mukhi traffic (1 visit); Search money still went to 1/12/14 Mukhi, m
   pendants are now reached through Shopping, which shows photo + price at ~a third of the click cost.
 - Takes effect once funds are added. Review after ~150 Shopping clicks: add-to-cart rate, checkouts,
   cost per checkout. Re-enable paused groups one at a time only once the site converts.
+- **7 Mukhi landing page → `/collections/7-mukhi-rudraksha`** (keyword-level final URL on all 8
+  keywords, so the RSAs aren't re-reviewed). The new per-Mukhi hub (SEO session, 28 Nov) shows the
+  ₹599 Indonesian and ₹999 Nepali pendants side by side, plus the mala and 7-Mukhi combinations,
+  instead of only the ₹999 one. **1 Mukhi stays on `/shop/1-mukhi-india`**: its hub lists that single
+  product, so the PDP is one step shorter. Certified stays on `/collections/rudraksha-pendant`.
+  If a paused group is re-enabled later, point it at its `/collections/<n>-mukhi-rudraksha` hub when
+  that hub has more than one live product.
 
 ### Negative keywords (campaign level)
 `free, meaning, benefits, wikipedia, pdf, video, youtube, image, images, photo, wallpaper,
